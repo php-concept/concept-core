@@ -1,5 +1,5 @@
 {
-    "name": "concept/core",
+    "name": "php-concept/core",
     "description": "Concept Framework Core Engine",
     "type": "library",
     "license": "MIT",

@@ -1,0 +1,45 @@
+{
+    "name": "concept/core",
+    "description": "Concept Framework Core Engine",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Concept\\Core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^13.1"
+    },
+    "require": {
+        "league/route": "^6.2",
+        "league/container": "^5.1",
+        "laminas/laminas-diactoros": "^3.8",
+        "laminas/laminas-httphandlerrunner": "^2.13",
+        "filp/whoops": "^2.18",
+        "monolog/monolog": "^3.10",
+        "vlucas/phpdotenv": "^5.6",
+        "hassankhan/config": "^3.2",
+        "symfony/http-foundation": "^8.0",
+        "twig/twig": "^3.0",
+        "illuminate/database": "^13.1",
+        "illuminate/events": "^13.1",
+        "illuminate/pagination": "^13.1",
+        "symfony/console": "^8.0",
+        "illuminate/filesystem": "^13.1",
+        "cuyz/valinor": "^2.4",
+        "magewirephp/validation": "^1.0"
+    },
+    "scripts": {
+        "phpstan": "vendor/bin/phpstan analyze --memory-limit=2G",
+        "test": "vendor/bin/phpunit -c phpunit.xml.dist",
+        "test:coverage": "php -d pcov.enabled=1 vendor/bin/phpunit -c phpunit.xml.dist --coverage-text --coverage-html storage/coverage",
+        "test:coverage-text": "php -d pcov.enabled=1 vendor/bin/phpunit -c phpunit.xml.dist --coverage-text"
+    }
+}

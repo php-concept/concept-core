@@ -2,6 +2,7 @@
 
 namespace Tests\Core\Integrations\Whoops;
 
+use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
@@ -76,10 +77,17 @@ final class ProductionErrorHandlerTest extends TestCase
     {
         file_put_contents($this->tmpDir . '/404.php', '<?php echo "specific:" . $code . ":" . $exception->getMessage();');
 
-        $handler = new ProductionErrorHandler(new ArrayContainer([]), $this->tmpDir);
+        $logger = $this->createStub(LoggerInterface::class);
+        $handler = new ProductionErrorHandler(new ArrayContainer([
+            LoggerInterface::class => $logger
+        ]), $this->tmpDir);
         $handler->setException(new \RuntimeException('not found'));
 
-        $output = $this->captureOutput(fn() => $this->invokePrivate($handler, 'renderFallback', [$this->tmpDir, 404]));
+        $output = $this->captureOutput(fn() => $this->invokePrivate($handler, 'renderFallback', [
+            $this->tmpDir, 
+            404, 
+            new \RuntimeException('fallback')
+        ]));
 
         self::assertSame('specific:404:not found', $output);
     }
@@ -88,20 +96,34 @@ final class ProductionErrorHandlerTest extends TestCase
     {
         file_put_contents($this->tmpDir . '/500.php', '<?php echo "fallback:" . $code;');
 
-        $handler = new ProductionErrorHandler(new ArrayContainer([]), $this->tmpDir);
+        $logger = $this->createStub(LoggerInterface::class);
+        $handler = new ProductionErrorHandler(new ArrayContainer([
+            LoggerInterface::class => $logger
+        ]), $this->tmpDir);
         $handler->setException(new \RuntimeException('oops'));
 
-        $output = $this->captureOutput(fn() => $this->invokePrivate($handler, 'renderFallback', [$this->tmpDir, 403]));
+        $output = $this->captureOutput(fn() => $this->invokePrivate($handler, 'renderFallback', [
+            $this->tmpDir, 
+            403, 
+            new \RuntimeException('fallback')
+        ]));
 
         self::assertSame('fallback:403', $output);
     }
 
     public function testRenderFallbackPrintsCriticalHtmlWhenNoTemplateFilesExist(): void
     {
-        $handler = new ProductionErrorHandler(new ArrayContainer([]), $this->tmpDir);
+        $logger = $this->createStub(LoggerInterface::class);
+        $handler = new ProductionErrorHandler(new ArrayContainer([
+            LoggerInterface::class => $logger
+        ]), $this->tmpDir);
         $handler->setException(new \RuntimeException('oops'));
 
-        $output = $this->captureOutput(fn() => $this->invokePrivate($handler, 'renderFallback', [$this->tmpDir, 403]));
+        $output = $this->captureOutput(fn() => $this->invokePrivate($handler, 'renderFallback', [
+            $this->tmpDir, 
+            403, 
+            new \RuntimeException('fallback')
+        ]));
 
         self::assertStringContainsString('<h1>403', $output);
         self::assertStringContainsString('Something went wrong and the error page could not be loaded.', $output);

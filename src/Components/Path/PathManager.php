@@ -15,6 +15,7 @@ class PathManager
     public const string DATABASE_DIR = 'database';
     public const string MIGRATIONS_DIR = 'migrations';
     public const string SEEDERS_DIR = 'seeders';
+    public const string PUBLIC_DIR = 'public';
     public const string RESOURCES_DIR = 'resources';
     public const string VIEWS_DIR = 'views';
     public const string STORAGE_DIR = 'storage';

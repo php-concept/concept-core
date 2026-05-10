@@ -17,8 +17,6 @@ use Twig\Loader\FilesystemLoader;
 
 class ViewServiceProvider extends AbstractServiceProvider
 {
-    private const string VIEWS_CACHE_DIR = 'views';
-
     public function provides(string $id): bool
     {
         $services = [
@@ -40,7 +38,9 @@ class ViewServiceProvider extends AbstractServiceProvider
 
             $debug = $config->getBool('app.debug');
             $templatesPath = $pathManager->get(PathManager::VIEWS_DIR);
-            $cachePath = $pathManager->get(PathManager::CACHE_DIR,self::VIEWS_CACHE_DIR);
+
+            $cacheSubDir = $config->getString('twig.cache_dir', 'views');
+            $cachePath = $pathManager->get(PathManager::CACHE_DIR, $cacheSubDir);
 
             $loader = new FilesystemLoader($templatesPath);
             $twig = new Environment($loader, [
@@ -96,11 +96,11 @@ class ViewServiceProvider extends AbstractServiceProvider
     {
         $namespaces = $config->get('twig.namespaces', []);
         if (is_array($namespaces)) {
-            foreach ($namespaces as $path => $namespace) {
-                if (!is_string($namespace)) {
+            foreach ($namespaces as $namespace => $path) {
+                if (!is_string($namespace) || !is_string($path)) {
                     continue;
                 }
-                $loader->addPath($templatesPath . $path, $namespace);
+                $loader->addPath(rtrim($templatesPath, '/') . '/' . ltrim($path, '/'), $namespace);
             }
         }
 

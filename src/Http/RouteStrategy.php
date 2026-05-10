@@ -91,13 +91,8 @@ class RouteStrategy extends ApplicationStrategy
      */
     private function getReflection(callable $callable): ReflectionFunctionAbstract
     {
-        if (is_array($callable) && isset($callable[0], $callable[1])) {
-            /** @var object|string $classOrObject */
-            $classOrObject = $callable[0];
-            /** @var string $methodName */
-            $methodName = $callable[1];
-
-            return new ReflectionMethod($classOrObject, $methodName);
+        if (is_array($callable)) {
+            return new ReflectionMethod($callable[0], $callable[1]);
         }
 
         if ($callable instanceof Closure) {

@@ -2,6 +2,7 @@
 
 namespace Concept\Core\Integrations\Whoops;
 
+use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\RequestFormat;
@@ -49,7 +50,7 @@ class ProductionErrorHandler extends Handler
                 exit;
             }
         } catch (Throwable $e) {
-            $this->renderFallback($this->fallbackPath, $code);
+            $this->renderFallback($this->fallbackPath, $code, $e);
 
             exit;
         }
@@ -65,7 +66,7 @@ class ProductionErrorHandler extends Handler
         try {
             echo $this->renderErrorPage($exception, $code);
         } catch (Throwable $e) {
-            $this->renderFallback($this->fallbackPath, $code);
+            $this->renderFallback($this->fallbackPath, $code, $e);
         }
 
         exit;
@@ -101,8 +102,12 @@ class ProductionErrorHandler extends Handler
         return $view->render($template, ['exception' => $exception]);
     }
 
-    private function renderFallback(string $fallbackPath, int $code): void
+    private function renderFallback(string $fallbackPath, int $code, Throwable $exception): void
     {
+        /** @var LoggerInterface $logger */
+        $logger = $this->container->get(LoggerInterface::class);
+        $logger->exception($exception);
+
         $file = sprintf(self::FALLBACK_FILE_FORMAT, $fallbackPath, $code);
         if (!file_exists($file)) {
             $file = sprintf(self::FALLBACK_FILE_FORMAT, $fallbackPath, self::DEFAULT_ERROR_CODE);

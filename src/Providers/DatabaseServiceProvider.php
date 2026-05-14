@@ -5,6 +5,7 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Database;
 use Concept\Core\Components\Database\Contracts\DatabaseInterface;
+use Concept\Core\Components\Database\Seeder;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Container\Container as IlluminateContainer;
@@ -27,6 +28,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             CapsuleManager::class,
             DatabaseInterface::class,
             Migrator::class,
+            Seeder::class,
         ];
 
         return in_array($id, $services);
@@ -53,6 +55,13 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             $repository = new DatabaseMigrationRepository($manager, 'migrations');
 
             return new Migrator($repository, $manager, new Filesystem());
+        })->setShared(true);
+
+        $container->add(Seeder::class, function () use ($container) {
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+
+            return new Seeder($container, $config);
         })->setShared(true);
     }
 

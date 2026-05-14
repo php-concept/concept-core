@@ -2,9 +2,8 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Illuminate\Database\Migrations\Migrator;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,7 +20,7 @@ class DbRollbackCommand extends Command
     private const string MSG_ROLLED_BACK = ' <info>✔</info> Rolled back: <comment>%s</comment> ... ';
     private const string ERR_ROLLBACK_FAILED = 'Rollback failed: %s';
 
-    public function __construct(private readonly Migrator $migrator, private readonly PathManager $pathManager)
+    public function __construct(private readonly Migrator $migrator, private readonly ConfigInterface $config)
     {
         parent::__construct();
     }
@@ -38,8 +37,8 @@ class DbRollbackCommand extends Command
         $io->title(self::MSG_STARTING);
 
         try {
-            $path = $this->pathManager->get(PathManager::MIGRATIONS_DIR);
-            $executed = $this->migrator->rollback($path);
+            $paths = $this->config->get('migrations.paths');
+            $executed = $this->migrator->rollback($paths);
             if (empty($executed)) {
                 $io->info(self::MSG_NOTHING);
                 return Command::SUCCESS;

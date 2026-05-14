@@ -2,8 +2,7 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Path\PathManager;
-use Symfony\Component\Console\Attribute\AsCommand;
+use Concept\Core\Components\Database\Seeder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,9 +17,8 @@ class DbSeedCommand extends Command
     private const string OPTION_CLASS = 'class';
     private const string OPTION_CLASS_SHORTCUT = 'c';
     private const string OPTION_CLASS_DESCRIPTION = 'The class name of the seeder';
-   private const string FILE_DATABASE_SEEDER = 'DatabaseSeeder.php';
 
-    public function __construct(private readonly PathManager $pathManager)
+    public function __construct(private readonly Seeder $seeder)
     {
         parent::__construct();
     }
@@ -43,8 +41,7 @@ class DbSeedCommand extends Command
         $io->title('Running Database Seeders');
 
         try {
-            $seeder = require $this->pathManager->get(PathManager::SEEDERS_DIR, self::FILE_DATABASE_SEEDER);
-            $seeder->run();
+            $this->seeder->run();
             $io->success('Database seeded successfully.');
 
             return Command::SUCCESS;

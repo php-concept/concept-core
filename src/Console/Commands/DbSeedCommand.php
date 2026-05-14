@@ -11,7 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-#[AsCommand(name: 'db:seed', description: 'Seed the database with records')]
 class DbSeedCommand extends Command
 {
     private const string COMMAND_NAME = 'db:seed';

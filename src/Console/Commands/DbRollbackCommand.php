@@ -11,7 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-#[AsCommand(name: 'db:rollback', description: 'Rollback the last database migration batch')]
 class DbRollbackCommand extends Command
 {
     private const string COMMAND_NAME = 'db:rollback';

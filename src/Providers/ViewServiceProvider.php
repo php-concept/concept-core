@@ -51,7 +51,7 @@ class ViewServiceProvider extends AbstractServiceProvider
             $extensions = $config->get('twig.extensions', []);
             $this->addAppExtensions($twig, $extensions, $debug);
 
-            $this->addNamespaces($loader, $config, $templatesPath);
+            $this->addNamespaces($loader, $config, $pathManager->root(), $templatesPath);
 
             return new View($twig);
         })->setShared(true);
@@ -88,11 +88,16 @@ class ViewServiceProvider extends AbstractServiceProvider
     /**
      * @param FilesystemLoader $loader
      * @param ConfigInterface $config
+     * @param string $rootPath
      * @param string $templatesPath
      * @return void
      * @throws LoaderError
      */
-    private function addNamespaces(FilesystemLoader $loader, ConfigInterface $config, string $templatesPath): void
+    private function addNamespaces(
+        FilesystemLoader $loader,
+        ConfigInterface $config,
+        string $rootPath,
+        string $templatesPath): void
     {
         $namespaces = $config->get('twig.namespaces', []);
         if (is_array($namespaces)) {
@@ -100,7 +105,7 @@ class ViewServiceProvider extends AbstractServiceProvider
                 if (!is_string($namespace) || !is_string($path)) {
                     continue;
                 }
-                $loader->addPath(rtrim($templatesPath, '/') . '/' . ltrim($path, '/'), $namespace);
+                $loader->addPath(rtrim($rootPath, '/') . '/' . ltrim($path, '/'), $namespace);
             }
         }
 

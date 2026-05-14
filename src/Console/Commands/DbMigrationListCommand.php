@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'migration:list', description: 'List all database migrations')]
 class DbMigrationListCommand extends Command
 {
     private const string COMMAND_NAME = 'migration:list';

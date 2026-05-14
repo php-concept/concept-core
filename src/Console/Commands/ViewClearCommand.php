@@ -12,7 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-#[AsCommand(name: 'view:clear', description: 'Clear all compiled view templates')]
 class ViewClearCommand extends Command
 {
     private const string COMMAND_NAME = 'view:clear';

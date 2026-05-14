@@ -11,7 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-#[AsCommand(name: 'db:migrate', description: 'Run all outstanding database migrations')]
 class DbMigrateCommand extends Command
 {
     private const string COMMAND_NAME = 'db:migrate';

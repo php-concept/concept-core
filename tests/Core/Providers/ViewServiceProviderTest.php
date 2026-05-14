@@ -51,7 +51,7 @@ final class ViewServiceProviderTest extends TestCase
             public function get(string $key, mixed $default = null): mixed
             {
                 if ($key === 'twig.namespaces') {
-                    return ['ui' => '/components'];
+                    return ['ui' => 'resources/views/components'];
                 }
                 if ($key === 'twig.extensions') {
                     return [];
@@ -102,7 +102,7 @@ final class ViewServiceProviderTest extends TestCase
                 }
                 if ($key === 'twig.namespaces') {
                     return [
-                        'ui' => '/components',
+                        'ui' => 'resources/views/components',
                         '/skip' => 99,
                     ];
                 }

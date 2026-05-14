@@ -3,32 +3,40 @@
 namespace Concept\Core\Components\Database;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Database\Contracts\SeederInterface;
 use Illuminate\Database\Seeder as IlluminateSeeder;
 use Psr\Container\ContainerInterface;
 
-class Seeder extends IlluminateSeeder
+class SeederManager extends IlluminateSeeder
 {
     public function __construct(
         private readonly ContainerInterface $appContainer,
         private readonly ConfigInterface $config,
-    ) {
-    }
+    ) {}
 
-    public function run(): void
+    /**
+     * @return array<string>
+     */
+    public function run(): array
     {
+        /** @var array<string> $seedersList */
         $seedersList = $this->config->get('seeders.list', []);
-
+        $completed = [];
         if (!empty($seedersList)) {
             foreach ($seedersList as $seederClass) {
                 $this->resolveAndRun($seederClass);
+                $completed[] = $seederClass;
             }
         }
+
+        return $completed;
     }
 
-    private function resolveAndRun(string $class): void
+    public function resolveAndRun(string $class): void
     {
         $seeder = $this->appContainer->get($class);
-
-        $seeder->run();
+        if ($seeder instanceof SeederInterface) {
+            $seeder->run();
+        }
     }
 }

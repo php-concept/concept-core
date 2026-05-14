@@ -41,6 +41,7 @@ class DbMigrateCommand extends Command
                 $this->migrator->getRepository()->createRepository();
             }
 
+            /** @var array<string> $paths */
             $paths = $this->config->get('migrations.paths');
             $executed = $this->migrator->run($paths);
             if (empty($executed)) {

@@ -37,8 +37,10 @@ class DbRollbackCommand extends Command
         $io->title(self::MSG_STARTING);
 
         try {
-            $paths = $this->config->get('migrations.paths');
+            /** @var array<string> $paths */
+            $paths = $this->config->get('migrations.paths', []);
             $executed = $this->migrator->rollback($paths);
+
             if (empty($executed)) {
                 $io->info(self::MSG_NOTHING);
                 return Command::SUCCESS;

@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Components\Database\SeederManager;
 use Concept\Core\Console\Commands\DbSeedCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -10,69 +10,52 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 final class DbSeedCommandTest extends TestCase
 {
-    private string $tmpRoot;
-
-    protected function setUp(): void
+    public function testExecuteRunsAllSeedersAndPrintsSuccess(): void
     {
-        parent::setUp();
-        $this->tmpRoot = sys_get_temp_dir() . '/seed-command-' . bin2hex(random_bytes(6));
-        mkdir($this->tmpRoot . '/database/seeders', 0777, true);
-    }
+        $seeder = $this->createMock(SeederManager::class);
+        $seeder->expects(self::once())
+            ->method('run')
+            ->willReturn(['DatabaseSeeder', 'UserSeeder']);
 
-    protected function tearDown(): void
-    {
-        $marker = $this->tmpRoot . '/seed-ran.txt';
-        $seeder = $this->tmpRoot . '/database/seeders/DatabaseSeeder.php';
-
-        if (is_file($marker)) {
-            unlink($marker);
-        }
-        if (is_file($seeder)) {
-            unlink($seeder);
-        }
-        if (is_dir($this->tmpRoot . '/database/seeders')) {
-            rmdir($this->tmpRoot . '/database/seeders');
-        }
-        if (is_dir($this->tmpRoot . '/database')) {
-            rmdir($this->tmpRoot . '/database');
-        }
-        if (is_dir($this->tmpRoot)) {
-            rmdir($this->tmpRoot);
-        }
-
-        parent::tearDown();
-    }
-
-    public function testExecuteRunsSeederAndPrintsSuccess(): void
-    {
-        $marker = $this->tmpRoot . '/seed-ran.txt';
-        $seederFile = $this->tmpRoot . '/database/seeders/DatabaseSeeder.php';
-
-        file_put_contents($seederFile, "<?php return new class { public function run(): void { file_put_contents('" . addslashes($marker) . "', 'ok'); } }; ");
-
-        $pathManager = new PathManager($this->tmpRoot, [
-            PathManager::SEEDERS_DIR => 'database/seeders',
-        ]);
-
-        $tester = new CommandTester(new DbSeedCommand($pathManager));
+        $tester = new CommandTester(new DbSeedCommand($seeder));
 
         $exitCode = $tester->execute([]);
+        $display = $tester->getDisplay();
 
         self::assertSame(Command::SUCCESS, $exitCode);
-        self::assertFileExists($marker);
-        self::assertStringContainsString('Database seeded successfully.', $tester->getDisplay());
+        self::assertStringContainsString('Starting database seeding', $display);
+        self::assertStringContainsString('Seeded: DatabaseSeeder', $display);
+        self::assertStringContainsString('Seeded: UserSeeder', $display);
+        self::assertStringContainsString('Database seeding completed successfully.', $display);
+    }
+
+    public function testExecuteRunsSpecificSeederClass(): void
+    {
+        $class = 'App\\Database\\Seeders\\UserSeeder';
+
+        $seeder = $this->createMock(SeederManager::class);
+        $seeder->expects(self::never())->method('run');
+        $seeder->expects(self::once())
+            ->method('resolveAndRun')
+            ->with($class);
+
+        $tester = new CommandTester(new DbSeedCommand($seeder));
+
+        $exitCode = $tester->execute(['--class' => $class]);
+        $display = $tester->getDisplay();
+
+        self::assertSame(Command::SUCCESS, $exitCode);
+        self::assertStringContainsString('Starting database seeding', $display);
+        self::assertStringContainsString('Seeded: ' . $class, $display);
+        self::assertStringContainsString('Database seeding completed successfully.', $display);
     }
 
     public function testExecuteReturnsFailureWhenSeederThrows(): void
     {
-        $seederFile = $this->tmpRoot . '/database/seeders/DatabaseSeeder.php';
-        file_put_contents($seederFile, "<?php return new class { public function run(): void { throw new \\RuntimeException('seeding failed'); } }; ");
+        $seeder = $this->createStub(SeederManager::class);
+        $seeder->method('run')->willThrowException(new \RuntimeException('seeding failed'));
 
-        $pathManager = new PathManager($this->tmpRoot, [
-            PathManager::SEEDERS_DIR => 'database/seeders',
-        ]);
-
-        $tester = new CommandTester(new DbSeedCommand($pathManager));
+        $tester = new CommandTester(new DbSeedCommand($seeder));
 
         $exitCode = $tester->execute([]);
 

@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Console\Commands\DbRollbackCommand;
 use Illuminate\Database\Migrations\Migrator;
 use PHPUnit\Framework\TestCase;
@@ -11,19 +11,23 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 final class DbRollbackCommandTest extends TestCase
 {
+    private const array MIGRATION_PATHS = ['/tmp/app/database/migrations'];
+
     public function testExecuteRollsBackMigrationsAndPrintsSuccess(): void
     {
         $migrator = $this->createMock(Migrator::class);
         $migrator->expects(self::once())
             ->method('rollback')
-            ->with('/tmp/app/database/migrations')
+            ->with(self::MIGRATION_PATHS)
             ->willReturn(['2026_01_01_000000_create_users_table']);
 
-        $pathManager = new PathManager('/tmp/app', [
-            PathManager::MIGRATIONS_DIR => 'database/migrations',
-        ]);
+        $config = $this->createMock(ConfigInterface::class);
+        $config->expects(self::once())
+            ->method('get')
+            ->with('migrations.paths', [])
+            ->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbRollbackCommand($migrator, $pathManager));
+        $tester = new CommandTester(new DbRollbackCommand($migrator, $config));
 
         $exitCode = $tester->execute([]);
         $display = $tester->getDisplay();
@@ -39,11 +43,10 @@ final class DbRollbackCommandTest extends TestCase
         $migrator = $this->createStub(Migrator::class);
         $migrator->method('rollback')->willReturn([]);
 
-        $pathManager = new PathManager('/tmp/app', [
-            PathManager::MIGRATIONS_DIR => 'database/migrations',
-        ]);
+        $config = $this->createStub(ConfigInterface::class);
+        $config->method('get')->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbRollbackCommand($migrator, $pathManager));
+        $tester = new CommandTester(new DbRollbackCommand($migrator, $config));
 
         $exitCode = $tester->execute([]);
 
@@ -56,11 +59,10 @@ final class DbRollbackCommandTest extends TestCase
         $migrator = $this->createStub(Migrator::class);
         $migrator->method('rollback')->willThrowException(new \RuntimeException('rollback fail'));
 
-        $pathManager = new PathManager('/tmp/app', [
-            PathManager::MIGRATIONS_DIR => 'database/migrations',
-        ]);
+        $config = $this->createStub(ConfigInterface::class);
+        $config->method('get')->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbRollbackCommand($migrator, $pathManager));
+        $tester = new CommandTester(new DbRollbackCommand($migrator, $config));
 
         $exitCode = $tester->execute([]);
 

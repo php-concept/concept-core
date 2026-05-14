@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DbMigrationListCommand extends Command
 {
     private const string COMMAND_NAME = 'migration:list';
-    private const string COMMAND_DESCRIPTION = 'Seed the database with records';
+    private const string COMMAND_DESCRIPTION = 'Show migrations list';
     private const string OPTION_LIMIT = 'limit';
     private const string OPTION_LIMIT_SHORTCUT = 'l';
     private const string OPTION_LIMIT_DESCRIPTION = 'The count of migrations to display';

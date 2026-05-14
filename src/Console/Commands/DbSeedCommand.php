@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Database\Seeder;
+use Concept\Core\Components\Database\SeederManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,7 +18,11 @@ class DbSeedCommand extends Command
     private const string OPTION_CLASS_SHORTCUT = 'c';
     private const string OPTION_CLASS_DESCRIPTION = 'The class name of the seeder';
 
-    public function __construct(private readonly Seeder $seeder)
+    private const string MSG_STARTING = 'Starting database seeding...';
+    private const string MSG_SEEDED = ' <info>✔</info> Seeded: <comment>%s</comment> ... ';
+    private const string MSG_SUCCESS = 'Database seeding completed successfully.';
+
+    public function __construct(private readonly SeederManager $seeder)
     {
         parent::__construct();
     }
@@ -38,12 +42,22 @@ class DbSeedCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $io->title('Running Database Seeders');
+        $io->title(self::MSG_STARTING);
 
         try {
-            $this->seeder->run();
-            $io->success('Database seeded successfully.');
-
+            /** @var string $class */
+            $class = $input->getOption(self::OPTION_CLASS);
+            if ($class) {
+                $this->seeder->resolveAndRun($class);
+                $io->writeln(sprintf(self::MSG_SEEDED, $class));
+                $io->success(self::MSG_SUCCESS);
+            } else {
+                $executed = $this->seeder->run();
+                foreach ($executed as $seeder) {
+                    $io->writeln(sprintf(self::MSG_SEEDED, $seeder));
+                }
+                $io->success(self::MSG_SUCCESS);
+            }
             return Command::SUCCESS;
         } catch (Throwable $e) {
             $io->error($e->getMessage());

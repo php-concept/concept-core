@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,8 +20,10 @@ class DbMigrateCommand extends Command
     private const string MSG_MIGRATED = ' <info>✔</info> Migrated: <comment>%s</comment> ... ';
     private const string ERR_MIGRATION_FAILED = 'Migration failed: %s';
 
-    public function __construct(private readonly Migrator $migrator, private readonly ConfigInterface $config)
-    {
+    public function __construct(
+        private readonly Migrator $migrator,
+        private readonly MigrationRegistry $migrationRegistry
+    ) {
         parent::__construct();
     }
 
@@ -42,7 +44,7 @@ class DbMigrateCommand extends Command
             }
 
             /** @var array<string> $paths */
-            $paths = $this->config->get('migrations.paths');
+            $paths = $this->migrationRegistry->all();
             $executed = $this->migrator->run($paths);
             if (empty($executed)) {
                 $io->info(self::MSG_NOTHING);

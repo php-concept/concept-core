@@ -33,8 +33,8 @@ class ConfigServiceProvider extends AbstractServiceProvider
             $envData = $this->loadDotEnv($pathManager->root());
             $this->loadOverrideConfig($nhConfig, $envData, $pathManager);
 
+            $this->mergeEnvData($nhConfig, $envData);
             $config = new Config($nhConfig);
-            $this->mergeEnvData($config, $envData);
             $this->setTimeZone($config->getString('app.timezone', 'UTC'));
 
             return $config;
@@ -68,11 +68,11 @@ class ConfigServiceProvider extends AbstractServiceProvider
     }
 
     /**
-     * @param ConfigInterface $config
+     * @param nhConfig $nhConfig
      * @param array<string, mixed> $envData
      * @return void
      */
-    private function mergeEnvData(ConfigInterface $config, array $envData): void
+    private function mergeEnvData(nhConfig $nhConfig, array $envData): void
     {
         foreach ($envData as $key => $value) {
             $parts = explode('_', strtolower($key), 2);
@@ -80,7 +80,7 @@ class ConfigServiceProvider extends AbstractServiceProvider
             $sub  = $parts[1] ?? '';
 
             $configKey = empty($sub) ? $root : sprintf('%s.%s', $root, $sub);
-            $config->set($configKey, $value);
+            $nhConfig->set($configKey, $value);
         }
     }
 

@@ -3,12 +3,14 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Database\Database;
 use Concept\Core\Components\Database\Contracts\DatabaseInterface;
+use Concept\Core\Components\Database\Database;
+use Concept\Core\Components\Database\Registries\MigrationRegistry;
+use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Database\SeederManager;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Container\Container as IlluminateContainer;
+use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\Migrator;
@@ -29,6 +31,8 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             DatabaseInterface::class,
             Migrator::class,
             SeederManager::class,
+            SeederRegistry::class,
+            MigrationRegistry::class,
         ];
 
         return in_array($id, $services);
@@ -58,10 +62,34 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         })->setShared(true);
 
         $container->add(SeederManager::class, function () use ($container) {
+            /** @var SeederRegistry $seederRegistry */
+            $seederRegistry = $container->get(SeederRegistry::class);
+
+            return new SeederManager($container, $seederRegistry);
+        })->setShared(true);
+
+        $container->add(SeederRegistry::class, function () use ($container) {
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            return new SeederManager($container, $config);
+            /** @var array<string> $seeders */
+            $seeders = $config->get('seeders.list', []);
+            $seederRegistry = new SeederRegistry();
+            $seederRegistry->append($seeders);
+
+            return $seederRegistry;
+        })->setShared(true);
+
+        $container->add(MigrationRegistry::class, function () use ($container) {
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+
+            /** @var array<string> $migrations */
+            $migrations = $config->get('migrations.paths', []);
+            $migrationRegistry = new MigrationRegistry();
+            $migrationRegistry->append($migrations);
+
+            return $migrationRegistry;
         })->setShared(true);
     }
 

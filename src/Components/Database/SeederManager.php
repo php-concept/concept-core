@@ -2,8 +2,8 @@
 
 namespace Concept\Core\Components\Database;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Contracts\SeederInterface;
+use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Illuminate\Database\Seeder as IlluminateSeeder;
 use Psr\Container\ContainerInterface;
 
@@ -11,7 +11,7 @@ class SeederManager extends IlluminateSeeder
 {
     public function __construct(
         private readonly ContainerInterface $appContainer,
-        private readonly ConfigInterface $config,
+        private readonly SeederRegistry $seederRegistry
     ) {}
 
     /**
@@ -20,7 +20,7 @@ class SeederManager extends IlluminateSeeder
     public function run(): array
     {
         /** @var array<string> $seedersList */
-        $seedersList = $this->config->get('seeders.list', []);
+        $seedersList = $this->seederRegistry->all();
         $completed = [];
         if (!empty($seedersList)) {
             foreach ($seedersList as $seederClass) {

@@ -16,11 +16,6 @@ class Config implements ConfigInterface
         return $this->noodlehausConfig->get($key, $default);
     }
 
-    public function set(string $key, mixed $default = null): void
-    {
-        $this->noodlehausConfig->set($key, $default);
-    }
-
     public function has(string $key): bool
     {
         return $this->noodlehausConfig->has($key);

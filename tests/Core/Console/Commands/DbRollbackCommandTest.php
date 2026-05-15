@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Console\Commands\DbRollbackCommand;
 use Illuminate\Database\Migrations\Migrator;
 use PHPUnit\Framework\TestCase;
@@ -21,13 +21,12 @@ final class DbRollbackCommandTest extends TestCase
             ->with(self::MIGRATION_PATHS)
             ->willReturn(['2026_01_01_000000_create_users_table']);
 
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())
-            ->method('get')
-            ->with('migrations.paths', [])
+        $migrationRegistry = $this->createMock(MigrationRegistry::class);
+        $migrationRegistry->expects(self::once())
+            ->method('all')
             ->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbRollbackCommand($migrator, $config));
+        $tester = new CommandTester(new DbRollbackCommand($migrator, $migrationRegistry));
 
         $exitCode = $tester->execute([]);
         $display = $tester->getDisplay();
@@ -43,10 +42,10 @@ final class DbRollbackCommandTest extends TestCase
         $migrator = $this->createStub(Migrator::class);
         $migrator->method('rollback')->willReturn([]);
 
-        $config = $this->createStub(ConfigInterface::class);
-        $config->method('get')->willReturn(self::MIGRATION_PATHS);
+        $migrationRegistry = $this->createStub(MigrationRegistry::class);
+        $migrationRegistry->method('all')->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbRollbackCommand($migrator, $config));
+        $tester = new CommandTester(new DbRollbackCommand($migrator, $migrationRegistry));
 
         $exitCode = $tester->execute([]);
 
@@ -59,10 +58,10 @@ final class DbRollbackCommandTest extends TestCase
         $migrator = $this->createStub(Migrator::class);
         $migrator->method('rollback')->willThrowException(new \RuntimeException('rollback fail'));
 
-        $config = $this->createStub(ConfigInterface::class);
-        $config->method('get')->willReturn(self::MIGRATION_PATHS);
+        $migrationRegistry = $this->createStub(MigrationRegistry::class);
+        $migrationRegistry->method('all')->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbRollbackCommand($migrator, $config));
+        $tester = new CommandTester(new DbRollbackCommand($migrator, $migrationRegistry));
 
         $exitCode = $tester->execute([]);
 

@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,7 +17,7 @@ class DbSeedersListCommand extends Command
     private const string MSG_END_OF_LIST = 'End of seeders list.';
 
     public function __construct(
-        private readonly ConfigInterface $config,
+        private readonly SeederRegistry $seederRegistry,
     ) {
         parent::__construct();
     }
@@ -33,7 +33,7 @@ class DbSeedersListCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         /** @var array<string> $seedersList */
-        $seedersList = $this->config->get('seeders.list', []);
+        $seedersList = $this->seederRegistry->all();
         if (empty($seedersList)) {
             $io->warning(self::MSG_NOT_FOUND);
 

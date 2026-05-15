@@ -48,13 +48,11 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
 
         /** @var ComponentRegistry $registry */
         $registry = $container->get(ComponentRegistry::class);
-        /** @var ConfigInterface $config */
-        $config = $container->get(ConfigInterface::class);
 
         if (PHP_SAPI === 'cli') {
             $this->registerConsoleCommands($registry);
-            $this->registerComponentSeeders($config, $registry);
-            $this->registerComponentMigrations($config, $registry);
+            $this->registerComponentSeeders($registry);
+            $this->registerComponentMigrations($registry);
 
             return;
         }
@@ -117,14 +115,14 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
         }
     }
 
-    private function registerComponentSeeders(ConfigInterface $config, ComponentRegistry $registry): void
+    private function registerComponentSeeders(ComponentRegistry $registry): void
     {
         /** @var SeederRegistry $seederRegistry */
         $seederRegistry = $this->getContainer()->get(SeederRegistry::class);
         $seederRegistry->append($registry->seeders());
     }
 
-    private function registerComponentMigrations(ConfigInterface $config, ComponentRegistry $registry): void
+    private function registerComponentMigrations(ComponentRegistry $registry): void
     {
         /** @var MigrationRegistry $migrationRegistry */
         $migrationRegistry = $this->getContainer()->get(MigrationRegistry::class);

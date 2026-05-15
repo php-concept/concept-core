@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Console\Commands\DbSeedersListCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -12,13 +12,12 @@ final class DbSeedersListCommandTest extends TestCase
 {
     public function testShowsWarningWhenNoSeedersConfigured(): void
     {
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())
-            ->method('get')
-            ->with('seeders.list', [])
+        $seederRegistry = $this->createMock(SeederRegistry::class);
+        $seederRegistry->expects(self::once())
+            ->method('all')
             ->willReturn([]);
 
-        $tester = new CommandTester(new DbSeedersListCommand($config));
+        $tester = new CommandTester(new DbSeedersListCommand($seederRegistry));
 
         $exitCode = $tester->execute([]);
 
@@ -33,13 +32,12 @@ final class DbSeedersListCommandTest extends TestCase
             'App\\Database\\Seeders\\UserSeeder',
         ];
 
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())
-            ->method('get')
-            ->with('seeders.list', [])
+        $seederRegistry = $this->createMock(SeederRegistry::class);
+        $seederRegistry->expects(self::once())
+            ->method('all')
             ->willReturn($seeders);
 
-        $tester = new CommandTester(new DbSeedersListCommand($config));
+        $tester = new CommandTester(new DbSeedersListCommand($seederRegistry));
 
         $exitCode = $tester->execute([]);
         $display = $tester->getDisplay();

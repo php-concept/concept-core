@@ -71,10 +71,10 @@ class ViewServiceProvider extends AbstractServiceProvider
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            /** @var array<string> $namespaces */
-            $namespaces = $config->get('twig.extensions', []);
+            /** @var array<string> $extensions */
+            $extensions = $config->get('twig.extensions', []);
             $viewExtensionRegistry = new TwigExtensionRegistry();
-            $viewExtensionRegistry->append($namespaces);
+            $viewExtensionRegistry->append($extensions);
 
             return $viewExtensionRegistry;
         })->setShared(true);
@@ -83,7 +83,7 @@ class ViewServiceProvider extends AbstractServiceProvider
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            /** @var array<string> $namespaces */
+            /** @var array<string, string> $namespaces */
             $namespaces = $config->get('twig.namespaces', []);
             $viewNamespaceRegistry = new TwigNamespaceRegistry();
             $viewNamespaceRegistry->append($namespaces);
@@ -120,11 +120,8 @@ class ViewServiceProvider extends AbstractServiceProvider
 
         foreach ($extensions as $extensionClass) {
             /** @var ExtensionInterface $extension */
-            if (class_exists($extensionClass)) {
-                /** @var ExtensionInterface $extension */
-                $extension = $this->getContainer()->get($extensionClass);
-                $twig->addExtension($extension);
-            }
+            $extension = $this->getContainer()->get($extensionClass);
+            $twig->addExtension($extension);
         }
     }
 

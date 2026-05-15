@@ -94,16 +94,11 @@ final class ViewServiceProviderTest extends TestCase
             public function get(string $key, mixed $default = null): mixed
             {
                 if ($key === 'twig.extensions') {
-                    return [
-                        StringLoaderExtension::class,
-                        'Tests\\Fixtures\\NonExistentTwigExtension',
-                        123,
-                    ];
+                    return [StringLoaderExtension::class];
                 }
                 if ($key === 'twig.namespaces') {
                     return [
                         'ui' => 'resources/views/components',
-                        '/skip' => 99,
                     ];
                 }
 
@@ -130,7 +125,7 @@ final class ViewServiceProviderTest extends TestCase
         self::assertSame('Hello Ada', $view->render('page', ['name' => 'Ada']));
     }
 
-    public function testRegisterAcceptsNonArrayExtensionsAndNamespaces(): void
+    public function testRegisterThrowsWhenTwigExtensionsConfigIsNotArray(): void
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
@@ -143,9 +138,6 @@ final class ViewServiceProviderTest extends TestCase
             {
                 if ($key === 'twig.extensions') {
                     return 'not-an-array';
-                }
-                if ($key === 'twig.namespaces') {
-                    return 'still-not-an-array';
                 }
 
                 return $default;
@@ -162,10 +154,9 @@ final class ViewServiceProviderTest extends TestCase
         $provider->setContainer($container);
         $provider->register();
 
-        /** @var ViewInterface $view */
-        $view = $container->get(ViewInterface::class);
+        $this->expectException(\TypeError::class);
 
-        self::assertSame('Hello Ada', $view->render('page', ['name' => 'Ada']));
+        $container->get(ViewInterface::class);
     }
 
     private function removeTree(string $path): void

@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Console\Commands\DbMigrateCommand;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Migrations\Migrator;
@@ -27,13 +27,12 @@ final class DbMigrateCommandTest extends TestCase
             ->with(self::MIGRATION_PATHS)
             ->willReturn(['2026_01_01_000000_create_users_table']);
 
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())
-            ->method('get')
-            ->with('migrations.paths')
+        $migrationRegistry = $this->createMock(MigrationRegistry::class);
+        $migrationRegistry->expects(self::once())
+            ->method('all')
             ->willReturn(self::MIGRATION_PATHS);
 
-        $command = new DbMigrateCommand($migrator, $config);
+        $command = new DbMigrateCommand($migrator, $migrationRegistry);
         $tester = new CommandTester($command);
 
         $exitCode = $tester->execute([]);
@@ -55,13 +54,12 @@ final class DbMigrateCommandTest extends TestCase
             ->with(self::MIGRATION_PATHS)
             ->willReturn([]);
 
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())
-            ->method('get')
-            ->with('migrations.paths')
+        $migrationRegistry = $this->createMock(MigrationRegistry::class);
+        $migrationRegistry->expects(self::once())
+            ->method('all')
             ->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbMigrateCommand($migrator, $config));
+        $tester = new CommandTester(new DbMigrateCommand($migrator, $migrationRegistry));
 
         $exitCode = $tester->execute([]);
 
@@ -75,10 +73,10 @@ final class DbMigrateCommandTest extends TestCase
         $migrator->method('repositoryExists')->willReturn(true);
         $migrator->method('run')->willThrowException(new \RuntimeException('db down'));
 
-        $config = $this->createStub(ConfigInterface::class);
-        $config->method('get')->willReturn(self::MIGRATION_PATHS);
+        $migrationRegistry = $this->createStub(MigrationRegistry::class);
+        $migrationRegistry->method('all')->willReturn(self::MIGRATION_PATHS);
 
-        $tester = new CommandTester(new DbMigrateCommand($migrator, $config));
+        $tester = new CommandTester(new DbMigrateCommand($migrator, $migrationRegistry));
 
         $exitCode = $tester->execute([]);
 

@@ -3,7 +3,6 @@
 namespace Concept\Core\Console\Commands;
 
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
-use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

@@ -48,7 +48,7 @@ class ResponseFactory implements ResponseFactoryInterface
      */
     public function view(string $template, array $data = [], int $code = HttpStatusCode::OK): ResponseInterface
     {
-        $sharedData = $this->request()->getAttribute(RequestAttribute::VIEW_CONTEXT, []);
+        $sharedData = $this->request()->getAttribute(RequestAttribute::VIEW_PAYLOAD, []);
         if (!is_array($sharedData)) {
             $sharedData = [];
         }

@@ -31,21 +31,21 @@ interface ComponentInterface
     /**
      * @return class-string<ExtensionInterface>[]
      */
-    public function twigExtensions(): array;
+    public function viewExtensions(): array;
 
     /**
      * Twig namespace => views path relative to the application root.
      *
      * @return array<string, string>
      */
-    public function twigNamespaces(): array;
+    public function viewPaths(): array;
 
     /**
      * URI path prefix => Twig namespace.
      *
      * @return array<string, string>
      */
-    public function twigRouteNamespaces(): array;
+    public function viewContexts(): array;
 
     /**
      * @return class-string<Command>[]

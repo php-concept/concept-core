@@ -50,10 +50,10 @@ final class ViewServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed
             {
-                if ($key === 'twig.namespaces') {
+                if ($key === 'view.paths') {
                     return ['ui' => 'resources/views/components'];
                 }
-                if ($key === 'twig.extensions') {
+                if ($key === 'view.extensions') {
                     return [];
                 }
 
@@ -93,10 +93,10 @@ final class ViewServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed
             {
-                if ($key === 'twig.extensions') {
+                if ($key === 'view.extensions') {
                     return [StringLoaderExtension::class];
                 }
-                if ($key === 'twig.namespaces') {
+                if ($key === 'view.paths') {
                     return [
                         'ui' => 'resources/views/components',
                     ];
@@ -136,7 +136,7 @@ final class ViewServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed
             {
-                if ($key === 'twig.extensions') {
+                if ($key === 'view.extensions') {
                     return 'not-an-array';
                 }
 

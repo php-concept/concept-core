@@ -5,9 +5,9 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\View\Registries\TwigExtensionRegistry;
-use Concept\Core\Components\View\Registries\TwigRouteNamespaceRegistry;
-use Concept\Core\Components\View\Registries\TwigNamespaceRegistry;
+use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
+use Concept\Core\Components\View\Registries\ViewContextRegistry;
+use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\View;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerExceptionInterface;
@@ -24,9 +24,9 @@ class ViewServiceProvider extends AbstractServiceProvider
     {
         $services = [
             ViewInterface::class,
-            TwigExtensionRegistry::class,
-            TwigNamespaceRegistry::class,
-            TwigRouteNamespaceRegistry::class,
+            ViewExtensionRegistry::class,
+            ViewPathRegistry::class,
+            ViewContextRegistry::class,
         ];
 
         return in_array($id, $services);
@@ -45,7 +45,7 @@ class ViewServiceProvider extends AbstractServiceProvider
             $debug = $config->getBool('app.debug');
             $templatesPath = $pathManager->get(PathManager::VIEWS_DIR);
 
-            $cacheSubDir = $config->getString('twig.cache_dir', 'views');
+            $cacheSubDir = $config->getString('view.cache_dir', 'views');
             $cachePath = $pathManager->get(PathManager::CACHE_DIR, $cacheSubDir);
 
             $loader = new FilesystemLoader($templatesPath);
@@ -54,53 +54,53 @@ class ViewServiceProvider extends AbstractServiceProvider
                 'debug' => $debug,
             ]);
 
-            /** @var TwigExtensionRegistry $twigExtensionRegistry */
-            $twigExtensionRegistry = $container->get(TwigExtensionRegistry::class);
-            $this->addExtensions($twig, $twigExtensionRegistry->all(), $debug);
+            /** @var ViewExtensionRegistry $viewExtensionRegistry */
+            $viewExtensionRegistry = $container->get(ViewExtensionRegistry::class);
+            $this->addExtensions($twig, $viewExtensionRegistry->all(), $debug);
 
-            /** @var TwigNamespaceRegistry $twigNamespaceRegistry */
-            $twigNamespaceRegistry = $container->get(TwigNamespaceRegistry::class);
-            $this->addNamespaces($loader, $pathManager->root(), $twigNamespaceRegistry->all());
+            /** @var ViewPathRegistry $viewPathRegistry */
+            $viewPathRegistry = $container->get(ViewPathRegistry::class);
+            $this->addPaths($loader, $pathManager->root(), $viewPathRegistry->all());
 
-            $this->addFallbackNamespace($loader, $templatesPath);
+            $this->addFallbackPath($loader, $templatesPath);
 
             return new View($twig);
         })->setShared(true);
 
-        $container->add(TwigExtensionRegistry::class, function () use ($container) {
+        $container->add(ViewExtensionRegistry::class, function () use ($container) {
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
             /** @var array<string> $extensions */
-            $extensions = $config->get('twig.extensions', []);
-            $viewExtensionRegistry = new TwigExtensionRegistry();
+            $extensions = $config->get('view.extensions', []);
+            $viewExtensionRegistry = new ViewExtensionRegistry();
             $viewExtensionRegistry->append($extensions);
 
             return $viewExtensionRegistry;
         })->setShared(true);
 
-        $container->add(TwigNamespaceRegistry::class, function () use ($container) {
+        $container->add(ViewPathRegistry::class, function () use ($container) {
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            /** @var array<string, string> $namespaces */
-            $namespaces = $config->get('twig.namespaces', []);
-            $viewNamespaceRegistry = new TwigNamespaceRegistry();
-            $viewNamespaceRegistry->append($namespaces);
+            /** @var array<string, string> $viewPaths */
+            $viewPaths = $config->get('view.paths', []);
+            $viewPathRegistry = new ViewPathRegistry();
+            $viewPathRegistry->append($viewPaths);
 
-            return $viewNamespaceRegistry;
+            return $viewPathRegistry;
         })->setShared(true);
 
-        $container->add(TwigRouteNamespaceRegistry::class, function () use ($container) {
+        $container->add(ViewContextRegistry::class, function () use ($container) {
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            /** @var array<string> $routeNamespaces */
-            $routeNamespaces = $config->get('twig.route_namespace', []);
-            $viewRouteNamespaceRegistry = new TwigRouteNamespaceRegistry();
-            $viewRouteNamespaceRegistry->append($routeNamespaces);
+            /** @var array<string> $viewContexts */
+            $viewContexts = $config->get('view.contexts', []);
+            $viewContextsRegistry = new ViewContextRegistry();
+            $viewContextsRegistry->append($viewContexts);
 
-            return $viewRouteNamespaceRegistry;
+            return $viewContextsRegistry;
         })->setShared(true);
     }
 
@@ -132,7 +132,7 @@ class ViewServiceProvider extends AbstractServiceProvider
      * @return void
      * @throws LoaderError
      */
-    private function addNamespaces(FilesystemLoader $loader, string $rootPath, array $namespaces): void
+    private function addPaths(FilesystemLoader $loader, string $rootPath, array $namespaces): void
     {
         if ($namespaces) {
             foreach ($namespaces as $namespace => $path) {
@@ -147,7 +147,7 @@ class ViewServiceProvider extends AbstractServiceProvider
      * @return void
      * @throws LoaderError
      */
-    private function addFallbackNamespace(FilesystemLoader $loader, string $templatesPath): void
+    private function addFallbackPath(FilesystemLoader $loader, string $templatesPath): void
     {
        // add root views as fallback
         $loader->addPath($templatesPath);

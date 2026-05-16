@@ -110,12 +110,12 @@ final class ComponentRegistry
     /**
      * @return class-string<ExtensionInterface>[]
      */
-    public function twigExtensions(): array
+    public function viewExtensions(): array
     {
         $extensions = [];
 
         foreach ($this->components() as $component) {
-            $extensions = array_merge($extensions, $component->twigExtensions());
+            $extensions = array_merge($extensions, $component->viewExtensions());
         }
 
         return $extensions;
@@ -124,12 +124,12 @@ final class ComponentRegistry
     /**
      * @return array<string, string>
      */
-    public function twigNamespaces(): array
+    public function viewPaths(): array
     {
         $namespaces = [];
 
         foreach ($this->components() as $component) {
-            $namespaces = array_merge($namespaces, $component->twigNamespaces());
+            $namespaces = array_merge($namespaces, $component->viewPaths());
         }
 
         return $namespaces;
@@ -138,12 +138,12 @@ final class ComponentRegistry
     /**
      * @return array<string, string>
      */
-    public function twigRoteNamespaces(): array
+    public function viewContexts(): array
     {
         $map = [];
 
         foreach ($this->components() as $component) {
-            $map = array_merge($map, $component->twigRouteNamespaces());
+            $map = array_merge($map, $component->viewContexts());
         }
 
         return $map;

@@ -7,9 +7,9 @@ use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
-use Concept\Core\Components\View\Registries\TwigExtensionRegistry;
-use Concept\Core\Components\View\Registries\TwigNamespaceRegistry;
-use Concept\Core\Components\View\Registries\TwigRouteNamespaceRegistry;
+use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
+use Concept\Core\Components\View\Registries\ViewPathRegistry;
+use Concept\Core\Components\View\Registries\ViewContextRegistry;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
@@ -59,7 +59,7 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
 
         $this->registerComponentRoutes($registry);
         $this->registerComponentProviders($registry);
-        $this->registerComponentTwigFeatures($registry);
+        $this->registerComponentViewFeatures($registry);
     }
 
     private function registerComponentRoutes(ComponentRegistry $registry): void
@@ -82,21 +82,21 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
         }
     }
 
-    private function registerComponentTwigFeatures(ComponentRegistry $registry): void
+    private function registerComponentViewFeatures(ComponentRegistry $registry): void
     {
         $container = $this->getContainer();
 
-        /** @var TwigExtensionRegistry $twigExtensionsRegistry */
-        $twigExtensionsRegistry = $container->get(TwigExtensionRegistry::class);
-        $twigExtensionsRegistry->append($registry->twigExtensions());
+        /** @var ViewExtensionRegistry $viewExtensionsRegistry */
+        $viewExtensionsRegistry = $container->get(ViewExtensionRegistry::class);
+        $viewExtensionsRegistry->append($registry->viewExtensions());
 
-        /** @var TwigNamespaceRegistry $twigNamespaceRegistry */
-        $twigNamespaceRegistry = $container->get(TwigNamespaceRegistry::class);
-        $twigNamespaceRegistry->append($registry->twigNamespaces());
+        /** @var ViewPathRegistry $viewPathRegistry */
+        $viewPathRegistry = $container->get(ViewPathRegistry::class);
+        $viewPathRegistry->append($registry->viewPaths());
 
-        /** @var TwigRouteNamespaceRegistry $twigRouteNamespaceRegistry */
-        $twigRouteNamespaceRegistry = $container->get(TwigRouteNamespaceRegistry::class);
-        $twigRouteNamespaceRegistry->append($registry->twigRoteNamespaces());
+        /** @var ViewContextRegistry $viewContextRegistry */
+        $viewContextRegistry = $container->get(ViewContextRegistry::class);
+        $viewContextRegistry->append($registry->viewContexts());
     }
 
 

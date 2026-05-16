@@ -154,7 +154,7 @@ final class ResponseFactoryTest extends TestCase
         $uri = new Uri('https://app.test/');
         $request = (new ServerRequest())
             ->withUri($uri)
-            ->withAttribute(RequestAttribute::VIEW_CONTEXT, ['shared' => 1, 'both' => 'from-shared']);
+            ->withAttribute(RequestAttribute::VIEW_PAYLOAD, ['shared' => 1, 'both' => 'from-shared']);
 
         $rendered = [];
         $view = $this->createStub(ViewInterface::class);
@@ -182,7 +182,7 @@ final class ResponseFactoryTest extends TestCase
         $uri = new Uri('https://app.test/');
         $request = (new ServerRequest())
             ->withUri($uri)
-            ->withAttribute(RequestAttribute::VIEW_CONTEXT, 'broken');
+            ->withAttribute(RequestAttribute::VIEW_PAYLOAD, 'broken');
 
         $mergedData = null;
         $view = $this->createStub(ViewInterface::class);

@@ -52,7 +52,7 @@ class ViewClearCommand extends Command
         $io->title(self::MSG_STARTING);
 
         try {
-            $cacheSubDir = $this->config->getString('twig.cache_dir', 'views');
+            $cacheSubDir = $this->config->getString('view.cache_dir', 'views');
             $cachePath = $this->pathManager->get(PathManager::CACHE_DIR, $cacheSubDir);
 
             if ($this->filesystem->exists($cachePath)) {

@@ -3,7 +3,7 @@
 namespace Tests\Core;
 
 use Concept\Core\Components\Csrf\CsrfTokenManager;
-use Concept\Core\Http\Middlewares\ShareTemplateDataMiddleware;
+use Concept\Core\Http\Middlewares\ShareViewDataMiddleware;
 use Concept\Core\Http\RequestAttribute;
 use Concept\Core\Http\SessionKey;
 use Concept\Core\Http\ViewKey;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Tests\Fixtures\Core\RecordingHandler;
 
-final class ShareTemplateDataMiddlewareTest extends TestCase
+final class ShareViewDataMiddlewareTest extends TestCase
 {
     public function testAddsViewContextAttributeForDownstream(): void
     {
@@ -30,13 +30,13 @@ final class ShareTemplateDataMiddlewareTest extends TestCase
         ]);
         $flash->method('all')->willReturn(['notice' => ['Welcome']]);
 
-        $middleware = new ShareTemplateDataMiddleware($flash, $csrf);
+        $middleware = new ShareViewDataMiddleware($flash, $csrf);
         $inner = new RecordingHandler(new Response());
 
         $middleware->process(new ServerRequest(), $inner);
 
         /** @var array<string, mixed> $ctx */
-        $ctx = $inner->request->getAttribute(RequestAttribute::VIEW_CONTEXT);
+        $ctx = $inner->request->getAttribute(RequestAttribute::VIEW_PAYLOAD);
         self::assertIsArray($ctx);
         self::assertSame(['email' => ['required']], $ctx[ViewKey::ERRORS]);
         self::assertSame(['email' => 'a@b.test'], $ctx[ViewKey::OLD_INPUT]);

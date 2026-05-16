@@ -129,17 +129,17 @@ final class StubComponent implements ComponentInterface
         return [];
     }
 
-    public function twigExtensions(): array
+    public function viewExtensions(): array
     {
         return [];
     }
 
-    public function twigNamespaces(): array
+    public function viewPaths(): array
     {
         return [];
     }
 
-    public function twigRouteNamespaces(): array
+    public function viewContexts(): array
     {
         return [];
     }

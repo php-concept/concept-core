@@ -12,7 +12,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
-class ShareTemplateDataMiddleware implements MiddlewareInterface
+class ShareViewDataMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private readonly FlashBagInterface $flashBag,
@@ -29,7 +29,7 @@ class ShareTemplateDataMiddleware implements MiddlewareInterface
         ];
 
         return $handler->handle(
-            $request->withAttribute(RequestAttribute::VIEW_CONTEXT, $viewContext)
+            $request->withAttribute(RequestAttribute::VIEW_PAYLOAD, $viewContext)
         );
     }
 }

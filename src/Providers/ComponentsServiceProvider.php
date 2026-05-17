@@ -11,16 +11,17 @@ use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
 use Concept\Core\Events\Framework\ComponentsRegistering;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
-use League\Event\EventDispatcher;
 use League\Route\Router;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
 class ComponentsServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
+    use PeeksEventDispatcher;
+
     public function provides(string $id): bool
     {
         $services = [
@@ -131,19 +132,5 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
         /** @var MigrationRegistry $migrationRegistry */
         $migrationRegistry = $this->getContainer()->get(MigrationRegistry::class);
         $migrationRegistry->append($registry->migrations());
-    }
-
-    private function peekEventDispatcher(): ?EventDispatcher
-    {
-        $container = $this->getContainer();
-
-        if (!$container->has(EventDispatcherInterface::class)) {
-            return null;
-        }
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $container->get(EventDispatcherInterface::class);
-
-        return $dispatcher;
     }
 }

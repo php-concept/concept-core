@@ -30,7 +30,7 @@ final class ComponentsRegistering implements HasEventName, DescribesTelemetryCon
         });
 
         return [
-            'components' => array_values($componentNames),
+            'components' => $componentNames,
         ];
     }
 }

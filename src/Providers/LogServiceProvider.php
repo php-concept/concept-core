@@ -6,6 +6,8 @@ use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Logger;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
@@ -15,6 +17,8 @@ use Throwable;
 
 class LogServiceProvider extends AbstractServiceProvider
 {
+    use PeeksEventDispatcher;
+
     public function provides(string $id): bool
     {
         $services = [
@@ -28,6 +32,8 @@ class LogServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(LoggerInterface::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(LoggerInterface::class));
+
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 

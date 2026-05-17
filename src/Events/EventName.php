@@ -17,6 +17,7 @@ final class EventName
     public const string VIEW_TEMPLATE_RENDERING = 'view.template_rendering';
     public const string VIEW_TEMPLATE_RENDERED = 'view.template_rendered';
     public const string FRAMEWORK_COMPONENT_PROVIDER_REGISTERING = 'framework.components_registering';
+    public const string FRAMEWORK_SERVICE_AWAKENING = 'framework.service_awakening';
 
     /**
      * @return list<string>
@@ -34,6 +35,7 @@ final class EventName
             self::VIEW_TEMPLATE_RENDERING,
             self::VIEW_TEMPLATE_RENDERED,
             self::FRAMEWORK_COMPONENT_PROVIDER_REGISTERING,
+            self::FRAMEWORK_SERVICE_AWAKENING,
         ];
     }
 }

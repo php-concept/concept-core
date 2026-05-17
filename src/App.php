@@ -8,18 +8,17 @@ use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Components\Path\PathManager;
 use InvalidArgumentException;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Concept\Core\Events\EventDispatcherResolver;
 use Concept\Core\Events\Http\RouterDispatchFinished;
 use Concept\Core\Events\Http\RouterDispatchStarted;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\ServiceProviderInterface;
-use League\Event\EventDispatcher;
 use League\Route\Router;
-use PHPUnit\Event\Code\Throwable;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Throwable;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Whoops\Handler\Handler;
@@ -129,7 +128,7 @@ final class App
         /** @var ServerRequestInterface $request */
         $request = $this->container->get(ServerRequestInterface::class);
 
-        $eventDispatcher = $this->peekEventDispatcher();
+        $eventDispatcher = EventDispatcherResolver::resolve($this->container);
         $eventDispatcher?->dispatch(new RouterDispatchStarted($request));
         $startedAt = microtime(true);
 
@@ -187,17 +186,5 @@ final class App
         $whoops->register();
 
         $this->container->add(Whoops::class, $whoops)->setShared(true);
-    }
-
-    private function peekEventDispatcher(): ?EventDispatcher
-    {
-        if (!$this->container->has(EventDispatcherInterface::class)) {
-            return null;
-        }
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->container->get(EventDispatcherInterface::class);
-
-        return $dispatcher;
     }
 }

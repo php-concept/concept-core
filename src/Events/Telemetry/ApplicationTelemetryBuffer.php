@@ -63,6 +63,44 @@ final class ApplicationTelemetryBuffer
     }
 
     /**
+     * Timeline intervals for profilers and tracers (OpenTelemetry-style spans).
+     *
+     * {@see record()} stores the end timestamp; when {@see DescribesTelemetryContext::context()}
+     * includes {@code duration_seconds}, {@code start} is computed as {@code end - duration}.
+     *
+     * @return list<array{
+     *     name: string,
+     *     start: float,
+     *     end: float,
+     *     duration: float,
+     *     meta: array<string, mixed>,
+     *     category: string
+     * }>
+     */
+    public function spans(): array
+    {
+        $spans = [];
+
+        foreach ($this->records as $record) {
+            ['start' => $start, 'end' => $end, 'duration' => $duration] = $this->resolveSpanBounds(
+                $record['microtime'],
+                $record['context'],
+            );
+
+            $spans[] = [
+                'name' => $record['name'],
+                'start' => $start,
+                'end' => $end,
+                'duration' => $duration,
+                'meta' => $record['context'],
+                'category' => $this->resolveCategory($record['name']),
+            ];
+        }
+
+        return $spans;
+    }
+
+    /**
      * Aggregated snapshot for logs, API, or DebugBar.
      *
      * @return array{
@@ -81,7 +119,9 @@ final class ApplicationTelemetryBuffer
      */
     public function statistics(): array
     {
-        if ($this->records === []) {
+        $spans = $this->spans();
+
+        if ($spans === []) {
             return [
                 'total' => 0,
                 'started_at' => null,
@@ -92,24 +132,22 @@ final class ApplicationTelemetryBuffer
             ];
         }
 
-        $startedAt = $this->records[0]['microtime'];
-        $endedAt = $this->records[array_key_last($this->records)]['microtime'];
+        $startedAt = $spans[0]['start'];
+        $endedAt = $spans[array_key_last($spans)]['end'];
 
         $timeline = [];
 
-        foreach ($this->records as $record) {
-            $duration = $record['context']['duration_seconds'] ?? null;
-
+        foreach ($spans as $span) {
             $timeline[] = [
-                'name' => $record['name'],
-                'offset_ms' => round(($record['microtime'] - $startedAt) * 1000, 3),
-                'context' => $record['context'],
-                'duration_seconds' => is_numeric($duration) ? (float) $duration : null,
+                'name' => $span['name'],
+                'offset_ms' => round(($span['end'] - $startedAt) * 1000, 3),
+                'context' => $span['meta'],
+                'duration_seconds' => $span['duration'] > 0.0 ? $span['duration'] : null,
             ];
         }
 
         return [
-            'total' => count($this->records),
+            'total' => count($spans),
             'started_at' => $startedAt,
             'ended_at' => $endedAt,
             'wall_time_seconds' => round($endedAt - $startedAt, 6),
@@ -121,5 +159,37 @@ final class ApplicationTelemetryBuffer
     public function reset(): void
     {
         $this->records = [];
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @return array{start: float, end: float, duration: float}
+     */
+    private function resolveSpanBounds(float $end, array $context): array
+    {
+        $duration = $context['duration_seconds'] ?? null;
+
+        if (is_numeric($duration) && (float) $duration > 0.0) {
+            $duration = (float) $duration;
+
+            return [
+                'start' => $end - $duration,
+                'end' => $end,
+                'duration' => $duration,
+            ];
+        }
+
+        return [
+            'start' => $end,
+            'end' => $end,
+            'duration' => 0.0,
+        ];
+    }
+
+    private function resolveCategory(string $name): string
+    {
+        $category = explode('.', $name, 2)[0];
+
+        return $category !== '' ? $category : 'app';
     }
 }

@@ -2,8 +2,10 @@
 
 namespace Concept\Core\Providers;
 
+use Concept\Core\Events\Framework\ServiceAwaking;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\RouteStrategy;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Illuminate\Pagination\Paginator;
 use Laminas\Diactoros\ServerRequestFactory;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -13,6 +15,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class HttpServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
+    use PeeksEventDispatcher;
+
     public function provides(string $id): bool
     {
         $services = [
@@ -35,6 +39,8 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         })->setShared(true);
 
         $container->add(Router::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(Router::class));
+
             $router = new Router();
 
             $strategy = new RouteStrategy();
@@ -45,6 +51,8 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         })->setShared(true);
 
         $container->add(RequestFormat::class, function () {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(RequestFormat::class));
+
             return new RequestFormat();
         })->setShared(true);
     }

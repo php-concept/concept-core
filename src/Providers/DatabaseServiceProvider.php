@@ -2,6 +2,7 @@
 
 namespace Concept\Core\Providers;
 
+use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Contracts\DatabaseInterface;
 use Concept\Core\Components\Database\Database;
@@ -9,6 +10,8 @@ use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Database\SeederManager;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Illuminate\Container\Container as IlluminateContainer;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Database\Events\QueryExecuted;
@@ -21,6 +24,8 @@ use League\Container\ServiceProvider\BootableServiceProviderInterface;
 
 class DatabaseServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
+    use PeeksEventDispatcher;
+
     /**
      * Determine if the provider is deferred.
      */
@@ -46,6 +51,8 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         $container = $this->getContainer();
 
         $container->add(DatabaseInterface::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(DatabaseInterface::class));
+
             /** @var CapsuleManager $capsuleManager */
             $capsuleManager = $container->get(CapsuleManager::class);
 

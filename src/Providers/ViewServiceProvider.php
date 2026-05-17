@@ -9,11 +9,10 @@ use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
 use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\View;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
-use League\Event\EventDispatcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Extension\DebugExtension;
@@ -22,6 +21,8 @@ use Twig\Loader\FilesystemLoader;
 
 class ViewServiceProvider extends AbstractServiceProvider
 {
+    use PeeksEventDispatcher;
+
     public function provides(string $id): bool
     {
         $services = [
@@ -66,12 +67,7 @@ class ViewServiceProvider extends AbstractServiceProvider
 
             $this->addFallbackPath($loader, $templatesPath);
 
-            /** @var EventDispatcher|null $events */
-            $events = $container->has(EventDispatcherInterface::class)
-                ? $container->get(EventDispatcherInterface::class)
-                : null;
-
-            return new View($twig, $events);
+            return new View($twig, $this->peekEventDispatcher());
         })->setShared(true);
 
         $container->add(ViewExtensionRegistry::class, function () use ($container) {

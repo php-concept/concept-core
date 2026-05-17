@@ -3,6 +3,8 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -12,6 +14,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 class SessionServiceProvider extends AbstractServiceProvider
 {
+    use PeeksEventDispatcher;
+
     public function provides(string $id): bool
     {
         $services = [
@@ -26,6 +30,8 @@ class SessionServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(SessionInterface::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(SessionInterface::class));
+
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
             $sessionOptions = $this->getSessionOptions($config);
@@ -45,6 +51,8 @@ class SessionServiceProvider extends AbstractServiceProvider
         })->setShared(true);
 
         $container->add(FlashBagInterface::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(FlashBagInterface::class));
+
             /** @var Session $session */
             $session = $container->get(SessionInterface::class);
 

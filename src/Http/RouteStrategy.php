@@ -12,13 +12,12 @@ use Concept\Core\Events\Http\RouteCallableInvoked;
 use Concept\Core\Events\Http\RouteCallableInvoking;
 use Concept\Core\Http\Requests\FormRequestInterface;
 use Concept\Core\Components\Validator\Exceptions\ValidationException;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\DefinitionContainerInterface;
-use League\Event\EventDispatcher;
 use League\Route\Route;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
@@ -30,6 +29,8 @@ use ReflectionParameter;
 
 class RouteStrategy extends ApplicationStrategy
 {
+    use PeeksEventDispatcher;
+
     public function invokeRouteCallable(Route $route, ServerRequestInterface $request): ResponseInterface
     {
         $eventDispatcher = $this->peekEventDispatcher();
@@ -38,7 +39,6 @@ class RouteStrategy extends ApplicationStrategy
 
         $callable = $route->getCallable($this->getContainer());
         $handlerLabel = $this->describeCallable($callable);
-
         $eventDispatcher?->dispatch(new RouteCallableInvoking(
             $this->normalizeRouteMethods($route),
             $route->getPath(),
@@ -246,21 +246,6 @@ class RouteStrategy extends ApplicationStrategy
         $caster = $container->get(CasterInterface::class);
 
         return $caster->cast($value, $type);
-    }
-
-    private function peekEventDispatcher(): ?EventDispatcher
-    {
-        /** @var DefinitionContainerInterface $container */
-        $container = $this->getContainer();
-
-        if (!$container->has(EventDispatcherInterface::class)) {
-            return null;
-        }
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $container->get(EventDispatcherInterface::class);
-
-        return $dispatcher;
     }
 
     /**

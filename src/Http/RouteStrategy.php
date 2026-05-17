@@ -5,13 +5,20 @@ namespace Concept\Core\Http;
 use Closure;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Caster\Exceptions\CastingException;
+use Concept\Core\Events\Http\FormRequestValidated;
+use Concept\Core\Events\Http\FormRequestValidating;
+use Concept\Core\Events\Http\FormRequestValidationFailed;
+use Concept\Core\Events\Http\RouteCallableInvoked;
+use Concept\Core\Events\Http\RouteCallableInvoking;
 use Concept\Core\Http\Requests\FormRequestInterface;
 use Concept\Core\Components\Validator\Exceptions\ValidationException;
 use League\Container\DefinitionContainerInterface;
+use League\Event\EventDispatcher;
 use League\Route\Route;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionException;
@@ -25,39 +32,49 @@ class RouteStrategy extends ApplicationStrategy
 {
     public function invokeRouteCallable(Route $route, ServerRequestInterface $request): ResponseInterface
     {
-        // 1. Prepare the request with route variables
+        $eventDispatcher = $this->peekEventDispatcher();
+
         $request = $this->prepareRequest($route, $request);
 
-        // 2. Get the reflection object for the callable
         $callable = $route->getCallable($this->getContainer());
-        /** @var ReflectionMethod $reflection */
-        $reflection = $this->getReflection($callable);
+        $handlerLabel = $this->describeCallable($callable);
 
-        // 3. Resolve arguments for the reflection object (Auto-wiring)
-        $arguments = $this->resolveArguments($reflection, $request, $route->getVars());
+        $eventDispatcher?->dispatch(new RouteCallableInvoking(
+            $this->normalizeRouteMethods($route),
+            $route->getPath(),
+            $handlerLabel,
+            $route->getVars(),
+        ));
 
-        // 4. Invoke the callable with prepared arguments
-        if (is_array($callable)) {
-            // For class methods, we need to pass the object instance as the first argument
-            /** @var object $object */
-            $object = $callable[0];
-            /** @var ResponseInterface $callableObj */
-            $callableObj = $reflection->invokeArgs($object, $arguments);
+        $startedAt = microtime(true);
 
-            return $callableObj;
+        try {
+            $reflection = $this->getReflection($callable);
+            $arguments = $this->resolveArguments($reflection, $request, $route->getVars());
+
+            if (is_array($callable)) {
+                /** @var object $object */
+                $object = $callable[0];
+                /** @phpstan-ignore method.notFound */
+                return $reflection->invokeArgs($object, $arguments);
+            }
+
+            if (is_object($callable) && !($callable instanceof Closure)) {
+                /** @phpstan-ignore method.notFound */
+                return $reflection->invokeArgs($callable, $arguments);
+            }
+
+            /** @phpstan-ignore-next-line */
+            return $reflection->invokeArgs($arguments);
+        } finally {
+            $eventDispatcher?->dispatch(new RouteCallableInvoked(
+                $this->normalizeRouteMethods($route),
+                $route->getPath(),
+                $handlerLabel,
+                $route->getVars(),
+                microtime(true) - $startedAt,
+            ));
         }
-
-        // 5. Invokable objects (__invoke) require target object for ReflectionMethod invocation.
-        if (is_object($callable) && !($callable instanceof Closure)) {
-            /** @var ResponseInterface $callableObj */
-            $callableObj = $reflection->invokeArgs($callable, $arguments);
-
-            return $callableObj;
-        }
-
-        // For closures and regular functions, we only pass the arguments.
-        /** @phpstan-ignore-next-line */
-        return $reflection->invokeArgs($arguments);
     }
 
     /**
@@ -188,12 +205,21 @@ class RouteStrategy extends ApplicationStrategy
     {
         /** @var DefinitionContainerInterface $container */
         $container = $this->getContainer();
+
+        $eventDispatcher = $this->peekEventDispatcher();
+        $eventDispatcher?->dispatch(new FormRequestValidating($className));
+        $startedAt = microtime(true);
+
         /** @var FormRequestInterface $formRequest */
         $formRequest = $container->get($className);
 
         if (!$formRequest->validate()) {
+            $eventDispatcher?->dispatch(new FormRequestValidationFailed($className, $formRequest->errors()));
+
             throw new ValidationException($formRequest->errors(), $formRequest->all());
         }
+
+        $eventDispatcher?->dispatch(new FormRequestValidated($className, microtime(true) - $startedAt));
 
         return $formRequest;
     }
@@ -220,5 +246,57 @@ class RouteStrategy extends ApplicationStrategy
         $caster = $container->get(CasterInterface::class);
 
         return $caster->cast($value, $type);
+    }
+
+    private function peekEventDispatcher(): ?EventDispatcher
+    {
+        /** @var DefinitionContainerInterface $container */
+        $container = $this->getContainer();
+
+        if (!$container->has(EventDispatcherInterface::class)) {
+            return null;
+        }
+
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = $container->get(EventDispatcherInterface::class);
+
+        return $dispatcher;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function normalizeRouteMethods(Route $route): array
+    {
+        $methods = $route->getMethod();
+        if (is_string($methods)) {
+            return [$methods];
+        }
+
+        return array_values($methods);
+    }
+
+    private function describeCallable(callable $callable): string
+    {
+        if ($callable instanceof Closure) {
+            return 'closure';
+        }
+
+        if (is_string($callable)) {
+            return $callable;
+        }
+
+        if (is_array($callable)) {
+            $target = $callable[0];
+            $method = $callable[1];
+
+            return (is_object($target) ? $target::class : (string) $target) . '::' . (string) $method;
+        }
+
+        if (is_object($callable)) {
+            return $callable::class . '::__invoke';
+        }
+
+        return 'callable';
     }
 }

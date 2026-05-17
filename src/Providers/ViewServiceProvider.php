@@ -10,8 +10,10 @@ use Concept\Core\Components\View\Registries\ViewContextRegistry;
 use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\View;
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Event\EventDispatcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Extension\DebugExtension;
@@ -64,7 +66,12 @@ class ViewServiceProvider extends AbstractServiceProvider
 
             $this->addFallbackPath($loader, $templatesPath);
 
-            return new View($twig);
+            /** @var EventDispatcher|null $events */
+            $events = $container->has(EventDispatcherInterface::class)
+                ? $container->get(EventDispatcherInterface::class)
+                : null;
+
+            return new View($twig, $events);
         })->setShared(true);
 
         $container->add(ViewExtensionRegistry::class, function () use ($container) {

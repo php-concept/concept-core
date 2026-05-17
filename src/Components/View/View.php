@@ -3,6 +3,9 @@
 namespace Concept\Core\Components\View;
 
 use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Events\View\TemplateRendered;
+use Concept\Core\Events\View\TemplateRendering;
+use League\Event\EventDispatcher;
 use Twig\Environment as Twig;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -11,7 +14,8 @@ use Twig\Error\SyntaxError;
 class View implements ViewInterface
 {
     public function __construct(
-        public readonly Twig $twig
+        public readonly Twig $twig,
+        private readonly ?EventDispatcher $events = null,
     ) {}
 
     /**
@@ -28,6 +32,14 @@ class View implements ViewInterface
             $viewName .= self::DEFAULT_EXTENSION;
         }
 
-        return $this->twig->render($viewName, $data);
+        $this->events?->dispatch(new TemplateRendering($viewName));
+
+        $startedAt = microtime(true);
+
+        try {
+            return $this->twig->render($viewName, $data);
+        } finally {
+            $this->events?->dispatch(new TemplateRendered($viewName, microtime(true) - $startedAt));
+        }
     }
 }

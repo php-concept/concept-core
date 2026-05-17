@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ce7ab1fc03c327ea99e8abf40df8fd7",
+    "content-hash": "6bbd649d86eb719ca9a7d308e5606cfa",
     "packages": [
         {
             "name": "brick/math",
@@ -1536,6 +1536,65 @@
                 }
             ],
             "time": "2026-03-19T18:52:39+00:00"
+        },
+        {
+            "name": "league/event",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/event.git",
+                "reference": "ec38ff7ea10cad7d99a79ac937fbcffb9334c210"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/event/zipball/ec38ff7ea10cad7d99a79ac937fbcffb9334c210",
+                "reference": "ec38ff7ea10cad7d99a79ac937fbcffb9334c210",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0",
+                "psr/event-dispatcher": "^1.0"
+            },
+            "provide": {
+                "psr/event-dispatcher-implementation": "1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "phpstan/phpstan": "^0.12.45",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Event\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Frank de Jonge",
+                    "email": "info@frenky.net"
+                }
+            ],
+            "description": "Event package",
+            "keywords": [
+                "emitter",
+                "event",
+                "listener"
+            ],
+            "support": {
+                "issues": "https://github.com/thephpleague/event/issues",
+                "source": "https://github.com/thephpleague/event/tree/3.0.3"
+            },
+            "time": "2024-09-04T16:06:53+00:00"
         },
         {
             "name": "league/route",

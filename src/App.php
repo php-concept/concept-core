@@ -2,17 +2,24 @@
 
 namespace Concept\Core;
 
+use Concept\Core\Components\Logger\DebugLogger;
+use Concept\Core\Events\Telemetry\ApplicationTelemetryBuffer;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Components\Path\PathManager;
 use InvalidArgumentException;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Concept\Core\Events\Http\RouterDispatchFinished;
+use Concept\Core\Events\Http\RouterDispatchStarted;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\ServiceProviderInterface;
+use League\Event\EventDispatcher;
 use League\Route\Router;
+use PHPUnit\Event\Code\Throwable;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Whoops\Handler\Handler;
@@ -119,11 +126,29 @@ final class App
     {
         /** @var Router $router */
         $router = $this->container->get(Router::class);
-
         /** @var ServerRequestInterface $request */
         $request = $this->container->get(ServerRequestInterface::class);
 
-        $response = $router->dispatch($request);
+        $eventDispatcher = $this->peekEventDispatcher();
+        $eventDispatcher?->dispatch(new RouterDispatchStarted($request));
+        $startedAt = microtime(true);
+
+        $response = null;
+        try {
+            $response = $router->dispatch($request);
+        } finally {
+            $eventDispatcher?->dispatch(
+                new RouterDispatchFinished(
+                    $request,
+                    $response,
+                    $startedAt ? microtime(true) - $startedAt : 0,
+                ),
+            );
+
+            /** @var ApplicationTelemetryBuffer $telemetry */
+            $telemetry = $this->container->get(ApplicationTelemetryBuffer::class);
+            DebugLogger::log($telemetry->statistics());
+        }
 
         (new SapiEmitter)->emit($response);
     }
@@ -147,7 +172,7 @@ final class App
             if (PHP_SAPI === 'cli') {
                 $whoops->pushHandler(new PlainTextHandler());
             } else {
-                $whoops->pushHandler(function($exception) {
+                $whoops->pushHandler(function(Throwable $exception) {
                     http_response_code(HttpStatusCode::INTERNAL_SERVER_ERROR);
                     $fallbackFileName = sprintf(self::FALLBACK_FILE_PATH, $this->rootPath);
                     if (file_exists($fallbackFileName)) {
@@ -162,5 +187,17 @@ final class App
         $whoops->register();
 
         $this->container->add(Whoops::class, $whoops)->setShared(true);
+    }
+
+    private function peekEventDispatcher(): ?EventDispatcher
+    {
+        if (!$this->container->has(EventDispatcherInterface::class)) {
+            return null;
+        }
+
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = $this->container->get(EventDispatcherInterface::class);
+
+        return $dispatcher;
     }
 }

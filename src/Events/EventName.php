@@ -16,6 +16,7 @@ final class EventName
     public const string HTTP_FORM_REQUEST_VALIDATION_FAILED = 'http.form_request_validation_failed';
     public const string VIEW_TEMPLATE_RENDERING = 'view.template_rendering';
     public const string VIEW_TEMPLATE_RENDERED = 'view.template_rendered';
+    public const string VIEW_TEMPLATE_PROFILE_ENTRY = 'view.template_profile_entry';
     public const string FRAMEWORK_COMPONENT_PROVIDER_REGISTERING = 'framework.components_registering';
     public const string FRAMEWORK_SERVICE_AWAKENING = 'framework.service_awakening';
 
@@ -34,6 +35,7 @@ final class EventName
             self::HTTP_FORM_REQUEST_VALIDATION_FAILED,
             self::VIEW_TEMPLATE_RENDERING,
             self::VIEW_TEMPLATE_RENDERED,
+            self::VIEW_TEMPLATE_PROFILE_ENTRY,
             self::FRAMEWORK_COMPONENT_PROVIDER_REGISTERING,
             self::FRAMEWORK_SERVICE_AWAKENING,
         ];

@@ -7,6 +7,7 @@ use Concept\Core\Events\View\TemplateRendered;
 use Concept\Core\Events\View\TemplateRendering;
 use League\Event\EventDispatcher;
 use Twig\Environment as Twig;
+use Twig\Profiler\Profile;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -16,6 +17,7 @@ class View implements ViewInterface
     public function __construct(
         public readonly Twig $twig,
         private readonly ?EventDispatcher $events = null,
+        private readonly ?Profile $twigProfile = null,
     ) {}
 
     /**
@@ -30,6 +32,10 @@ class View implements ViewInterface
     {
         if (!str_ends_with($viewName, self::DEFAULT_EXTENSION)) {
             $viewName .= self::DEFAULT_EXTENSION;
+        }
+
+        if ($this->twigProfile !== null) {
+            $this->twigProfile->reset();
         }
 
         $this->events?->dispatch(new TemplateRendering($viewName));

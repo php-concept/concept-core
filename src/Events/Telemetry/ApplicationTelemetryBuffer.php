@@ -17,12 +17,16 @@ final class ApplicationTelemetryBuffer
 
     public function record(object $event): void
     {
-        $name = $event instanceof HasEventName ? $event->eventName() : $event::class;
         $context = $event instanceof DescribesTelemetryContext ? $event->context() : [];
+        $name = $event instanceof HasEventName ? $event->eventName() : $event::class;
+
+        $endTime = is_numeric($context['end_time'] ?? null)
+            ? (float) $context['end_time']
+            : microtime(true);
 
         $this->records[] = [
             'name' => $name,
-            'microtime' => microtime(true),
+            'microtime' => $endTime,
             'context' => $context,
         ];
     }
@@ -33,6 +37,22 @@ final class ApplicationTelemetryBuffer
     public function all(): array
     {
         return $this->records;
+    }
+
+    /**
+     * @return list<array{name: string, microtime: float, context: array<string, mixed>}>
+     */
+    public function recordsOf(string $eventName): array
+    {
+        $matched = [];
+
+        foreach ($this->records as $record) {
+            if ($record['name'] === $eventName) {
+                $matched[] = $record;
+            }
+        }
+
+        return $matched;
     }
 
     public function count(): int
@@ -167,6 +187,20 @@ final class ApplicationTelemetryBuffer
      */
     private function resolveSpanBounds(float $end, array $context): array
     {
+        $startTime = $context['start_time'] ?? null;
+        $endTime = $context['end_time'] ?? null;
+
+        if (is_numeric($startTime) && is_numeric($endTime)) {
+            $start = (float) $startTime;
+            $end = (float) $endTime;
+
+            return [
+                'start' => $start,
+                'end' => $end,
+                'duration' => max(0.0, $end - $start),
+            ];
+        }
+
         $duration = $context['duration_seconds'] ?? null;
 
         if (is_numeric($duration) && (float) $duration > 0.0) {

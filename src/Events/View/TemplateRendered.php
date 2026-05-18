@@ -2,16 +2,17 @@
 
 namespace Concept\Core\Events\View;
 
-use Concept\Core\Events\Contracts\DescribesTelemetryContext;
+use Concept\Core\Events\Contracts\TimedEventInterface;
 use Concept\Core\Events\EventName;
-use League\Event\HasEventName;
 
-final class TemplateRendered implements HasEventName, DescribesTelemetryContext
+final class TemplateRendered extends AbstractViewEvent implements TimedEventInterface
 {
     public function __construct(
-        public readonly string $templateLogicalName,
+        string $templateLogicalName,
         public readonly float $durationSeconds,
-    ) {}
+    ) {
+        parent::__construct($templateLogicalName);
+    }
 
     public function eventName(): string
     {
@@ -20,9 +21,23 @@ final class TemplateRendered implements HasEventName, DescribesTelemetryContext
 
     public function context(): array
     {
-        return [
-            'template' => $this->templateLogicalName,
+        return array_merge(parent::context(), [
             'duration_seconds' => $this->durationSeconds,
-        ];
+        ]);
+    }
+
+    public function getDurationSeconds(): float
+    {
+        return $this->durationSeconds;
+    }
+
+    public function getStartTime(): ?float
+    {
+        return null;
+    }
+
+    public function getEndTime(): ?float
+    {
+        return null;
     }
 }

@@ -6,21 +6,10 @@ use Concept\Core\Events\Contracts\DescribesTelemetryContext;
 use Concept\Core\Events\EventName;
 use League\Event\HasEventName;
 
-final class TemplateRendering implements HasEventName, DescribesTelemetryContext
+final class TemplateRendering extends AbstractViewEvent
 {
-    public function __construct(
-        public readonly string $templateLogicalName,
-    ) {}
-
     public function eventName(): string
     {
         return EventName::VIEW_TEMPLATE_RENDERING;
-    }
-
-    public function context(): array
-    {
-        return [
-            'template' => $this->templateLogicalName,
-        ];
     }
 }

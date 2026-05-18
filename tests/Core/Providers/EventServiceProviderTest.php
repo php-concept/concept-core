@@ -8,8 +8,8 @@ use Concept\Core\Events\Http\RouterDispatchStarted;
 use Concept\Core\Events\Telemetry\ApplicationTelemetryBuffer;
 use Concept\Core\Providers\EventServiceProvider;
 use League\Container\Container;
-use League\Event\EventDispatcher;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class EventServiceProviderTest extends TestCase
@@ -36,13 +36,13 @@ final class EventServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, $this->configStub(debug: true))->setShared(true);
         $container->addServiceProvider(new EventServiceProvider());
 
-        /** @var EventDispatcher $dispatcher */
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $container->get(EventDispatcherInterface::class);
         /** @var ApplicationTelemetryBuffer $buffer */
         $buffer = $container->get(ApplicationTelemetryBuffer::class);
 
         $request = $this->createStub(ServerRequestInterface::class);
-        $dispatcher->dispatch(new RouterDispatchStarted(EventName::HTTP_ROUTER_DISPATCH_STARTED, $request));
+        $dispatcher->dispatch(new RouterDispatchStarted($request));
 
         $entries = $buffer->all();
         self::assertCount(1, $entries);
@@ -55,13 +55,13 @@ final class EventServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, $this->configStub(debug: false))->setShared(true);
         $container->addServiceProvider(new EventServiceProvider());
 
-        /** @var EventDispatcher $dispatcher */
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $container->get(EventDispatcherInterface::class);
         /** @var ApplicationTelemetryBuffer $buffer */
         $buffer = $container->get(ApplicationTelemetryBuffer::class);
 
         $request = $this->createStub(ServerRequestInterface::class);
-        $dispatcher->dispatch(new RouterDispatchStarted(EventName::HTTP_ROUTER_DISPATCH_STARTED, $request));
+        $dispatcher->dispatch(new RouterDispatchStarted($request));
 
         self::assertCount(0, $buffer->all());
     }
@@ -74,13 +74,13 @@ final class EventServiceProviderTest extends TestCase
         $provider = new EventServiceProvider();
         $container->addServiceProvider($provider);
 
-        /** @var EventDispatcher $dispatcher */
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $container->get(EventDispatcherInterface::class);
         /** @var ApplicationTelemetryBuffer $buffer */
         $buffer = $container->get(ApplicationTelemetryBuffer::class);
 
         $request = $this->createStub(ServerRequestInterface::class);
-        $dispatcher->dispatch(new RouterDispatchStarted(EventName::HTTP_ROUTER_DISPATCH_STARTED, $request));
+        $dispatcher->dispatch(new RouterDispatchStarted($request));
 
         self::assertCount(1, $buffer->all());
     }

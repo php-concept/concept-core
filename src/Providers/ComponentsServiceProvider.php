@@ -62,8 +62,8 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
             return;
         }
 
-        $this->registerComponentRoutes($registry);
         $this->registerComponentProviders($registry);
+        $this->registerComponentRoutes($registry);
         $this->registerComponentViewFeatures($registry);
     }
 

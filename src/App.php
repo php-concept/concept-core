@@ -2,15 +2,10 @@
 
 namespace Concept\Core;
 
-use Concept\Core\Components\Logger\DebugLogger;
-use Concept\Core\Events\Telemetry\ApplicationTelemetryBuffer;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Components\Path\PathManager;
 use InvalidArgumentException;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use Concept\Core\Events\EventDispatcherResolver;
-use Concept\Core\Events\Http\RouterDispatchFinished;
-use Concept\Core\Events\Http\RouterDispatchStarted;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\ServiceProviderInterface;
@@ -128,27 +123,7 @@ final class App
         /** @var ServerRequestInterface $request */
         $request = $this->container->get(ServerRequestInterface::class);
 
-        $eventDispatcher = EventDispatcherResolver::resolve($this->container);
-        $eventDispatcher?->dispatch(new RouterDispatchStarted($request));
-        $startedAt = microtime(true);
-
-        $response = null;
-        try {
-            $response = $router->dispatch($request);
-        } finally {
-            $eventDispatcher?->dispatch(
-                new RouterDispatchFinished(
-                    $request,
-                    $response,
-                    $startedAt ? microtime(true) - $startedAt : 0,
-                ),
-            );
-
-            /** @var ApplicationTelemetryBuffer $telemetry */
-            $telemetry = $this->container->get(ApplicationTelemetryBuffer::class);
-            DebugLogger::log($telemetry->statistics());
-        }
-
+        $response = $router->dispatch($request);
         (new SapiEmitter)->emit($response);
     }
 

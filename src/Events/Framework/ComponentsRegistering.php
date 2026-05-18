@@ -23,14 +23,8 @@ final class ComponentsRegistering implements HasEventName, DescribesTelemetryCon
 
     public function context(): array
     {
-        $components = $this->components;
-        $componentNames = [];
-        array_walk_recursive($components, function ($value) use (&$componentNames) {
-            $componentNames[] = get_class($value);
-        });
-
         return [
-            'components' => $componentNames,
+            'components' => array_map(fn($component) => get_class($component), $this->components),
         ];
     }
 }

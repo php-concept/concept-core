@@ -17,7 +17,7 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Extension\DebugExtension;
 use Twig\Extension\ExtensionInterface;
-use Concept\Core\Components\View\Twig\TelemetryProfilerExtension;
+use Twig\Extension\ProfilerExtension;
 use Twig\Loader\FilesystemLoader;
 use Twig\Profiler\Profile;
 
@@ -72,7 +72,7 @@ class ViewServiceProvider extends AbstractServiceProvider
             $profile = null;
             if ($debug) {
                 $profile = new Profile();
-                $twig->addExtension(new TelemetryProfilerExtension($profile, $this->peekEventDispatcher()));
+                $twig->addExtension(new ProfilerExtension($profile));
             }
 
             return new View($twig, $this->peekEventDispatcher(), $profile);

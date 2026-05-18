@@ -3,11 +3,11 @@
 namespace Concept\Core\Providers\Concerns;
 
 use Concept\Core\Events\EventDispatcherResolver;
-use League\Event\EventDispatcher;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 trait PeeksEventDispatcher
 {
-    protected function peekEventDispatcher(): ?EventDispatcher
+    protected function peekEventDispatcher(): ?EventDispatcherInterface
     {
         return EventDispatcherResolver::resolve($this->getContainer());
     }

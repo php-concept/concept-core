@@ -2,7 +2,6 @@
 
 namespace Concept\Core\Events;
 
-use League\Event\EventDispatcher;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -11,7 +10,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
  */
 final class EventDispatcherResolver
 {
-    public static function resolve(?ContainerInterface $container): ?EventDispatcher
+    public static function resolve(?ContainerInterface $container): ?EventDispatcherInterface
     {
         if (!$container || !$container->has(EventDispatcherInterface::class)) {
             return null;
@@ -19,6 +18,6 @@ final class EventDispatcherResolver
 
         $dispatcher = $container->get(EventDispatcherInterface::class);
 
-        return $dispatcher instanceof EventDispatcher ? $dispatcher : null;
+        return $dispatcher instanceof EventDispatcherInterface ? $dispatcher : null;
     }
 }

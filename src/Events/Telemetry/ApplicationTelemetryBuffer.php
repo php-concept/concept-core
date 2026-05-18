@@ -3,6 +3,7 @@
 namespace Concept\Core\Events\Telemetry;
 
 use Concept\Core\Events\Contracts\DescribesTelemetryContext;
+use Concept\Core\Events\Contracts\TimedEventInterface;
 use League\Event\HasEventName;
 
 /**
@@ -20,14 +21,18 @@ final class ApplicationTelemetryBuffer
         $context = $event instanceof DescribesTelemetryContext ? $event->context() : [];
         $name = $event instanceof HasEventName ? $event->eventName() : $event::class;
 
-        $endTime = is_numeric($context['end_time'] ?? null)
-            ? (float) $context['end_time']
-            : microtime(true);
+        $endTime = microtime(true);
+        if ($event instanceof TimedEventInterface && $event->getEndTime() !== null) {
+            $endTime = $event->getEndTime();
+        } elseif (is_numeric($context['end_time'] ?? null)) {
+            $endTime = (float) $context['end_time'];
+        }
 
         $this->records[] = [
             'name' => $name,
             'microtime' => $endTime,
             'context' => $context,
+            'event' => $event,
         ];
     }
 
@@ -104,7 +109,7 @@ final class ApplicationTelemetryBuffer
         foreach ($this->records as $record) {
             ['start' => $start, 'end' => $end, 'duration' => $duration] = $this->resolveSpanBounds(
                 $record['microtime'],
-                $record['context'],
+                $record,
             );
 
             $spans[] = [
@@ -182,11 +187,37 @@ final class ApplicationTelemetryBuffer
     }
 
     /**
-     * @param array<string, mixed> $context
+     * @param float $end
+     * @param array{name: string, microtime: float, context: array<string, mixed>, event?: object} $record
      * @return array{start: float, end: float, duration: float}
      */
-    private function resolveSpanBounds(float $end, array $context): array
+    private function resolveSpanBounds(float $end, array $record): array
     {
+        $event = $record['event'] ?? null;
+        $context = $record['context'];
+
+        if ($event instanceof TimedEventInterface) {
+            $start = $event->getStartTime();
+            $endTime = $event->getEndTime() ?? $end;
+            $duration = $event->getDurationSeconds();
+
+            if ($start !== null) {
+                return [
+                    'start' => $start,
+                    'end' => $endTime,
+                    'duration' => $duration ?? max(0.0, $endTime - $start),
+                ];
+            }
+
+            if ($duration !== null) {
+                return [
+                    'start' => $endTime - $duration,
+                    'end' => $endTime,
+                    'duration' => $duration,
+                ];
+            }
+        }
+
         $startTime = $context['start_time'] ?? null;
         $endTime = $context['end_time'] ?? null;
 

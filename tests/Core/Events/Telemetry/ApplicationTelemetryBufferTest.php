@@ -76,7 +76,7 @@ final class ApplicationTelemetryBufferTest extends TestCase
         self::assertSame('view.template_profile_entry', $spans[0]['name']);
         self::assertSame(1000.0, $spans[0]['start']);
         self::assertSame(1000.05, $spans[0]['end']);
-        self::assertSame(0.05, $spans[0]['duration']);
+        self::assertEqualsWithDelta(0.05, $spans[0]['duration'], 0.0001);
     }
 
     public function testRecordsOfFiltersByEventName(): void

@@ -3,9 +3,10 @@
 namespace Concept\Core\Components\View;
 
 use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Events\View\TemplateProfileEntry;
 use Concept\Core\Events\View\TemplateRendered;
 use Concept\Core\Events\View\TemplateRendering;
-use League\Event\EventDispatcher;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment as Twig;
 use Twig\Profiler\Profile;
 use Twig\Error\LoaderError;
@@ -16,7 +17,7 @@ class View implements ViewInterface
 {
     public function __construct(
         public readonly Twig $twig,
-        private readonly ?EventDispatcher $events = null,
+        private readonly ?EventDispatcherInterface $events = null,
         private readonly ?Profile $twigProfile = null,
     ) {}
 
@@ -45,7 +46,49 @@ class View implements ViewInterface
         try {
             return $this->twig->render($viewName, $data);
         } finally {
+            if ($this->twigProfile !== null) {
+                $this->dispatchProfileEntries($this->twigProfile);
+            }
+
             $this->events?->dispatch(new TemplateRendered($viewName, microtime(true) - $startedAt));
         }
+    }
+
+    private function dispatchProfileEntries(Profile $profile, int $depth = 0): void
+    {
+        foreach ($profile as $child) {
+            if (!$child instanceof Profile) {
+                continue;
+            }
+
+            $this->dispatchProfileEntry($child, $depth);
+            $this->dispatchProfileEntries($child, $depth + 1);
+        }
+    }
+
+    private function dispatchProfileEntry(Profile $profile, int $depth): void
+    {
+        if ($this->events === null || $profile->isRoot()) {
+            return;
+        }
+
+        $startTime = $profile->getStartTime();
+        $endTime = $profile->getEndTime();
+        $duration = $profile->getDuration();
+
+        if ($startTime > 0.0 && $endTime > 0.0) {
+            $duration = max(0.0, $endTime - $startTime);
+        }
+
+        $this->events->dispatch(new TemplateProfileEntry(
+            $profile->getTemplate(),
+            $profile->getType(),
+            $profile->getName(),
+            $duration,
+            $profile->getMemoryUsage(),
+            $startTime,
+            $endTime,
+            $depth,
+        ));
     }
 }

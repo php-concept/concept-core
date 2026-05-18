@@ -45,9 +45,9 @@ final class TemplateProfileEntry implements HasEventName, DescribesTelemetryCont
      */
     public static function displayLabel(array $context): string
     {
-        $type = (string) ($context['type'] ?? '');
-        $template = (string) ($context['template'] ?? '');
-        $name = (string) ($context['name'] ?? '');
+        $type = isset($context['type']) && is_scalar($context['type']) ? (string) $context['type'] : '';
+        $template = isset($context['template']) && is_scalar($context['template']) ? (string) $context['template'] : '';
+        $name = isset($context['name']) && is_scalar($context['name']) ? (string) $context['name'] : '';
 
         if ($type === 'template') {
             return $template !== '' ? $template : $name;

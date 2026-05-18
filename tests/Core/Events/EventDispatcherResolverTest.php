@@ -15,25 +15,15 @@ final class EventDispatcherResolverTest extends TestCase
         self::assertNull(EventDispatcherResolver::resolve(new Container()));
     }
 
-    public function testReturnsLeagueDispatcherWhenBoundToInterface(): void
+    public function testReturnsDispatcherWhenBoundToInterface(): void
     {
         $container = new Container();
-        $dispatcher = new EventDispatcher();
+        $dispatcher = new class implements EventDispatcherInterface {
+            public function dispatch(object $event): object { return $event; }
+        };
         $container->add(EventDispatcherInterface::class, $dispatcher)->setShared(true);
 
         self::assertSame($dispatcher, EventDispatcherResolver::resolve($container));
     }
 
-    public function testReturnsNullWhenBindingIsNotLeagueDispatcher(): void
-    {
-        $container = new Container();
-        $container->add(EventDispatcherInterface::class, new class implements EventDispatcherInterface {
-            public function dispatch(object $event): object
-            {
-                return $event;
-            }
-        })->setShared(true);
-
-        self::assertNull(EventDispatcherResolver::resolve($container));
-    }
 }

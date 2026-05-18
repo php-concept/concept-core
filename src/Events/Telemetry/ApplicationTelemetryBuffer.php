@@ -4,6 +4,7 @@ namespace Concept\Core\Events\Telemetry;
 
 use Concept\Core\Events\Contracts\DescribesTelemetryContext;
 use Concept\Core\Events\Contracts\TimedEventInterface;
+use Concept\Core\Events\Contracts\DictionaryEventInterface;
 use League\Event\HasEventName;
 
 /**
@@ -12,7 +13,7 @@ use League\Event\HasEventName;
 final class ApplicationTelemetryBuffer
 {
     /**
-     * @var list<array{name: string, microtime: float, context: array<string, mixed>}>
+     * @var list<array{name: string, microtime: float, context: array<string, mixed>, event: object}>
      */
     private array $records = [];
 
@@ -37,7 +38,7 @@ final class ApplicationTelemetryBuffer
     }
 
     /**
-     * @return list<array{name: string, microtime: float, context: array<string, mixed>}>
+     * @return list<array{name: string, microtime: float, context: array<string, mixed>, event: object}>
      */
     public function all(): array
     {
@@ -45,7 +46,7 @@ final class ApplicationTelemetryBuffer
     }
 
     /**
-     * @return list<array{name: string, microtime: float, context: array<string, mixed>}>
+     * @return list<array{name: string, microtime: float, context: array<string, mixed>, event: object}>
      */
     public function recordsOf(string $eventName): array
     {
@@ -107,10 +108,23 @@ final class ApplicationTelemetryBuffer
         $spans = [];
 
         foreach ($this->records as $record) {
+            $event = $record['event'];
+
+            // Skip dictionary events in spans
+            if ($event instanceof DictionaryEventInterface) {
+                continue;
+            }
+
             ['start' => $start, 'end' => $end, 'duration' => $duration] = $this->resolveSpanBounds(
                 $record['microtime'],
                 $record,
             );
+
+            // Skip zero-duration events that don't explicitly have start/end (like markers)
+            // But keep them if they are TimedEventInterface (even with 0 duration)
+            if ($duration === 0.0 && !($event instanceof TimedEventInterface)) {
+                continue;
+            }
 
             $spans[] = [
                 'name' => $record['name'],
@@ -123,6 +137,44 @@ final class ApplicationTelemetryBuffer
         }
 
         return $spans;
+    }
+
+    /**
+     * Dictionary data for static metadata (e.g. lists of services, components).
+     *
+     * @return array<string, list<string>|array<string, mixed>>
+     */
+    public function dictionary(): array
+    {
+        $dictionary = [];
+
+        foreach ($this->records as $record) {
+            $event = $record['event'];
+
+            if ($event instanceof DictionaryEventInterface) {
+                $type = $event->dictionaryType();
+                $label = $event->dictionaryLabel();
+                $data = $event->dictionaryData();
+
+                if ($data !== null) {
+                    if (isset($dictionary[$type][$label]) && is_array($dictionary[$type][$label])) {
+                        $dictionary[$type][$label] = array_merge($dictionary[$type][$label], $data);
+                    } else {
+                        $dictionary[$type][$label] = $data;
+                    }
+                } else {
+                    // Flattening: if no data, we just collect labels into a list
+                    if (!isset($dictionary[$type])) {
+                        $dictionary[$type] = [];
+                    }
+                    $dictionary[$type][] = $label;
+                }
+            }
+        }
+
+        ksort($dictionary);
+
+        return $dictionary;
     }
 
     /**
@@ -139,21 +191,24 @@ final class ApplicationTelemetryBuffer
      *         offset_ms: float,
      *         context: array<string, mixed>,
      *         duration_seconds: float|null
-     *     }>
+     *     }>,
+     *     dictionary: array<string, list<string>|array<string, mixed>>
      * }
      */
     public function statistics(): array
     {
         $spans = $this->spans();
+        $dictionary = $this->dictionary();
 
         if ($spans === []) {
             return [
-                'total' => 0,
+                'total' => count($this->records),
                 'started_at' => null,
                 'ended_at' => null,
                 'wall_time_seconds' => null,
-                'counts_by_name' => [],
+                'counts_by_name' => $this->countsByName(),
                 'timeline' => [],
+                'dictionary' => $dictionary,
             ];
         }
 
@@ -172,12 +227,13 @@ final class ApplicationTelemetryBuffer
         }
 
         return [
-            'total' => count($spans),
+            'total' => count($this->records),
             'started_at' => $startedAt,
             'ended_at' => $endedAt,
             'wall_time_seconds' => round($endedAt - $startedAt, 6),
             'counts_by_name' => $this->countsByName(),
             'timeline' => $timeline,
+            'dictionary' => $dictionary,
         ];
     }
 
@@ -188,12 +244,12 @@ final class ApplicationTelemetryBuffer
 
     /**
      * @param float $end
-     * @param array{name: string, microtime: float, context: array<string, mixed>, event?: object} $record
+     * @param array{name: string, microtime: float, context: array<string, mixed>, event: object} $record
      * @return array{start: float, end: float, duration: float}
      */
     private function resolveSpanBounds(float $end, array $record): array
     {
-        $event = $record['event'] ?? null;
+        $event = $record['event'];
         $context = $record['context'];
 
         if ($event instanceof TimedEventInterface) {

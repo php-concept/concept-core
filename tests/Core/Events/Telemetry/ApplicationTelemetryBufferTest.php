@@ -3,6 +3,8 @@
 namespace Tests\Core\Events\Telemetry;
 
 use Concept\Core\Events\EventName;
+use Concept\Core\Events\Framework\ComponentsRegistering;
+use Concept\Core\Events\Framework\ServiceAwaking;
 use Concept\Core\Events\Http\RouteCallableInvoked;
 use Concept\Core\Events\Http\RouterDispatchStarted;
 use Concept\Core\Events\Telemetry\ApplicationTelemetryBuffer;
@@ -30,9 +32,25 @@ final class ApplicationTelemetryBufferTest extends TestCase
         self::assertSame(1, $stats['counts_by_name'][EventName::HTTP_ROUTER_DISPATCH_STARTED]);
         self::assertSame(1, $stats['counts_by_name'][EventName::HTTP_ROUTE_CALLABLE_INVOKED]);
         self::assertSame(1, $stats['counts_by_name'][EventName::VIEW_TEMPLATE_RENDERED]);
-        self::assertCount(3, $stats['timeline']);
-        self::assertSame(0.012, $stats['timeline'][1]['duration_seconds']);
-        self::assertSame('users/show.twig', $stats['timeline'][2]['context']['template']);
+        self::assertCount(2, $stats['timeline']); // Only Invoked and Rendered (Started has 0 duration and is not TimedEvent)
+        self::assertSame(0.012, $stats['timeline'][0]['duration_seconds']);
+        self::assertSame('users/show.twig', $stats['timeline'][1]['context']['template']);
+    }
+
+    public function testStatisticsIncludesDictionary(): void
+    {
+        $buffer = new ApplicationTelemetryBuffer();
+        $buffer->record(new ComponentsRegistering([]));
+        $buffer->record(new ServiceAwaking('Cache'));
+
+        $stats = $buffer->statistics();
+
+        self::assertSame(2, $stats['total']);
+        self::assertCount(0, $stats['timeline']);
+        self::assertArrayHasKey('components', $stats['dictionary']);
+        self::assertArrayHasKey('services', $stats['dictionary']);
+        self::assertContains('', $stats['dictionary']['components']); // empty string because [] means empty string in implode
+        self::assertContains('Cache', $stats['dictionary']['services']);
     }
 
     public function testStatisticsReturnsEmptyStructureWhenNoRecords(): void
@@ -109,21 +127,16 @@ final class ApplicationTelemetryBufferTest extends TestCase
 
         $spans = $buffer->spans();
 
-        self::assertCount(3, $spans);
+        self::assertCount(2, $spans); // Skip RouterDispatchStarted (0 duration, not TimedEvent)
 
-        self::assertSame(EventName::HTTP_ROUTER_DISPATCH_STARTED, $spans[0]['name']);
+        self::assertSame(EventName::HTTP_ROUTE_CALLABLE_INVOKED, $spans[0]['name']);
         self::assertSame('http', $spans[0]['category']);
-        self::assertSame(0.0, $spans[0]['duration']);
-        self::assertSame($spans[0]['start'], $spans[0]['end']);
+        self::assertSame(0.012, $spans[0]['duration']);
+        self::assertSame($spans[0]['end'] - 0.012, $spans[0]['start']);
 
-        self::assertSame(EventName::HTTP_ROUTE_CALLABLE_INVOKED, $spans[1]['name']);
-        self::assertSame('http', $spans[1]['category']);
-        self::assertSame(0.012, $spans[1]['duration']);
-        self::assertSame($spans[1]['end'] - 0.012, $spans[1]['start']);
-
-        self::assertSame(EventName::VIEW_TEMPLATE_RENDERED, $spans[2]['name']);
-        self::assertSame('view', $spans[2]['category']);
-        self::assertSame(0.004, $spans[2]['duration']);
-        self::assertSame('users/show.twig', $spans[2]['meta']['template']);
+        self::assertSame(EventName::VIEW_TEMPLATE_RENDERED, $spans[1]['name']);
+        self::assertSame('view', $spans[1]['category']);
+        self::assertSame(0.004, $spans[1]['duration']);
+        self::assertSame('users/show.twig', $spans[1]['meta']['template']);
     }
 }

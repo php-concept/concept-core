@@ -4,10 +4,11 @@ namespace Concept\Core\Events\Framework;
 
 use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Events\Contracts\DescribesTelemetryContext;
+use Concept\Core\Events\Contracts\DictionaryEventInterface;
 use Concept\Core\Events\EventName;
 use League\Event\HasEventName;
 
-final class ComponentsRegistering implements HasEventName, DescribesTelemetryContext
+final class ComponentsRegistering implements HasEventName, DescribesTelemetryContext, DictionaryEventInterface
 {
     /**
      * @param array<ComponentInterface> $components
@@ -26,5 +27,20 @@ final class ComponentsRegistering implements HasEventName, DescribesTelemetryCon
         return [
             'components' => array_map(fn($component) => get_class($component), $this->components),
         ];
+    }
+
+    public function dictionaryType(): string
+    {
+        return 'components';
+    }
+
+    public function dictionaryLabel(): string
+    {
+        return implode(', ', array_map(fn($component) => get_class($component), $this->components));
+    }
+
+    public function dictionaryData(): ?array
+    {
+        return null;
     }
 }

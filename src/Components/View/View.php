@@ -31,14 +31,9 @@ class View implements ViewInterface
      */
     public function render(string $viewName, array $data = []): string
     {
-        if (!str_ends_with($viewName, self::DEFAULT_EXTENSION)) {
-            $viewName .= self::DEFAULT_EXTENSION;
-        }
+        $viewName = $this->ensureExtension($viewName);
 
-        if ($this->twigProfile !== null) {
-            $this->twigProfile->reset();
-        }
-
+        $this->resetProfile();
         $this->events?->dispatch(new TemplateRendering($viewName));
 
         $startedAt = microtime(true);
@@ -46,12 +41,32 @@ class View implements ViewInterface
         try {
             return $this->twig->render($viewName, $data);
         } finally {
-            if ($this->twigProfile !== null) {
-                $this->dispatchProfileEntries($this->twigProfile);
-            }
-
-            $this->events?->dispatch(new TemplateRendered($viewName, microtime(true) - $startedAt));
+            $this->handlePostRender($viewName, $startedAt);
         }
+    }
+
+    private function ensureExtension(string $viewName): string
+    {
+        if (str_ends_with($viewName, self::DEFAULT_EXTENSION)) {
+            return $viewName;
+        }
+
+        return $viewName . self::DEFAULT_EXTENSION;
+    }
+
+    private function resetProfile(): void
+    {
+        $this->twigProfile?->reset();
+    }
+
+    private function handlePostRender(string $viewName, float $startedAt): void
+    {
+        if ($this->twigProfile !== null) {
+            $this->dispatchProfileEntries($this->twigProfile);
+        }
+
+        $duration = microtime(true) - $startedAt;
+        $this->events?->dispatch(new TemplateRendered($viewName, $duration));
     }
 
     private function dispatchProfileEntries(Profile $profile, int $depth = 0): void
@@ -72,23 +87,27 @@ class View implements ViewInterface
             return;
         }
 
-        $startTime = $profile->getStartTime();
-        $endTime = $profile->getEndTime();
-        $duration = $profile->getDuration();
-
-        if ($startTime > 0.0 && $endTime > 0.0) {
-            $duration = max(0.0, $endTime - $startTime);
-        }
-
         $this->events->dispatch(new TemplateProfileEntry(
             $profile->getTemplate(),
             $profile->getType(),
             $profile->getName(),
-            $duration,
+            $this->calculateDuration($profile),
             $profile->getMemoryUsage(),
-            $startTime,
-            $endTime,
+            $profile->getStartTime(),
+            $profile->getEndTime(),
             $depth,
         ));
+    }
+
+    private function calculateDuration(Profile $profile): float
+    {
+        $startTime = $profile->getStartTime();
+        $endTime = $profile->getEndTime();
+
+        if ($startTime > 0.0 && $endTime > 0.0) {
+            return max(0.0, $endTime - $startTime);
+        }
+
+        return $profile->getDuration();
     }
 }

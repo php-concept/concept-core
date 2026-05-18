@@ -7,7 +7,7 @@ use Concept\Core\Events\Contracts\DictionaryEventInterface;
 use Concept\Core\Events\EventName;
 use League\Event\HasEventName;
 
-final class ServiceAwaking implements HasEventName, DescribesTelemetryContext, DictionaryEventInterface
+final class ServiceAwakening implements HasEventName, DescribesTelemetryContext, DictionaryEventInterface
 {
     public function __construct(
         public readonly string $serviceName,

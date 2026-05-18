@@ -11,7 +11,7 @@ use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Database\SeederManager;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Events\Database\QueryExecuted as TelemetryQueryExecuted;
-use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Illuminate\Container\Container as IlluminateContainer;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
@@ -52,7 +52,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         $container = $this->getContainer();
 
         $container->add(DatabaseInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(DatabaseInterface::class));
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(DatabaseInterface::class));
 
             /** @var CapsuleManager $capsuleManager */
             $capsuleManager = $container->get(CapsuleManager::class);

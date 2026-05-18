@@ -5,7 +5,7 @@ namespace Tests\Core\Events\Telemetry;
 use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Events\EventName;
 use Concept\Core\Events\Framework\ComponentRegistering;
-use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Events\Http\RouteCallableInvoked;
 use Concept\Core\Events\Http\RouterDispatchStarted;
 use Concept\Core\Events\Telemetry\ApplicationTelemetryBuffer;
@@ -43,7 +43,7 @@ final class ApplicationTelemetryBufferTest extends TestCase
         $buffer = new ApplicationTelemetryBuffer();
         $component = $this->createStub(ComponentInterface::class);
         $buffer->record(new ComponentRegistering($component));
-        $buffer->record(new ServiceAwaking('Cache'));
+        $buffer->record(new ServiceAwakening('Cache'));
 
         $stats = $buffer->statistics();
 

@@ -6,7 +6,7 @@ use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Logger;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Monolog\Handler\RotatingFileHandler;
@@ -32,7 +32,7 @@ class LogServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(LoggerInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(LoggerInterface::class));
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(LoggerInterface::class));
 
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);

@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Providers;
 
-use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\RouteStrategy;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
@@ -39,7 +39,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         })->setShared(true);
 
         $container->add(Router::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(Router::class));
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(Router::class));
 
             $router = new Router();
 
@@ -51,7 +51,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         })->setShared(true);
 
         $container->add(RequestFormat::class, function () {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(RequestFormat::class));
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(RequestFormat::class));
 
             return new RequestFormat();
         })->setShared(true);

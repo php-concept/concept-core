@@ -5,7 +5,7 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Validator\Validator;
-use Concept\Core\Events\Framework\ServiceAwaking;
+use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Rakit\Validation\Validator as RakitValidator;
@@ -33,7 +33,7 @@ class ValidationServiceProvider extends AbstractServiceProvider
         })->setShared(true);
 
         $container->add(ValidatorInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwaking(ValidatorInterface::class));
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ValidatorInterface::class));
 
             /** @var RakitValidator $rakitValidator */
             $rakitValidator = $container->get(RakitValidator::class);

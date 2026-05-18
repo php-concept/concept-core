@@ -5,6 +5,7 @@ namespace Concept\Core\Events\Telemetry;
 use Concept\Core\Events\Contracts\DescribesTelemetryContext;
 use Concept\Core\Events\Contracts\TimedEventInterface;
 use Concept\Core\Events\Contracts\DictionaryEventInterface;
+use Concept\Core\Events\Database\QueryExecuted;
 use League\Event\HasEventName;
 
 /**
@@ -59,6 +60,23 @@ final class ApplicationTelemetryBuffer
         }
 
         return $matched;
+    }
+
+    /**
+     * @return list<array{sql: string, bindings: array<mixed>, time: float, connection: string}>
+     */
+    public function queryRecords(): array
+    {
+        $queries = [];
+
+        foreach ($this->records as $record) {
+            $event = $record['event'];
+            if ($event instanceof QueryExecuted) {
+                $queries[] = $event->context();
+            }
+        }
+
+        return $queries;
     }
 
     public function count(): int

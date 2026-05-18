@@ -19,6 +19,7 @@ final class EventName
     public const string VIEW_TEMPLATE_PROFILE_ENTRY = 'view.template_profile_entry';
     public const string FRAMEWORK_COMPONENT_REGISTERING = 'framework.component_registering';
     public const string FRAMEWORK_SERVICE_AWAKENING = 'framework.service_awakening';
+    public const string DATABASE_QUERY_EXECUTED = 'database.query_executed';
 
     /**
      * @return list<string>
@@ -38,6 +39,7 @@ final class EventName
             self::VIEW_TEMPLATE_PROFILE_ENTRY,
             self::FRAMEWORK_COMPONENT_REGISTERING,
             self::FRAMEWORK_SERVICE_AWAKENING,
+            self::DATABASE_QUERY_EXECUTED,
         ];
     }
 }

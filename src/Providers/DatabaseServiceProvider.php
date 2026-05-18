@@ -10,6 +10,7 @@ use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Database\SeederManager;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Events\Database\QueryExecuted as TelemetryQueryExecuted;
 use Concept\Core\Events\Framework\ServiceAwaking;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Illuminate\Container\Container as IlluminateContainer;
@@ -118,13 +119,20 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         $capsuleManager->setEventDispatcher(new Dispatcher(new IlluminateContainer()));
 
         if ($config->getBool('log.query')) {
-            $capsuleManager->getConnection()->listen(static function (QueryExecuted $query) use ($container) {
+            $capsuleManager->getConnection()->listen(function (QueryExecuted $query) use ($container) {
                 /** @var LoggerInterface $logger */
                 $logger = $container->get(LoggerInterface::class);
                 $logger->debug('SQL: ' . $query->sql, [
                     'bindings' => $query->bindings,
                     'time'     => $query->time
                 ]);
+
+                $this->peekEventDispatcher()?->dispatch(new TelemetryQueryExecuted(
+                    $query->sql,
+                    $query->bindings,
+                    $query->time,
+                    $query->connectionName
+                ));
             });
         }
 

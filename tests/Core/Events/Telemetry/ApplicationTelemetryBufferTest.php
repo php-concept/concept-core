@@ -2,8 +2,9 @@
 
 namespace Tests\Core\Events\Telemetry;
 
+use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Events\EventName;
-use Concept\Core\Events\Framework\ComponentsRegistering;
+use Concept\Core\Events\Framework\ComponentRegistering;
 use Concept\Core\Events\Framework\ServiceAwaking;
 use Concept\Core\Events\Http\RouteCallableInvoked;
 use Concept\Core\Events\Http\RouterDispatchStarted;
@@ -40,7 +41,8 @@ final class ApplicationTelemetryBufferTest extends TestCase
     public function testStatisticsIncludesDictionary(): void
     {
         $buffer = new ApplicationTelemetryBuffer();
-        $buffer->record(new ComponentsRegistering([]));
+        $component = $this->createStub(ComponentInterface::class);
+        $buffer->record(new ComponentRegistering($component));
         $buffer->record(new ServiceAwaking('Cache'));
 
         $stats = $buffer->statistics();
@@ -49,7 +51,7 @@ final class ApplicationTelemetryBufferTest extends TestCase
         self::assertCount(0, $stats['timeline']);
         self::assertArrayHasKey('components', $stats['dictionary']);
         self::assertArrayHasKey('services', $stats['dictionary']);
-        self::assertContains('', $stats['dictionary']['components']); // empty string because [] means empty string in implode
+        self::assertContains(get_class($component), $stats['dictionary']['components']);
         self::assertContains('Cache', $stats['dictionary']['services']);
     }
 

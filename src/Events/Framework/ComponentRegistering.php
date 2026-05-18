@@ -8,24 +8,21 @@ use Concept\Core\Events\Contracts\DictionaryEventInterface;
 use Concept\Core\Events\EventName;
 use League\Event\HasEventName;
 
-final class ComponentsRegistering implements HasEventName, DescribesTelemetryContext, DictionaryEventInterface
+final class ComponentRegistering implements HasEventName, DescribesTelemetryContext, DictionaryEventInterface
 {
-    /**
-     * @param array<ComponentInterface> $components
-     */
     public function __construct(
-        public readonly array $components,
+        public readonly ComponentInterface $component,
     ) {}
 
     public function eventName(): string
     {
-        return EventName::FRAMEWORK_COMPONENT_PROVIDER_REGISTERING;
+        return EventName::FRAMEWORK_COMPONENT_REGISTERING;
     }
 
     public function context(): array
     {
         return [
-            'components' => array_map(fn($component) => get_class($component), $this->components),
+            'component' => get_class($this->component),
         ];
     }
 
@@ -36,7 +33,7 @@ final class ComponentsRegistering implements HasEventName, DescribesTelemetryCon
 
     public function dictionaryLabel(): string
     {
-        return implode(', ', array_map(fn($component) => get_class($component), $this->components));
+        return get_class($this->component);
     }
 
     public function dictionaryData(): ?array

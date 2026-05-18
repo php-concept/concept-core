@@ -10,7 +10,7 @@ use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
-use Concept\Core\Events\Framework\ComponentsRegistering;
+use Concept\Core\Events\Framework\ComponentRegistering;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
@@ -52,7 +52,12 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
 
         /** @var ComponentRegistry $registry */
         $registry = $container->get(ComponentRegistry::class);
-        $this->peekEventDispatcher()?->dispatch(new ComponentsRegistering($registry->all()));
+
+        if ($dispatcher = $this->peekEventDispatcher()) {
+            foreach ($registry->all() as $component) {
+                $dispatcher->dispatch(new ComponentRegistering($component));
+            }
+        }
 
         if (PHP_SAPI === 'cli') {
             $this->registerConsoleCommands($registry);

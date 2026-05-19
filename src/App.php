@@ -31,9 +31,6 @@ final class App
     protected Container $container;
     protected string $rootPath;
 
-    /** @var array<ServiceProviderInterface> */
-    protected array $providers = [];
-
     /**
      * @param string $rootPath
      * @param array<string, string> $paths
@@ -56,9 +53,9 @@ final class App
      * @param array<string, string> $paths
      * @return static
      */
-    public static function create(string $rootPath, array $paths): static
+    public static function create(string $rootPath, array $paths): App
     {
-        return new static($rootPath, $paths);
+        return new App($rootPath, $paths);
     }
 
     public function getContainer(): ContainerInterface
@@ -128,7 +125,7 @@ final class App
     }
 
     /**
-     * Registers Whoops before the container and service providers finish booting so failures
+     * Registers Whoops before the container and service providers finish booting, so failures
      * during early bootstrap still get a usable error page or CLI output.
      *
      * This installs global PHP exception/error handlers. Automated tests that construct {@see App}
@@ -148,6 +145,7 @@ final class App
             } else {
                 $whoops->pushHandler(function(Throwable $exception) {
                     http_response_code(HttpStatusCode::INTERNAL_SERVER_ERROR);
+                    $code = $exception->getCode();
                     $fallbackFileName = sprintf(self::FALLBACK_FILE_PATH, $this->rootPath);
                     if (file_exists($fallbackFileName)) {
                         include $fallbackFileName;

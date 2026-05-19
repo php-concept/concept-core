@@ -95,6 +95,7 @@ abstract class FormRequest implements FormRequestInterface
 
         if ($this->config->getBool('log.validation_data', false)) {
             $this->logger->debug(sprintf(self::LOG_PAYLOAD_MESSAGE, static::class), [
+                self::LOG_PAYLOAD_URI => $this->request->getUri()->getPath(),
                 self::LOG_PAYLOAD_IS_VALID => $isValid,
                 self::LOG_PAYLOAD_VALID_DATA => $this->validation->getValidData(),
                 self::LOG_PAYLOAD_ERRORS => $this->validation->getErrors(),
@@ -151,15 +152,7 @@ abstract class FormRequest implements FormRequestInterface
         $body = $this->request->getParsedBody();
         $parsedBody = is_array($body) ? $body : (is_object($body) ? (array)$body : []);
 
-        $data = array_merge($this->request->getQueryParams(), $parsedBody);
-        if ($this->config->getBool('log.validation_data', false)) {
-            $this->logger->debug(sprintf(self::LOG_PAYLOAD_MESSAGE, static::class), [
-                self::LOG_PAYLOAD_URI => $this->request->getUri()->getPath(),
-                self::LOG_PAYLOAD_DATA => $data,
-            ]);
-        }
-
-        return $data;
+        return array_merge($this->request->getQueryParams(), $parsedBody);
     }
 
     /**

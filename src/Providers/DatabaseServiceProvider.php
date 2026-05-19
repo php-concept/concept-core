@@ -2,7 +2,6 @@
 
 namespace Concept\Core\Providers;
 
-use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Contracts\DatabaseInterface;
 use Concept\Core\Components\Database\Database;
@@ -22,6 +21,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use Psr\Container\ContainerInterface;
 
 class DatabaseServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
@@ -118,23 +118,10 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         $capsuleManager->bootEloquent();
         $capsuleManager->setEventDispatcher(new Dispatcher(new IlluminateContainer()));
 
-        if ($config->getBool('log.query')) {
-            $capsuleManager->getConnection()->listen(function (QueryExecuted $query) use ($container) {
-                /** @var LoggerInterface $logger */
-                $logger = $container->get(LoggerInterface::class);
-                $logger->debug('SQL: ' . $query->sql, [
-                    'bindings' => $query->bindings,
-                    'time'     => $query->time
-                ]);
-
-                $this->peekEventDispatcher()?->dispatch(new TelemetryQueryExecuted(
-                    $query->sql,
-                    $query->bindings,
-                    $query->time,
-                    $query->connectionName
-                ));
-            });
-        }
+        $capsuleManager->getConnection()->listen(function (QueryExecuted $query) use ($container, $config) {
+            $this->logQueries($container, $config, $query);
+            $this->dispatchEvent($config, $query);
+        });
 
         $container->add(CapsuleManager::class, $capsuleManager);
     }
@@ -157,5 +144,29 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
         ];
+    }
+
+    private function logQueries(ContainerInterface $container, ConfigInterface $config, QueryExecuted $query): void
+    {
+        if ($config->getBool('app.debug') || $config->getBool('log.query')) {
+            /** @var LoggerInterface $logger */
+            $logger = $container->get(LoggerInterface::class);
+            $logger->debug('SQL: ' . $query->sql, [
+                'bindings' => $query->bindings,
+                'time' => $query->time
+            ]);
+        }
+    }
+
+    private function dispatchEvent(ConfigInterface $config, QueryExecuted $query): void
+    {
+        if ($config->getBool('log.query')) {
+            $this->peekEventDispatcher()?->dispatch(new TelemetryQueryExecuted(
+                $query->sql,
+                $query->bindings,
+                $query->time,
+                $query->connectionName
+            ));
+        }
     }
 }

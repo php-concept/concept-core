@@ -20,6 +20,13 @@ class ErrorLogHandler extends Handler
         /** @var LoggerInterface $logger **/
         $logger = $this->container->get(LoggerInterface::class);
 
+        $logger->exception($this->getException(), $this->getUri());
+
+        return Handler::DONE;
+    }
+
+    private function getUri(): string
+    {
         $uri = '';
         if (isset($_SERVER['REQUEST_URI'])) {
             // Check if we have a request object, otherwise fallback to $_SERVER
@@ -31,8 +38,6 @@ class ErrorLogHandler extends Handler
             }
         }
 
-        $logger->exception($this->getException(), $uri);
-
-        return Handler::DONE;
+        return $uri;
     }
 }

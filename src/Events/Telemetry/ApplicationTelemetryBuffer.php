@@ -2,10 +2,11 @@
 
 namespace Concept\Core\Events\Telemetry;
 
-use Concept\Core\Events\Contracts\DescribesTelemetryContext;
 use Concept\Core\Events\Contracts\TimedEventInterface;
 use Concept\Core\Events\Contracts\DictionaryEventInterface;
 use Concept\Core\Events\Database\QueryExecuted;
+use Concept\Core\Events\Telemetry\Internal\Span;
+use Concept\Core\Events\Telemetry\Internal\TelemetryRecord;
 use League\Event\HasEventName;
 
 /**
@@ -14,32 +15,17 @@ use League\Event\HasEventName;
 final class ApplicationTelemetryBuffer
 {
     /**
-     * @var list<array{name: string, microtime: float, context: array<string, mixed>, event: object}>
+     * @var list<TelemetryRecord>
      */
     private array $records = [];
 
     public function record(object $event): void
     {
-        $context = $event instanceof DescribesTelemetryContext ? $event->context() : [];
-        $name = $event instanceof HasEventName ? $event->eventName() : $event::class;
-
-        $endTime = microtime(true);
-        if ($event instanceof TimedEventInterface && $event->getEndTime() !== null) {
-            $endTime = $event->getEndTime();
-        } elseif (is_numeric($context['end_time'] ?? null)) {
-            $endTime = (float) $context['end_time'];
-        }
-
-        $this->records[] = [
-            'name' => $name,
-            'microtime' => $endTime,
-            'context' => $context,
-            'event' => $event,
-        ];
+        $this->records[] = new TelemetryRecord($event);
     }
 
     /**
-     * @return list<array{name: string, microtime: float, context: array<string, mixed>, event: object}>
+     * @return list<TelemetryRecord>
      */
     public function all(): array
     {
@@ -47,19 +33,14 @@ final class ApplicationTelemetryBuffer
     }
 
     /**
-     * @return list<array{name: string, microtime: float, context: array<string, mixed>, event: object}>
+     * @return list<TelemetryRecord>
      */
     public function recordsOf(string $eventName): array
     {
-        $matched = [];
-
-        foreach ($this->records as $record) {
-            if ($record['name'] === $eventName) {
-                $matched[] = $record;
-            }
-        }
-
-        return $matched;
+        return array_values(array_filter(
+            $this->records,
+            fn(TelemetryRecord $record) => $record->name === $eventName
+        ));
     }
 
     /**
@@ -70,7 +51,7 @@ final class ApplicationTelemetryBuffer
         $queries = [];
 
         foreach ($this->records as $record) {
-            $event = $record['event'];
+            $event = $record->event;
             if ($event instanceof QueryExecuted) {
                 $queries[] = $event->context();
             }
@@ -99,8 +80,7 @@ final class ApplicationTelemetryBuffer
         $counts = [];
 
         foreach ($this->records as $record) {
-            $name = $record['name'];
-            $counts[$name] = ($counts[$name] ?? 0) + 1;
+            $counts[$record->name] = ($counts[$record->name] ?? 0) + 1;
         }
 
         return $counts;
@@ -109,49 +89,24 @@ final class ApplicationTelemetryBuffer
     /**
      * Timeline intervals for profilers and tracers (OpenTelemetry-style spans).
      *
-     * {@see record()} stores the end timestamp; when {@see DescribesTelemetryContext::context()}
-     * includes {@code duration_seconds}, {@code start} is computed as {@code end - duration}.
-     *
-     * @return list<array{
-     *     name: string,
-     *     start: float,
-     *     end: float,
-     *     duration: float,
-     *     meta: array<string, mixed>,
-     *     category: string
-     * }>
+     * @return list<Span>
      */
     public function spans(): array
     {
         $spans = [];
 
         foreach ($this->records as $record) {
-            $event = $record['event'];
-
-            // Skip dictionary events in spans
-            if ($event instanceof DictionaryEventInterface) {
+            if ($record->event instanceof DictionaryEventInterface) {
                 continue;
             }
 
-            ['start' => $start, 'end' => $end, 'duration' => $duration] = $this->resolveSpanBounds(
-                $record['microtime'],
-                $record,
-            );
+            $span = $record->toSpan($this->resolveCategory($record->name));
 
-            // Skip zero-duration events that don't explicitly have start/end (like markers)
-            // But keep them if they are TimedEventInterface (even with 0 duration)
-            if ($duration === 0.0 && !($event instanceof TimedEventInterface)) {
+            if ($span->duration === 0.0 && !($record->event instanceof TimedEventInterface)) {
                 continue;
             }
 
-            $spans[] = [
-                'name' => $record['name'],
-                'start' => $start,
-                'end' => $end,
-                'duration' => $duration,
-                'meta' => $record['context'],
-                'category' => $this->resolveCategory($record['name']),
-            ];
+            $spans[] = $span;
         }
 
         return $spans;
@@ -167,7 +122,7 @@ final class ApplicationTelemetryBuffer
         $dictionary = [];
 
         foreach ($this->records as $record) {
-            $event = $record['event'];
+            $event = $record->event;
 
             if ($event instanceof DictionaryEventInterface) {
                 $type = $event->dictionaryType();
@@ -181,10 +136,6 @@ final class ApplicationTelemetryBuffer
                         $dictionary[$type][$label] = $data;
                     }
                 } else {
-                    // Flattening: if no data, we just collect labels into a list
-                    if (!isset($dictionary[$type])) {
-                        $dictionary[$type] = [];
-                    }
                     $dictionary[$type][] = $label;
                 }
             }
@@ -230,17 +181,17 @@ final class ApplicationTelemetryBuffer
             ];
         }
 
-        $startedAt = $spans[0]['start'];
-        $endedAt = $spans[array_key_last($spans)]['end'];
+        $startedAt = $spans[0]->start;
+        $endedAt = $spans[array_key_last($spans)]->end;
 
         $timeline = [];
 
         foreach ($spans as $span) {
             $timeline[] = [
-                'name' => $span['name'],
-                'offset_ms' => round(($span['end'] - $startedAt) * 1000, 3),
-                'context' => $span['meta'],
-                'duration_seconds' => $span['duration'] > 0.0 ? $span['duration'] : null,
+                'name' => $span->name,
+                'offset_ms' => round(($span->end - $startedAt) * 1000, 3),
+                'context' => $span->meta,
+                'duration_seconds' => $span->duration > 0.0 ? $span->duration : null,
             ];
         }
 
@@ -258,71 +209,6 @@ final class ApplicationTelemetryBuffer
     public function reset(): void
     {
         $this->records = [];
-    }
-
-    /**
-     * @param float $end
-     * @param array{name: string, microtime: float, context: array<string, mixed>, event: object} $record
-     * @return array{start: float, end: float, duration: float}
-     */
-    private function resolveSpanBounds(float $end, array $record): array
-    {
-        $event = $record['event'];
-        $context = $record['context'];
-
-        if ($event instanceof TimedEventInterface) {
-            $start = $event->getStartTime();
-            $endTime = $event->getEndTime() ?? $end;
-            $duration = $event->getDurationSeconds();
-
-            if ($start !== null) {
-                return [
-                    'start' => $start,
-                    'end' => $endTime,
-                    'duration' => $duration ?? max(0.0, $endTime - $start),
-                ];
-            }
-
-            if ($duration !== null) {
-                return [
-                    'start' => $endTime - $duration,
-                    'end' => $endTime,
-                    'duration' => $duration,
-                ];
-            }
-        }
-
-        $startTime = $context['start_time'] ?? null;
-        $endTime = $context['end_time'] ?? null;
-
-        if (is_numeric($startTime) && is_numeric($endTime)) {
-            $start = (float) $startTime;
-            $end = (float) $endTime;
-
-            return [
-                'start' => $start,
-                'end' => $end,
-                'duration' => max(0.0, $end - $start),
-            ];
-        }
-
-        $duration = $context['duration_seconds'] ?? null;
-
-        if (is_numeric($duration) && (float) $duration > 0.0) {
-            $duration = (float) $duration;
-
-            return [
-                'start' => $end - $duration,
-                'end' => $end,
-                'duration' => $duration,
-            ];
-        }
-
-        return [
-            'start' => $end,
-            'end' => $end,
-            'duration' => 0.0,
-        ];
     }
 
     private function resolveCategory(string $name): string

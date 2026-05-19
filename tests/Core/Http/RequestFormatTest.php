@@ -48,4 +48,28 @@ final class RequestFormatTest extends TestCase
 
         self::assertFalse($format->expectsJson($request));
     }
+
+    public function testIsHtmlReturnsTrueWhenAcceptContainsHtml(): void
+    {
+        $request = $this->createStub(ServerRequestInterface::class);
+        $request->method('getHeaderLine')->willReturnMap([
+            [HttpHeader::ACCEPT, 'text/html,application/xhtml+xml,application/xml;q=0.9'],
+        ]);
+
+        $format = new RequestFormat();
+
+        self::assertTrue($format->expectsHtml($request));
+    }
+
+    public function testIsHtmlReturnsFalseWhenAcceptDoesNotContainHtml(): void
+    {
+        $request = $this->createStub(ServerRequestInterface::class);
+        $request->method('getHeaderLine')->willReturnMap([
+            [HttpHeader::ACCEPT, 'application/json'],
+        ]);
+
+        $format = new RequestFormat();
+
+        self::assertFalse($format->expectsHtml($request));
+    }
 }

@@ -93,10 +93,10 @@ final class ApplicationTelemetryBufferTest extends TestCase
 
         $spans = $buffer->spans();
         self::assertCount(1, $spans);
-        self::assertSame('view.template_profile_entry', $spans[0]['name']);
-        self::assertSame(1000.0, $spans[0]['start']);
-        self::assertSame(1000.05, $spans[0]['end']);
-        self::assertEqualsWithDelta(0.05, $spans[0]['duration'], 0.0001);
+        self::assertSame('view.template_profile_entry', $spans[0]->name);
+        self::assertSame(1000.0, $spans[0]->start);
+        self::assertSame(1000.05, $spans[0]->end);
+        self::assertEqualsWithDelta(0.05, $spans[0]->duration, 0.0001);
     }
 
     public function testRecordsOfFiltersByEventName(): void
@@ -131,14 +131,14 @@ final class ApplicationTelemetryBufferTest extends TestCase
 
         self::assertCount(2, $spans); // Skip RouterDispatchStarted (0 duration, not TimedEvent)
 
-        self::assertSame(EventName::HTTP_ROUTE_CALLABLE_INVOKED, $spans[0]['name']);
-        self::assertSame('http', $spans[0]['category']);
-        self::assertSame(0.012, $spans[0]['duration']);
-        self::assertSame($spans[0]['end'] - 0.012, $spans[0]['start']);
+        self::assertSame(EventName::HTTP_ROUTE_CALLABLE_INVOKED, $spans[0]->name);
+        self::assertSame('http', $spans[0]->category);
+        self::assertSame(0.012, $spans[0]->duration);
+        self::assertSame($spans[0]->end - 0.012, $spans[0]->start);
 
-        self::assertSame(EventName::VIEW_TEMPLATE_RENDERED, $spans[1]['name']);
-        self::assertSame('view', $spans[1]['category']);
-        self::assertSame(0.004, $spans[1]['duration']);
-        self::assertSame('users/show.twig', $spans[1]['meta']['template']);
+        self::assertSame(EventName::VIEW_TEMPLATE_RENDERED, $spans[1]->name);
+        self::assertSame('view', $spans[1]->category);
+        self::assertSame(0.004, $spans[1]->duration);
+        self::assertSame('users/show.twig', $spans[1]->meta['template']);
     }
 }

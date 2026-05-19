@@ -15,4 +15,9 @@ class RequestFormat
 
         return str_contains($accept, HttpValue::JSON) || $xhr === HttpValue::XML_HTTP_REQUEST;
     }
+
+    public function expectsHtml(ServerRequestInterface $request): bool
+    {
+        return str_contains($request->getHeaderLine(HttpHeader::ACCEPT), HttpValue::HTML);
+    }
 }

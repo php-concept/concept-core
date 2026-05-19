@@ -150,6 +150,20 @@ final class ComponentRegistry
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function assets(): array
+    {
+        $assets = [];
+
+        foreach ($this->components() as $component) {
+            $assets = array_merge($assets, $component->assets());
+        }
+
+        return $assets;
+    }
+
+    /**
      * @return ComponentInterface[]
      */
     public function all(): array

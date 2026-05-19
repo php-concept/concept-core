@@ -61,4 +61,9 @@ interface ComponentInterface
      * @return class-string<Migration>[]
      */
     public function migrations(): array;
+
+    /**
+     * @return array<string, string>
+     */
+    public function assets(): array;
 }

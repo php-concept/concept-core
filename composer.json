@@ -35,7 +35,8 @@
         "illuminate/filesystem": "^13.1",
         "cuyz/valinor": "^2.4",
         "magewirephp/validation": "^1.0",
-        "league/event": "^3.0"
+        "league/event": "^3.0",
+        "symfony/filesystem": "^8.0"
     },
     "scripts": {
         "phpstan": "vendor/bin/phpstan analyze --memory-limit=2G",

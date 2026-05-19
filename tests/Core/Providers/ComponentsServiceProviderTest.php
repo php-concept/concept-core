@@ -100,6 +100,16 @@ final class ComponentsServiceProviderTest extends TestCase
             $container->get(MigrationRegistry::class)->all()
         );
     }
+
+    public function testAssetsReturnsMergedAssetsFromAllComponents(): void
+    {
+        $container = new Container();
+        $container->add(StubComponent::class, new StubComponent())->setShared(true);
+
+        $registry = new ComponentRegistry($container, [StubComponent::class]);
+
+        self::assertSame(['source' => 'target'], $registry->assets());
+    }
 }
 
 final class StubComponent implements ComponentInterface
@@ -157,5 +167,10 @@ final class StubComponent implements ComponentInterface
     public function migrations(): array
     {
         return ['/stub/migrations'];
+    }
+
+    public function assets(): array
+    {
+        return ['source' => 'target'];
     }
 }

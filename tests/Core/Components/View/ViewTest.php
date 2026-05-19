@@ -63,8 +63,8 @@ final class ViewTest extends TestCase
         self::assertNotEmpty($records);
 
         $spans = $buffer->spans();
-        self::assertSame(EventName::VIEW_TEMPLATE_PROFILE_ENTRY, $spans[0]['name']);
-        self::assertGreaterThan(0.0, $spans[0]['duration']);
-        self::assertSame('page.twig', $spans[0]['meta']['template']);
+        self::assertSame(EventName::VIEW_TEMPLATE_PROFILE_ENTRY, $spans[0]->name);
+        self::assertGreaterThan(0.0, $spans[0]->duration);
+        self::assertSame('page.twig', $spans[0]->meta['template']);
     }
 }

@@ -46,7 +46,7 @@ final class EventServiceProviderTest extends TestCase
 
         $entries = $buffer->all();
         self::assertCount(1, $entries);
-        self::assertSame(EventName::HTTP_ROUTER_DISPATCH_STARTED, $entries[0]['name']);
+        self::assertSame(EventName::HTTP_ROUTER_DISPATCH_STARTED, $entries[0]->name);
     }
 
     public function testDoesNotWireTelemetryBufferWhenAppDebugIsFalse(): void

@@ -47,7 +47,7 @@ final class FormRequestTest extends TestCase
         $logger->expects(self::once())
             ->method('debug')
             ->with(
-                'Validation attempt for [' . TestBlogFormRequest::class . ']',
+                'Validated data for [' . TestBlogFormRequest::class . ']',
                 self::callback(static function (array $context): bool {
                     return $context['is_valid'] === true
                         && $context['valid_data'] === ['title' => 'Hello']
@@ -113,7 +113,7 @@ final class FormRequestTest extends TestCase
         $logger->expects(self::once())
             ->method('debug')
             ->with(
-                'Validation attempt for [' . TestBlogFormRequest::class . ']',
+                'Validation incoming data [' . TestBlogFormRequest::class . ']',
                 self::callback(static function (array $context): bool {
                     return $context['uri'] === '/filter'
                         && $context['data'] === ['q' => 'abc', 'page' => '1'];

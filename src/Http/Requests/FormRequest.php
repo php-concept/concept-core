@@ -20,7 +20,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 abstract class FormRequest implements FormRequestInterface
 {
-    private const string LOG_PAYLOAD_MESSAGE = 'Validation attempt for [%s]';
+    private const string LOG_INCOMING_DATA_FOR_VALIDATION = 'Validation incoming data [%s]';
+    private const string LOG_VALIDATED_DATA = 'Validated data for [%s]';
     private const string LOG_PAYLOAD_IS_VALID = 'is_valid';
     private const string LOG_PAYLOAD_VALID_DATA = 'valid_data';
     private const string LOG_PAYLOAD_ERRORS = 'errors';
@@ -94,8 +95,7 @@ abstract class FormRequest implements FormRequestInterface
         $isValid = $this->validation->isValid();
 
         if ($this->config->getBool('log.validation_data', false)) {
-            $this->logger->debug(sprintf(self::LOG_PAYLOAD_MESSAGE, static::class), [
-                self::LOG_PAYLOAD_URI => $this->request->getUri()->getPath(),
+            $this->logger->debug(sprintf(self::LOG_VALIDATED_DATA, static::class), [
                 self::LOG_PAYLOAD_IS_VALID => $isValid,
                 self::LOG_PAYLOAD_VALID_DATA => $this->validation->getValidData(),
                 self::LOG_PAYLOAD_ERRORS => $this->validation->getErrors(),
@@ -152,7 +152,15 @@ abstract class FormRequest implements FormRequestInterface
         $body = $this->request->getParsedBody();
         $parsedBody = is_array($body) ? $body : (is_object($body) ? (array)$body : []);
 
-        return array_merge($this->request->getQueryParams(), $parsedBody);
+        $data = array_merge($this->request->getQueryParams(), $parsedBody);
+        if ($this->config->getBool('log.validation_data', false)) {
+            $this->logger->debug(sprintf(self::LOG_INCOMING_DATA_FOR_VALIDATION, static::class), [
+                self::LOG_PAYLOAD_URI => $this->request->getUri()->getPath(),
+                self::LOG_PAYLOAD_DATA => $data,
+            ]);
+        }
+
+        return $data;
     }
 
     /**

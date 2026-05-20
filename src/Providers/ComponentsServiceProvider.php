@@ -11,6 +11,7 @@ use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
 use Concept\Core\Events\Framework\ComponentRegistering;
+use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
@@ -35,6 +36,8 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
     {
         $container = $this->getContainer();
         $container->add(ComponentRegistry::class, function() use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ComponentRegistry::class));
+
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
             /** @var class-string<ComponentInterface>[] $componentClasses */

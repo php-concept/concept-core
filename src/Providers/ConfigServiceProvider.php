@@ -5,12 +5,16 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Config;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Events\Framework\ServiceAwakening;
+use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Dotenv\Dotenv;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Noodlehaus\Config as nhConfig;
 
 class ConfigServiceProvider extends AbstractServiceProvider
 {
+    use PeeksEventDispatcher;
+
     private const string APP_ENV_KEY = 'APP_ENV';
 
     public function provides(string $id): bool
@@ -26,6 +30,8 @@ class ConfigServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(ConfigInterface::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ConfigInterface::class));
+
             /** @var PathManager $pathManager */
             $pathManager = $container->get(PathManager::class);
 

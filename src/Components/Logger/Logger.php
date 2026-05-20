@@ -3,15 +3,30 @@
 namespace Concept\Core\Components\Logger;
 
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Components\Masker\Contracts\MaskerInterface;
 use Monolog\Level;
 use Monolog\Logger as Monolog;
+use Monolog\LogRecord;
 use Psr\Log\AbstractLogger;
 use Stringable;
 use Throwable;
 
 class Logger extends AbstractLogger implements LoggerInterface
 {
-    public function __construct(private readonly Monolog $monolog) {}
+    public function __construct(
+        private readonly Monolog $monolog,
+        ?MaskerInterface $masker
+    ) {
+        if (!$masker) {
+            return;
+        }
+
+        $this->monolog->pushProcessor(function (LogRecord $record) use ($masker): LogRecord {
+            return $record->with(
+                context: $masker->mask($record->context)
+            );
+        });
+    }
 
     /**
      * @param Level $level

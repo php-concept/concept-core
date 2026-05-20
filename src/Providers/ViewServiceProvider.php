@@ -9,6 +9,7 @@ use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
 use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\View;
+use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerExceptionInterface;
@@ -42,6 +43,8 @@ class ViewServiceProvider extends AbstractServiceProvider
         $container = $this->getContainer();
 
         $container->add(ViewInterface::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ViewInterface::class));
+
             /** @var PathManager $pathManager */
             $pathManager = $container->get(PathManager::class);
             /** @var ConfigInterface $config */

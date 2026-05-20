@@ -2,6 +2,7 @@
 
 namespace Concept\Core\Providers;
 
+use Concept\Core\Components\Masker\Contracts\MaskerInterface;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Logger;
@@ -40,7 +41,12 @@ class LogServiceProvider extends AbstractServiceProvider
             $monolog = new Monolog($config->getString('log.name'));
             $this->setup($monolog);
 
-            return new Logger($monolog);
+            /** @var MaskerInterface|null $masker */
+            $masker = $container->has(MaskerInterface::class)
+                ? $container->get(MaskerInterface::class)
+                : null;
+
+            return new Logger($monolog, $masker);
         })->setShared(true);
     }
 

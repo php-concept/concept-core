@@ -15,7 +15,7 @@ final class LoggerTest extends TestCase
             ->method('log')
             ->with('info', 'message', ['k' => 'v']);
 
-        $logger = new Logger($monolog);
+        $logger = new Logger($monolog, null);
         $logger->log('info', 'message', ['k' => 'v']);
     }
 
@@ -34,7 +34,7 @@ final class LoggerTest extends TestCase
                 })
             );
 
-        $logger = new Logger($monolog);
+        $logger = new Logger($monolog, null);
 
         $exception = new class ('Boom') extends \RuntimeException {
             public function getStatusCode(): int
@@ -59,7 +59,7 @@ final class LoggerTest extends TestCase
                 })
             );
 
-        $logger = new Logger($monolog);
+        $logger = new Logger($monolog, null);
         $logger->exception(new \RuntimeException('Failed', 500));
     }
 }

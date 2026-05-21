@@ -10,7 +10,7 @@ use Concept\Core\Http\Protocol\UrlComponent;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -56,13 +56,6 @@ class ResponseFactory implements ResponseFactoryInterface
         ], $code, $jsonFlags);
     }
 
-    /**
-     * @param string $message
-     * @param int $code
-     * @param array<string, mixed> $errors
-     * @param int $jsonFlags
-     * @return ResponseInterface
-     */
     public function jsonError(
         string $message,
         int $code = HttpStatusCode::INTERNAL_SERVER_ERROR,
@@ -87,12 +80,6 @@ class ResponseFactory implements ResponseFactoryInterface
         return new RedirectResponse($url, $status);
     }
 
-    /**
-     * @param string $urlName
-     * @param array<string, mixed> $parameters
-     * @param int $status
-     * @return ResponseInterface
-     */
     public function redirectByName(string $urlName, array $parameters = [], int $status = HttpStatusCode::FOUND): ResponseInterface
     {
         /** @var UrlGeneratorInterface $urlGenerator */

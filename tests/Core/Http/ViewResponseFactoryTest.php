@@ -33,9 +33,9 @@ final class ViewResponseFactoryTest extends TestCase
 
         $container = new \Tests\Fixtures\Core\ArrayContainer([]);
         $responseFactory = new ResponseFactory($container);
-        $factory = new ViewResponseFactory($responseFactory, $view);
+        $factory = new ViewResponseFactory($request, $responseFactory, $view);
         
-        $response = $factory->create($request, 'home.twig', ['both' => 'from-local', 'local' => true]);
+        $response = $factory->create('home.twig', ['both' => 'from-local', 'local' => true]);
 
         self::assertSame(HttpStatusCode::OK, $response->getStatusCode());
         self::assertSame(HttpValue::HTML, $response->getHeaderLine(HttpHeader::CONTENT_TYPE));
@@ -65,9 +65,9 @@ final class ViewResponseFactoryTest extends TestCase
 
         $container = new \Tests\Fixtures\Core\ArrayContainer([]);
         $responseFactory = new ResponseFactory($container);
-        $factory = new ViewResponseFactory($responseFactory, $view);
+        $factory = new ViewResponseFactory($request, $responseFactory, $view);
         
-        $factory->create($request, 'x', ['only' => true]);
+        $factory->create('x', ['only' => true]);
 
         self::assertSame(['only' => true], $mergedData);
     }
@@ -79,9 +79,9 @@ final class ViewResponseFactoryTest extends TestCase
         
         $container = new \Tests\Fixtures\Core\ArrayContainer([]);
         $responseFactory = new ResponseFactory($container);
-        $factory = new ViewResponseFactory($responseFactory, $view);
+        $factory = new ViewResponseFactory(new ServerRequest(), $responseFactory, $view);
         
-        $response = $factory->create(new ServerRequest(), 'errors/404', [], HttpStatusCode::NOT_FOUND);
+        $response = $factory->create('errors/404', [], HttpStatusCode::NOT_FOUND);
         
         self::assertSame(HttpStatusCode::NOT_FOUND, $response->getStatusCode());
         self::assertSame('Error Page', (string) $response->getBody());
@@ -94,11 +94,11 @@ final class ViewResponseFactoryTest extends TestCase
         
         $container = new \Tests\Fixtures\Core\ArrayContainer([]);
         $responseFactory = new ResponseFactory($container);
-        $factory = new ViewResponseFactory($responseFactory, $view);
+        $factory = new ViewResponseFactory(new ServerRequest(), $responseFactory, $view);
         
         $this->expectException(LoaderError::class);
         $this->expectExceptionMessage('Template "missing.twig" not found.');
         
-        $factory->create(new ServerRequest(), 'missing');
+        $factory->create('missing');
     }
 }

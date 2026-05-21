@@ -16,7 +16,7 @@ use Laminas\Diactoros\ServerRequestFactory;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Route\Router;
-use Psr\Http\Message\ResponseFactoryInterface;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class HttpServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
@@ -75,7 +75,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         })->setShared(true);
 
         $container->add(ResponseFactoryInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ResponseFactory::class));
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ResponseFactoryInterface::class));
 
             return new ResponseFactory($container);
         })->setShared(true);

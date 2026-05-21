@@ -13,7 +13,7 @@ use Laminas\Diactoros\Uri;
 use League\Container\Container;
 use League\Route\Router;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseFactoryInterface;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class HttpServiceProviderTest extends TestCase
@@ -26,7 +26,7 @@ final class HttpServiceProviderTest extends TestCase
         self::assertTrue($provider->provides(Router::class));
         self::assertTrue($provider->provides(RequestFormat::class));
         self::assertTrue($provider->provides(ResponseFactoryInterface::class));
-        self::assertTrue($provider->provides(ResponseFactory::class));
+        self::assertFalse($provider->provides(ResponseFactory::class));
         self::assertTrue($provider->provides(ViewResponseFactory::class));
     }
 
@@ -47,8 +47,8 @@ final class HttpServiceProviderTest extends TestCase
 
         self::assertInstanceOf(RequestFormat::class, $container->get(RequestFormat::class));
         self::assertInstanceOf(Router::class, $container->get(Router::class));
-        self::assertInstanceOf(ResponseFactory::class, $container->get(ResponseFactory::class));
         self::assertInstanceOf(ResponseFactoryInterface::class, $container->get(ResponseFactoryInterface::class));
+        self::assertFalse($container->has(ResponseFactory::class));
 
         $container->add(ViewInterface::class, $this->createStub(ViewInterface::class));
         self::assertInstanceOf(ViewResponseFactory::class, $container->get(ViewResponseFactory::class));

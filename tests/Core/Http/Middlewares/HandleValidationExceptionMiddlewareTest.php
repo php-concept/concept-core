@@ -8,7 +8,7 @@ use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
 use Concept\Core\Http\RequestFormat;
-use Concept\Core\Http\ResponseFactory;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Concept\Core\Http\SessionKey;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
@@ -26,7 +26,7 @@ final class HandleValidationExceptionMiddlewareTest extends TestCase
             ->withUri(new Uri('https://app.test/api'))
             ->withHeader(HttpHeader::ACCEPT, HttpValue::JSON);
 
-        $responseFactory = $this->createMock(ResponseFactory::class);
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
         $responseFactory->expects(self::once())
             ->method('jsonError')
             ->with(
@@ -59,7 +59,7 @@ final class HandleValidationExceptionMiddlewareTest extends TestCase
         $request = (new ServerRequest())->withUri(new Uri('https://app.test/form'));
 
         $back = (new Response())->withStatus(HttpStatusCode::FOUND)->withHeader('Location', '/prev');
-        $responseFactory = $this->createMock(ResponseFactory::class);
+        $responseFactory = $this->createMock(ResponseFactoryInterface::class);
         $responseFactory->expects(self::once())->method('back')->willReturn($back);
         $responseFactory->expects(self::never())->method('jsonError');
 

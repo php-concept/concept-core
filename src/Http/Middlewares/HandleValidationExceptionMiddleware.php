@@ -6,7 +6,7 @@ use Concept\Core\Components\Validator\Exceptions\ValidationException;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\SessionKey;
-use Concept\Core\Http\ResponseFactory;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 class HandleValidationExceptionMiddleware implements MiddlewareInterface
 {
     public function __construct(
-        private readonly ResponseFactory $responseFactory,
+        private readonly ResponseFactoryInterface $responseFactory,
         private readonly RequestFormat $requestFormat,
         private readonly FlashBagInterface $flashBag
     ) {}

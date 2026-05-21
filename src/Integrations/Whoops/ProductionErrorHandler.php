@@ -6,7 +6,7 @@ use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\RequestFormat;
-use Concept\Core\Http\ResponseFactory;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Concept\Core\Components\Path\PathManager;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Container\ContainerInterface;
@@ -36,8 +36,8 @@ class ProductionErrorHandler extends Handler
         $code = $this->prepareResponseCode($exception);
 
         try {
-            /** @var ResponseFactory $responseFactory */
-            $responseFactory = $this->container->get(ResponseFactory::class);
+            /** @var ResponseFactoryInterface $responseFactory */
+            $responseFactory = $this->container->get(ResponseFactoryInterface::class);
             /** @var ServerRequestInterface $request */
             $request = $this->container->get(ServerRequestInterface::class);
             /** @var RequestFormat $requestFormat */

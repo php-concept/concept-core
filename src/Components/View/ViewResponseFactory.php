@@ -7,7 +7,7 @@ use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
 use Concept\Core\Http\RequestAttribute;
-use Psr\Http\Message\ResponseFactoryInterface;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Twig\Error\LoaderError;

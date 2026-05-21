@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Http;
 
-use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
@@ -13,9 +13,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 class ResponseFactory implements ResponseFactoryInterface
 {
@@ -28,38 +25,12 @@ class ResponseFactory implements ResponseFactoryInterface
     private const string PAYLOAD_STATUS_ERROR = 'error';
 
     public function __construct(
-        readonly private ContainerInterface $container,
-        readonly private ViewInterface $view
+        readonly private ContainerInterface $container
     ) {}
 
     public function createResponse(int $code = HttpStatusCode::OK, string $reasonPhrase = ''): ResponseInterface
     {
         return (new Response())->withStatus($code, $reasonPhrase);
-    }
-
-    /**
-     * @param string $template
-     * @param array<string, mixed> $data
-     * @param int $code
-     * @return ResponseInterface
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
-    public function view(string $template, array $data = [], int $code = HttpStatusCode::OK): ResponseInterface
-    {
-        $sharedData = $this->request()->getAttribute(RequestAttribute::VIEW_PAYLOAD, []);
-        if (!is_array($sharedData)) {
-            $sharedData = [];
-        }
-        $combinedData = array_merge($sharedData, $data);
-
-        $content = $this->view->render($template, $combinedData);
-
-        $response = $this->createResponse($code);
-        $response->getBody()->write($content);
-
-        return $response->withHeader(HttpHeader::CONTENT_TYPE, HttpValue::HTML);
     }
 
     public function json(
@@ -114,6 +85,21 @@ class ResponseFactory implements ResponseFactoryInterface
     public function redirect(string $url, int $status = HttpStatusCode::FOUND): ResponseInterface
     {
         return new RedirectResponse($url, $status);
+    }
+
+    /**
+     * @param string $urlName
+     * @param array<string, mixed> $parameters
+     * @param int $status
+     * @return ResponseInterface
+     */
+    public function redirectByName(string $urlName, array $parameters = [], int $status = HttpStatusCode::FOUND): ResponseInterface
+    {
+        /** @var UrlGeneratorInterface $urlGenerator */
+        $urlGenerator = $this->container->get(UrlGeneratorInterface::class);
+        $url = $urlGenerator->route($urlName, $parameters);
+
+        return $this->redirect($url, $status);
     }
 
     public function back(int $status = HttpStatusCode::FOUND, string $fallback = '/'): ResponseInterface

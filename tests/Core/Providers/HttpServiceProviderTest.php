@@ -2,14 +2,18 @@
 
 namespace Tests\Core\Providers;
 
+use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Components\View\ViewResponseFactory;
 use Concept\Core\Http\RequestFormat;
+use Concept\Core\Http\ResponseFactory;
 use Concept\Core\Providers\HttpServiceProvider;
-use League\Container\Container;
-use League\Route\Router;
 use Illuminate\Pagination\Paginator;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;
+use League\Container\Container;
+use League\Route\Router;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class HttpServiceProviderTest extends TestCase
@@ -21,6 +25,9 @@ final class HttpServiceProviderTest extends TestCase
         self::assertTrue($provider->provides(ServerRequestInterface::class));
         self::assertTrue($provider->provides(Router::class));
         self::assertTrue($provider->provides(RequestFormat::class));
+        self::assertTrue($provider->provides(ResponseFactoryInterface::class));
+        self::assertTrue($provider->provides(ResponseFactory::class));
+        self::assertTrue($provider->provides(ViewResponseFactory::class));
     }
 
     public function testRegisterAndBootBindServicesAndConfigurePaginatorResolvers(): void
@@ -40,6 +47,11 @@ final class HttpServiceProviderTest extends TestCase
 
         self::assertInstanceOf(RequestFormat::class, $container->get(RequestFormat::class));
         self::assertInstanceOf(Router::class, $container->get(Router::class));
+        self::assertInstanceOf(ResponseFactory::class, $container->get(ResponseFactory::class));
+        self::assertInstanceOf(ResponseFactoryInterface::class, $container->get(ResponseFactoryInterface::class));
+
+        $container->add(ViewInterface::class, $this->createStub(ViewInterface::class));
+        self::assertInstanceOf(ViewResponseFactory::class, $container->get(ViewResponseFactory::class));
 
         self::assertSame(4, Paginator::resolveCurrentPage());
         self::assertSame('/list', Paginator::resolveCurrentPath());

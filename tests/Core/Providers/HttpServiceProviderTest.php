@@ -3,6 +3,7 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Components\View\ViewResponseFactory;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\ResponseFactory;
@@ -27,7 +28,7 @@ final class HttpServiceProviderTest extends TestCase
         self::assertTrue($provider->provides(RequestFormat::class));
         self::assertTrue($provider->provides(ResponseFactoryInterface::class));
         self::assertFalse($provider->provides(ResponseFactory::class));
-        self::assertTrue($provider->provides(ViewResponseFactory::class));
+        self::assertTrue($provider->provides(ViewResponseFactoryInterface::class));
     }
 
     public function testRegisterAndBootBindServicesAndConfigurePaginatorResolvers(): void
@@ -51,7 +52,8 @@ final class HttpServiceProviderTest extends TestCase
         self::assertFalse($container->has(ResponseFactory::class));
 
         $container->add(ViewInterface::class, $this->createStub(ViewInterface::class));
-        self::assertInstanceOf(ViewResponseFactory::class, $container->get(ViewResponseFactory::class));
+        self::assertInstanceOf(ViewResponseFactoryInterface::class, $container->get(ViewResponseFactoryInterface::class));
+        self::assertFalse($container->has(ViewResponseFactory::class));
 
         self::assertSame(4, Paginator::resolveCurrentPage());
         self::assertSame('/list', Paginator::resolveCurrentPath());

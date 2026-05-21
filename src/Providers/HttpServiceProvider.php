@@ -5,6 +5,7 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Components\Routing\UrlGenerator;
 use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Components\View\ViewResponseFactory;
 use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Http\RequestFormat;
@@ -31,7 +32,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             UrlGeneratorInterface::class,
             RequestFormat::class,
             ResponseFactoryInterface::class,
-            ViewResponseFactory::class,
+            ViewResponseFactoryInterface::class,
         ];
 
         return in_array($id, $services);
@@ -80,8 +81,8 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             return new ResponseFactory($container);
         })->setShared(true);
 
-        $container->add(ViewResponseFactory::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ViewResponseFactory::class));
+        $container->add(ViewResponseFactoryInterface::class, function () use ($container) {
+            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ViewResponseFactoryInterface::class));
 
             /** @var ServerRequestInterface $request */
             $request = $container->get(ServerRequestInterface::class);

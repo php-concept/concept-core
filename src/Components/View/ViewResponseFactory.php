@@ -3,6 +3,7 @@
 namespace Concept\Core\Components\View;
 
 use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
@@ -14,7 +15,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-class ViewResponseFactory
+class ViewResponseFactory implements ViewResponseFactoryInterface
 {
     public function __construct(
         private readonly ServerRequestInterface $request,

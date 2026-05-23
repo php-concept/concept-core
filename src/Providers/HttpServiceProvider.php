@@ -63,10 +63,12 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         $container->add(UrlGeneratorInterface::class, function () use ($container) {
             $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(UrlGeneratorInterface::class));
 
+            /** @var ServerRequestInterface $request */
+            $request = $container->get(ServerRequestInterface::class);
             /** @var Router $router */
             $router = $container->get(Router::class);
 
-            return new UrlGenerator($router);
+            return new UrlGenerator($request, $router);
         })->setShared(true);
 
         $container->add(RequestFormat::class, function () {

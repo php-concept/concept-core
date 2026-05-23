@@ -84,7 +84,7 @@ class ResponseFactory implements ResponseFactoryInterface
     {
         /** @var UrlGeneratorInterface $urlGenerator */
         $urlGenerator = $this->container->get(UrlGeneratorInterface::class);
-        $url = $urlGenerator->route($urlName, $parameters);
+        $url = $urlGenerator->path($urlName, $parameters);
 
         return $this->redirect($url, $status);
     }

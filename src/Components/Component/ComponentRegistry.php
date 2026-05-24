@@ -171,6 +171,16 @@ final class ComponentRegistry
         return $this->components();
     }
 
+    public function has(string $name): bool
+    {
+        foreach ($this->components as $component) {
+            if ($component->name() === $name || $component instanceof $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @return ComponentInterface[]
      */

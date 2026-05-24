@@ -62,17 +62,15 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
             }
         }
 
-        if (PHP_SAPI === 'cli') {
-            $this->registerConsoleCommands($registry);
-            $this->registerComponentSeeders($registry);
-            $this->registerComponentMigrations($registry);
-
-            return;
-        }
+        $this->registerConsoleCommands($registry);
+        $this->registerComponentSeeders($registry);
+        $this->registerComponentMigrations($registry);
 
         $this->registerComponentProviders($registry);
         $this->registerComponentRoutes($registry);
-        $this->registerComponentViewFeatures($registry);
+        if (PHP_SAPI !== 'cli') {
+            $this->registerComponentViewFeatures($registry);
+        }
     }
 
     private function registerComponentRoutes(ComponentRegistry $registry): void

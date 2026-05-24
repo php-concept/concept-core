@@ -173,6 +173,10 @@ final class ComponentRegistry
 
     public function has(string $name): bool
     {
+        if ($this->components === null) {
+            return false;
+        }
+
         foreach ($this->components as $component) {
             if ($component->name() === $name || $component instanceof $name) {
                 return true;

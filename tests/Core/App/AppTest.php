@@ -150,68 +150,6 @@ final class AppTest extends TestCase
         self::assertSame($this->tempRoot, $this->app->getRootPath());
     }
 
-    public function testRegisterRoutesThrowsForMissingFile(): void
-    {
-        $this->app = App::create($this->tempRoot, []);
-        $this->app->getContainer()->add(Router::class, $this->createStub(Router::class), true);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Routes file not found at:');
-
-        $this->app->registerRoutes([$this->tempRoot . '/missing-routes.php']);
-    }
-
-    public function testRegisterRoutesIncludesProvidedRouteFiles(): void
-    {
-        $marker = $this->tempRoot . '/routes-loaded.flag';
-        $routesFile = $this->tempRoot . '/routes.php';
-        file_put_contents(
-            $routesFile,
-            "<?php file_put_contents('" . $marker . "', 'loaded');"
-        );
-
-        $this->app = App::create($this->tempRoot, []);
-        $this->app->getContainer()->add(Router::class, $this->createStub(Router::class), true);
-        $this->app->registerRoutes([$routesFile]);
-
-        self::assertFileExists($marker);
-        self::assertSame('loaded', file_get_contents($marker));
-    }
-
-    /**
-     * Verifies that route files can be registered multiple times across different App instances.
-     * This ensures that 'require' is used instead of 'require_once'.
-     */
-    public function testRegisterRoutesCanBeCalledMultipleTimes(): void
-    {
-        $routesFile = $this->tempRoot . '/routes-multi.php';
-        file_put_contents($routesFile, "<?php \$router->get('/test', fn() => 'ok');");
-
-        // First instance
-        $app1 = App::create($this->tempRoot, []);
-        $router1 = $this->createMock(Router::class);
-        $router1->expects(self::once())->method('get');
-        $app1->getContainer()->add(Router::class, $router1, true);
-        $app1->registerRoutes([$routesFile]);
-
-        // Second instance in the same process
-        $app2 = App::create($this->tempRoot, []);
-        $router2 = $this->createMock(Router::class);
-        $router2->expects(self::once())->method('get');
-        $app2->getContainer()->add(Router::class, $router2, true);
-
-        $app2->registerRoutes([$routesFile]);
-
-        // Clean up both to avoid "risky test" (global error handlers)
-        /** @var \Whoops\Run $whoops1 */
-        $whoops1 = $app1->getContainer()->get(\Whoops\Run::class);
-        $whoops1->unregister();
-
-        /** @var \Whoops\Run $whoops2 */
-        $whoops2 = $app2->getContainer()->get(\Whoops\Run::class);
-        $whoops2->unregister();
-    }
-
     public function testRegisterEarlyErrorHandlerUsesPrettyPageHandlerWhenDebugEnabled(): void
     {
         $previous = $_ENV['APP_DEBUG'] ?? null;

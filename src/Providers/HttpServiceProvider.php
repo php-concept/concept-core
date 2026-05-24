@@ -2,6 +2,7 @@
 
 namespace Concept\Core\Providers;
 
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Components\Routing\UrlGenerator;
 use Concept\Core\Components\View\Contracts\ViewInterface;
@@ -13,6 +14,7 @@ use Concept\Core\Http\ResponseFactory;
 use Concept\Core\Http\RouteStrategy;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Illuminate\Pagination\Paginator;
+use InvalidArgumentException;
 use Laminas\Diactoros\ServerRequestFactory;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
@@ -23,6 +25,8 @@ use Psr\Http\Message\ServerRequestInterface;
 class HttpServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
     use PeeksEventDispatcher;
+
+    private const string ERR_ROUTES_NOT_FOUND = 'Routes file not found at: %s';
 
     public function provides(string $id): bool
     {
@@ -56,6 +60,12 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             $strategy = new RouteStrategy();
             $strategy->setContainer($container);
             $router->setStrategy($strategy);
+
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+            /** @var array<string> $routes */
+            $routes = $config->get('routes');
+            $this->registerRoutes($router, $routes);
 
             return $router;
         })->setShared(true);
@@ -100,6 +110,23 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
     public function boot(): void
     {
         $this->configurePaginator();
+    }
+
+    /**
+     * @param Router $router
+     * @param array<string> $routePaths
+     * @return void
+     */
+    private function registerRoutes(Router $router, array $routePaths): void
+    {
+        $container = $this->getContainer();
+        foreach ($routePaths as $routesFileName) {
+            if (!file_exists($routesFileName)) {
+                throw new InvalidArgumentException(sprintf(self::ERR_ROUTES_NOT_FOUND, $routesFileName));
+            }
+
+            require $routesFileName;
+        }
     }
 
     private function configurePaginator(): void

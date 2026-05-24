@@ -10,9 +10,7 @@ use League\Container\Container;
 use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\ServiceProviderInterface;
 use League\Route\Router;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -26,7 +24,6 @@ final class App
     private const string FALLBACK_FILE_PATH = '%s/resources/views/errors/fallback/500.php';
     private const string ERR_PROVIDERS_NOT_FOUND = 'Providers file not found at: %s';
     private const string ERR_PROVIDERS_NOT_ARRAY = 'Providers file must return an array: %s';
-    private const string ERR_ROUTES_NOT_FOUND = 'Routes file not found at: %s';
 
     protected Container $container;
     protected string $rootPath;
@@ -89,27 +86,6 @@ final class App
                 $provider = new $providerClassName();
                 $this->container->addServiceProvider($provider);
             }
-        }
-    }
-
-    /**
-     * @param array<string> $routePaths
-     * @return void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function registerRoutes(array $routePaths): void
-    {
-        $container = $this->container;
-        /** @var Router $router */
-        $router = $container->get(Router::class);
-
-        foreach ($routePaths as $routesFileName) {
-            if (!file_exists($routesFileName)) {
-                throw new InvalidArgumentException(sprintf(self::ERR_ROUTES_NOT_FOUND, $routesFileName));
-            }
-
-            require $routesFileName;
         }
     }
 

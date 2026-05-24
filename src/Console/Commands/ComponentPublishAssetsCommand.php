@@ -15,7 +15,7 @@ final class ComponentPublishAssetsCommand extends Command
 {
     private const string COMMAND_NAME = 'component:publish-assets';
     private const string OPTION_OVERRIDE = 'override';
-    private const string DESCRIPTION = 'Publish all component assets to public directory.';
+    private const string DESCRIPTION = 'Publish all component assets to public directory';
     private const string MSG_NO_ASSETS = 'No assets configured to publish.';
     private const string MSG_SOURCE_NOT_FOUND = 'Source path not found: %s';
     private const string MSG_MIRRORED = 'Mirrored directory <info>%s</info> to <info>%s</info>';

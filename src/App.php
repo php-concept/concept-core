@@ -2,8 +2,9 @@
 
 namespace Concept\Core;
 
-use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Integrations\Whoops\EarlyBootstrapErrorLogHandler;
+use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use InvalidArgumentException;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use League\Container\Container;
@@ -11,17 +12,14 @@ use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\ServiceProviderInterface;
 use League\Route\Router;
 use Psr\Container\ContainerInterface;
-use Throwable;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
-use Whoops\Handler\Handler;
 use Whoops\Handler\PlainTextHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run as Whoops;
 
 final class App
 {
-    private const string FALLBACK_FILE_PATH = '%s/resources/views/errors/fallback/500.php';
     private const string ERR_PROVIDERS_NOT_FOUND = 'Providers file not found at: %s';
     private const string ERR_PROVIDERS_NOT_ARRAY = 'Providers file must return an array: %s';
 
@@ -91,6 +89,10 @@ final class App
 
     public function run(): void
     {
+        if (!$this->container->has(Router::class) || !$this->container->has(ServerRequestInterface::class)) {
+            throw new RuntimeException('Router and ServerRequestInterface must be registered before running the application.');
+        }
+
         /** @var Router $router */
         $router = $this->container->get(Router::class);
         /** @var ServerRequestInterface $request */
@@ -113,24 +115,17 @@ final class App
         $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
 
         $whoops = new Whoops();
+
         if ($debug) {
             $whoops->pushHandler(new PrettyPageHandler());
+        } elseif (PHP_SAPI === 'cli') {
+            $whoops->pushHandler(new PlainTextHandler());
         } else {
-            if (PHP_SAPI === 'cli') {
-                $whoops->pushHandler(new PlainTextHandler());
-            } else {
-                $whoops->pushHandler(function(Throwable $exception) {
-                    http_response_code(HttpStatusCode::INTERNAL_SERVER_ERROR);
-                    $code = $exception->getCode();
-                    $fallbackFileName = sprintf(self::FALLBACK_FILE_PATH, $this->rootPath);
-                    if (file_exists($fallbackFileName)) {
-                        include $fallbackFileName;
-                    }
-
-                    return Handler::QUIT;
-                });
-            }
+            $whoops->pushHandler(new EarlyBootstrapFallbackHandler($this->rootPath));
         }
+
+        // Whoops runs handlers in reverse push order — log first, then render.
+        $whoops->pushHandler(new EarlyBootstrapErrorLogHandler());
 
         $whoops->register();
 

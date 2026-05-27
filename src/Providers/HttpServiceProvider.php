@@ -61,11 +61,13 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             $strategy->setContainer($container);
             $router->setStrategy($strategy);
 
-            /** @var ConfigInterface $config */
-            $config = $container->get(ConfigInterface::class);
-            /** @var array<string> $routes */
-            $routes = $config->get('routes');
-            $this->registerRoutes($router, $routes);
+            if ($container->has(ConfigInterface::class)) {
+                /** @var ConfigInterface $config */
+                $config = $container->get(ConfigInterface::class);
+                /** @var array<string> $routes */
+                $routes = $config->get('routes', []);
+                $this->registerRoutes($router, $routes);
+            }
 
             return $router;
         })->setShared(true);

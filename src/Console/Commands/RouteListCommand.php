@@ -58,7 +58,8 @@ final class RouteListCommand extends Command
 
         usort(
             $routes,
-            static fn(Route $left, Route $right): int => [$left->getPath(), $left->getMethod()] <=> [$right->getPath(), $right->getMethod()]
+            static fn(Route $left, Route $right): int => [$left->getPath(), $left->getMethod()] <=>
+                [$right->getPath(), $right->getMethod()]
         );
 
         $fullMiddlewareClass = (bool) $input->getOption(self::OPTION_FULL_MIDDLEWARE);

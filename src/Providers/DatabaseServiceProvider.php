@@ -27,6 +27,8 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 {
     use PeeksEventDispatcher;
 
+    private const string DEFAULT_TABLE_NAME = 'migrations';
+
     /**
      * Determine if the provider is deferred.
      */
@@ -64,7 +66,11 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             /** @var CapsuleManager $capsuleManager */
             $capsuleManager = $container->get(CapsuleManager::class);
             $manager = $capsuleManager->getDatabaseManager();
-            $repository = new DatabaseMigrationRepository($manager, 'migrations');
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+
+            $migrationTableName = $config->getString('migrations.table', self::DEFAULT_TABLE_NAME);
+            $repository = new DatabaseMigrationRepository($manager, $migrationTableName);
 
             return new Migrator($repository, $manager, new Filesystem());
         })->setShared(true);
@@ -148,6 +154,10 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 
     private function logQueries(ContainerInterface $container, ConfigInterface $config, QueryExecuted $query): void
     {
+        if (!$container->has(LoggerInterface::class)) {
+            return;
+        }
+
         if ($config->getBool('app.debug') || $config->getBool('log.query')) {
             /** @var LoggerInterface $logger */
             $logger = $container->get(LoggerInterface::class);

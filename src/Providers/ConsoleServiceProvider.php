@@ -3,9 +3,11 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Console\DisabledCommand;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Command\Command;
+use Throwable;
 
 class ConsoleServiceProvider extends AbstractServiceProvider
 {
@@ -45,9 +47,13 @@ class ConsoleServiceProvider extends AbstractServiceProvider
         /** @var array<class-string> $commandClasses */
         $commandClasses = $config->get('commands');
         foreach ($commandClasses as $className) {
-            /** @var Command $commandInstance */
-            $commandInstance = $container->get($className);
-            $consoleApplication->addCommand($commandInstance);
+            try {
+                /** @var Command $commandInstance */
+                $commandInstance = $container->get($className);
+                $consoleApplication->addCommand($commandInstance);
+            } catch (Throwable $e) {
+                $consoleApplication->addCommand(new DisabledCommand($className, $e->getMessage()));
+            }
         }
     }
 }

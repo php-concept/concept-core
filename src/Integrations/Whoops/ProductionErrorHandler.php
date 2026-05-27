@@ -104,9 +104,11 @@ class ProductionErrorHandler extends Handler
 
     private function renderFallback(string $fallbackPath, int $code, Throwable $exception): void
     {
-        /** @var LoggerInterface $logger */
-        $logger = $this->container->get(LoggerInterface::class);
-        $logger->exception($exception);
+        if ($this->container->has(LoggerInterface::class)) {
+            /** @var LoggerInterface $logger */
+            $logger = $this->container->get(LoggerInterface::class);
+            $logger->exception($exception);
+        }
 
         $file = sprintf(self::FALLBACK_FILE_FORMAT, $fallbackPath, $code);
         if (!file_exists($file)) {

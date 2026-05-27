@@ -3,6 +3,7 @@
 namespace Tests\Core\App;
 
 use Concept\Core\App;
+use Concept\Core\Integrations\Whoops\EarlyBootstrapErrorLogHandler;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -47,7 +48,8 @@ final class EarlyErrorHandlerTest extends TestCase
         $whoops = $app->getContainer()->get(Whoops::class);
         $handlers = $whoops->getHandlers();
 
-        self::assertNotEmpty($handlers, 'Early error handler should register at least one handler');
-        self::assertInstanceOf(PlainTextHandler::class, $handlers[0], 'In CLI mode, PlainTextHandler should be registered');
+        self::assertCount(2, $handlers);
+        self::assertInstanceOf(EarlyBootstrapErrorLogHandler::class, $handlers[0]);
+        self::assertInstanceOf(PlainTextHandler::class, $handlers[1]);
     }
 }

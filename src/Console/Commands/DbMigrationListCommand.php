@@ -2,8 +2,8 @@
 
 namespace Concept\Core\Console\Commands;
 
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,10 +17,18 @@ class DbMigrationListCommand extends Command
     private const string OPTION_LIMIT = 'limit';
     private const string OPTION_LIMIT_SHORTCUT = 'l';
     private const string OPTION_LIMIT_DESCRIPTION = 'The count of migrations to display';
+    private const string DEFAULT_TABLE_NAME = 'migrations';
     private const int DEFAULT_LIMIT = 10;
     private const string MSG_MIGRATIONS_LIST = 'Migrations List';
     private const string MSG_NOT_FOUND = 'No migrations found.';
     private const string MSG_TOTAL = 'Showing top %d migrations.';
+
+    public function __construct(
+        private readonly ConfigInterface $config,
+        private readonly CapsuleManager $capsule
+    ) {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -48,7 +56,7 @@ class DbMigrationListCommand extends Command
 
         $io->title(self::MSG_MIGRATIONS_LIST);
         /** @var array<array<string, mixed>> $migrations */
-        $migrations = CapsuleManager::table('migrations')
+        $migrations = $this->capsule->getConnection()->table($this->config->getString('migrations.table', self::DEFAULT_TABLE_NAME))
             ->limit($limit)
             ->get()
             ->map(fn($item) => (array) $item)

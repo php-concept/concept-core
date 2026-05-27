@@ -5,58 +5,50 @@ namespace Tests\Core\Integrations\Whoops;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapErrorLogHandler;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Whoops\Run as Whoops;
 
 final class EarlyBootstrapErrorLogHandlerTest extends TestCase
 {
     private string $tempRoot;
 
+    private ?string $previousErrorLog = null;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->tempRoot = sys_get_temp_dir() . '/concept-early-log-' . bin2hex(random_bytes(6));
-        mkdir($this->tempRoot . '/storage/logs', 0777, true);
+        mkdir($this->tempRoot, 0777, true);
     }
 
     protected function tearDown(): void
     {
-        $logDir = $this->tempRoot . '/storage/logs';
-        foreach (glob($logDir . '/*') ?: [] as $file) {
-            if (is_file($file)) {
-                unlink($file);
-            }
+        if ($this->previousErrorLog !== null) {
+            ini_set('error_log', $this->previousErrorLog);
         }
-        if (is_dir($logDir)) {
-            rmdir($logDir);
-        }
-        if (is_dir($this->tempRoot . '/storage')) {
-            rmdir($this->tempRoot . '/storage');
+
+        $logFile = $this->tempRoot . '/php-error.log';
+        if (is_file($logFile)) {
+            unlink($logFile);
         }
         if (is_dir($this->tempRoot)) {
             rmdir($this->tempRoot);
         }
+
         parent::tearDown();
     }
 
-    public function testWritesExceptionToAppLogFile(): void
+    public function testWritesExceptionToErrorLog(): void
     {
-        $whoops = new Whoops();
-        $whoops->pushHandler(new EarlyBootstrapErrorLogHandler($this->tempRoot));
-        $whoops->register();
+        $logFile = $this->tempRoot . '/php-error.log';
+        $this->previousErrorLog = ini_get('error_log') ?: '';
+        ini_set('error_log', $logFile);
 
-        try {
-            throw new RuntimeException('bootstrap failed');
-        } catch (RuntimeException $exception) {
-            $handler = new EarlyBootstrapErrorLogHandler($this->tempRoot);
-            $handler->setException($exception);
-            $handler->handle();
-        }
+        $handler = new EarlyBootstrapErrorLogHandler();
+        $handler->setException(new RuntimeException('bootstrap failed'));
+        $handler->handle();
 
-        $logFiles = glob($this->tempRoot . '/storage/logs/app-*.log');
-        self::assertNotFalse($logFiles);
-        self::assertCount(1, $logFiles);
+        self::assertFileExists($logFile);
 
-        $contents = file_get_contents($logFiles[0]);
+        $contents = file_get_contents($logFile);
         self::assertIsString($contents);
         self::assertStringContainsString('app.ERROR: bootstrap failed', $contents);
         self::assertStringContainsString('"bootstrap":true', $contents);

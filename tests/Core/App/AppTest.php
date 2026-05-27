@@ -7,6 +7,7 @@ use Concept\Core\Components\Path\PathManager;
 use InvalidArgumentException;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
+use League\Container\Container;
 use League\Route\Router;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -179,6 +180,7 @@ final class AppTest extends TestCase
     {
         $app = App::create($this->tempRoot, []);
         $container = $app->getContainer();
+        self::assertInstanceOf(Container::class, $container);
 
         $request = new ServerRequest();
         $response = (new Response())->withHeader('X-Dispatched', 'yes');

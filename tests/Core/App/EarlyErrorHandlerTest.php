@@ -41,15 +41,16 @@ final class EarlyErrorHandlerTest extends TestCase
     #[PreserveGlobalState(false)]
     public function testEarlyErrorHandlerRegistersPlainTextHandlerInCli(): void
     {
-        // In our test environment PHP_SAPI is 'cli'
         $app = App::create($this->tempRoot, []);
-        
+
         /** @var Whoops $whoops */
         $whoops = $app->getContainer()->get(Whoops::class);
         $handlers = $whoops->getHandlers();
 
         self::assertCount(2, $handlers);
-        self::assertInstanceOf(EarlyBootstrapErrorLogHandler::class, $handlers[0]);
-        self::assertInstanceOf(PlainTextHandler::class, $handlers[1]);
+        self::assertInstanceOf(PlainTextHandler::class, $handlers[0]);
+        self::assertInstanceOf(EarlyBootstrapErrorLogHandler::class, $handlers[1]);
+
+        $whoops->unregister();
     }
 }

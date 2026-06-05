@@ -2,6 +2,7 @@
 
 namespace Concept\Core\Integrations\Whoops;
 
+use Concept\Core\Components\Container\ContainerResolver;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
@@ -11,6 +12,7 @@ use Concept\Core\Components\Path\PathManager;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 use Throwable;
 use Whoops\Handler\Handler;
 
@@ -35,24 +37,26 @@ class ProductionErrorHandler extends Handler
         $exception = $this->getException();
         $code = $this->prepareResponseCode($exception);
 
-        try {
-            /** @var ResponseFactoryInterface $responseFactory */
-            $responseFactory = $this->container->get(ResponseFactoryInterface::class);
-            /** @var ServerRequestInterface $request */
-            $request = $this->container->get(ServerRequestInterface::class);
-            /** @var RequestFormat $requestFormat */
-            $requestFormat = $this->container->get(RequestFormat::class);
+        /** @var ResponseFactoryInterface|null $responseFactory */
+        $responseFactory = ContainerResolver::tryGet($this->container, ResponseFactoryInterface::class);
+        /** @var ServerRequestInterface|null $request */
+        $request = ContainerResolver::tryGet($this->container, ServerRequestInterface::class);
+        /** @var RequestFormat|null $requestFormat */
+        $requestFormat = ContainerResolver::tryGet($this->container, RequestFormat::class);
 
-            if ($requestFormat->expectsJson($request)) {
-                $response = $responseFactory->jsonError($exception->getMessage(), $code);
-                (new SapiEmitter())->emit($response);
+        if ($responseFactory !== null && $request !== null && $requestFormat !== null) {
+            try {
+                if ($requestFormat->expectsJson($request)) {
+                    $response = $responseFactory->jsonError($exception->getMessage(), $code);
+                    (new SapiEmitter())->emit($response);
+
+                    exit;
+                }
+            } catch (Throwable $e) {
+                $this->renderFallback($this->fallbackPath, $code, $e);
 
                 exit;
             }
-        } catch (Throwable $e) {
-            $this->renderFallback($this->fallbackPath, $code, $e);
-
-            exit;
         }
 
         if (!headers_sent()) {
@@ -88,10 +92,14 @@ class ProductionErrorHandler extends Handler
 
     private function renderErrorPage(Throwable $exception, int $code): string
     {
-        /** @var PathManager $pathManager */
-        $pathManager = $this->container->get(PathManager::class);
-        /** @var ViewInterface $view */
-        $view = $this->container->get(ViewInterface::class);
+        /** @var PathManager|null $pathManager */
+        $pathManager = ContainerResolver::tryGet($this->container, PathManager::class);
+        /** @var ViewInterface|null $view */
+        $view = ContainerResolver::tryGet($this->container, ViewInterface::class);
+
+        if ($pathManager === null || $view === null) {
+            throw new RuntimeException('View services are not available.');
+        }
 
         $template = sprintf(self::TEMPLATE_ERROR_FORMAT, $code);
         $templatePath = $pathManager->get(PathManager::VIEWS_DIR , $template);
@@ -104,11 +112,9 @@ class ProductionErrorHandler extends Handler
 
     private function renderFallback(string $fallbackPath, int $code, Throwable $exception): void
     {
-        if ($this->container->has(LoggerInterface::class)) {
-            /** @var LoggerInterface $logger */
-            $logger = $this->container->get(LoggerInterface::class);
-            $logger->exception($exception);
-        }
+        /** @var LoggerInterface|null $logger */
+        $logger = ContainerResolver::tryGet($this->container, LoggerInterface::class);
+        $logger?->exception($exception);
 
         $file = sprintf(self::FALLBACK_FILE_FORMAT, $fallbackPath, $code);
         if (!file_exists($file)) {

@@ -2,9 +2,11 @@
 
 namespace Concept\Core\Integrations\Whoops;
 
+use Concept\Core\Components\Container\ContainerResolver;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 use Whoops\Handler\Handler;
 
 class ErrorLogHandler extends Handler
@@ -13,13 +15,16 @@ class ErrorLogHandler extends Handler
 
     public function handle(): int
     {
-        if (!$this->container->has(LoggerInterface::class)) {
+        /** @var LoggerInterface|null $logger */
+        $logger = ContainerResolver::tryGet($this->container, LoggerInterface::class);
+        if ($logger === null) {
             return Handler::DONE;
         }
 
-        /** @var LoggerInterface $logger **/
-        $logger = $this->container->get(LoggerInterface::class);
-        $logger->exception($this->getException(), $this->getUri());
+        try {
+            $logger->exception($this->getException(), $this->getUri());
+        } catch (Throwable) {
+        }
 
         return Handler::DONE;
     }
@@ -28,11 +33,10 @@ class ErrorLogHandler extends Handler
     {
         $uri = '';
         if (isset($_SERVER['REQUEST_URI'])) {
-            // Check if we have a request object, otherwise fallback to $_SERVER
             $uri = is_string($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'unknown';
-            if ($this->container->has(ServerRequestInterface::class)) {
-                /** @var ServerRequestInterface $request */
-                $request = $this->container->get(ServerRequestInterface::class);
+            /** @var ServerRequestInterface|null $request */
+            $request = ContainerResolver::tryGet($this->container, ServerRequestInterface::class);
+            if ($request !== null) {
                 $uri = $request->getUri()->getPath();
             }
         }

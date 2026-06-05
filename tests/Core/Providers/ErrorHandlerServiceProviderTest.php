@@ -3,6 +3,7 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Http\RequestFormat;
@@ -108,6 +109,25 @@ final class ErrorHandlerServiceProviderTest extends TestCase
         $provider->register();
 
         self::assertFalse($container->has(Whoops::class));
+    }
+
+    public function testBootRegistersEarlyFallbackWhenConfigIsMissing(): void
+    {
+        $container = new Container();
+
+        $whoops = new Whoops();
+        $container->add(Whoops::class, $whoops, true);
+        $container->add(PathManager::class, new PathManager(sys_get_temp_dir(), [
+            PathManager::ERRORS_FALLBACK_VIEWS_DIR => 'errors-fallback',
+        ]), true);
+
+        $provider = $this->makeWebProvider();
+        $provider->setContainer($container);
+        $provider->boot();
+
+        $GLOBALS['__test_whoops'] = $whoops;
+
+        self::assertTrue($this->containsHandler($whoops->getHandlers(), EarlyBootstrapFallbackHandler::class));
     }
 
     public function testBootRegistersHandlersWhenRequestServicesAreMissing(): void

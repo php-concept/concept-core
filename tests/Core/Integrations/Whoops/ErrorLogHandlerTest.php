@@ -4,6 +4,8 @@ namespace Tests\Core\Integrations\Whoops;
 
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Integrations\Whoops\ErrorLogHandler;
+use League\Container\Container;
+use League\Container\ServiceProvider\AbstractServiceProvider;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\TestCase;
@@ -64,6 +66,29 @@ final class ErrorLogHandlerTest extends TestCase
         $container = new ArrayContainer([
             LoggerInterface::class => $logger,
         ]);
+
+        $handler = new ErrorLogHandler($container);
+        $handler->setException(new \RuntimeException('boom'));
+
+        self::assertSame(Handler::DONE, $handler->handle());
+    }
+
+    public function testHandleReturnsDoneWhenLoggerResolutionFails(): void
+    {
+        $container = new Container();
+        $container->addServiceProvider(new class extends AbstractServiceProvider {
+            public function provides(string $id): bool
+            {
+                return $id === LoggerInterface::class;
+            }
+
+            public function register(): void
+            {
+                $this->getContainer()->add(LoggerInterface::class, function (): never {
+                    throw new \RuntimeException('missing dependency');
+                });
+            }
+        });
 
         $handler = new ErrorLogHandler($container);
         $handler->setException(new \RuntimeException('boom'));

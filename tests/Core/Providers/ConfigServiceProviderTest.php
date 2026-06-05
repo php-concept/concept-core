@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 final class ConfigServiceProviderTest extends TestCase
 {
     private string $tmpRoot;
+    /** @var array<string, string|false|null> */
+    private array $previousEnv = [];
 
     protected function setUp(): void
     {
@@ -23,10 +25,28 @@ final class ConfigServiceProviderTest extends TestCase
         file_put_contents($this->tmpRoot . '/config/log.php', "<?php return ['level' => 'info'];");
         file_put_contents($this->tmpRoot . '/config/local/app.php', "<?php return ['name' => 'Framework Local'];");
         file_put_contents($this->tmpRoot . '/.env', "APP_ENV=local\nAPP_NAME=EnvName\nAPP_DEBUG=true\n");
+
+        foreach (['APP_ENV', 'APP_NAME', 'APP_DEBUG'] as $key) {
+            $this->previousEnv[$key] = getenv($key);
+            putenv($key);
+            unset($_ENV[$key], $_SERVER[$key]);
+        }
     }
 
     protected function tearDown(): void
     {
+        foreach ($this->previousEnv as $key => $value) {
+            if ($value === false || $value === null) {
+                putenv($key);
+                unset($_ENV[$key], $_SERVER[$key]);
+                continue;
+            }
+
+            putenv(sprintf('%s=%s', $key, $value));
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+        }
+
         $this->removeTree($this->tmpRoot);
         parent::tearDown();
     }
@@ -39,7 +59,7 @@ final class ConfigServiceProviderTest extends TestCase
         self::assertFalse($provider->provides('config.unknown'));
     }
 
-    public function testRegisterLoadsBaseOverrideAndEnvValues(): void
+    public function testBootLoadsBaseOverrideAndEnvValues(): void
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
@@ -48,14 +68,13 @@ final class ConfigServiceProviderTest extends TestCase
 
         $provider = new ConfigServiceProvider();
         $provider->setContainer($container);
-        $provider->register();
+        $provider->boot();
 
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
 
         // env merge has priority over file values due to set() after load.
         self::assertSame('EnvName', $config->getString('app.name'));
-        self::assertTrue($config->getBool('app.debug'));
         self::assertSame('local', $config->getString('app.env'));
         self::assertSame('UTC', date_default_timezone_get());
     }

@@ -9,9 +9,10 @@ use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Dotenv\Dotenv;
 use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use Noodlehaus\Config as nhConfig;
 
-class ConfigServiceProvider extends AbstractServiceProvider
+class ConfigServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
     use PeeksEventDispatcher;
 
@@ -28,23 +29,25 @@ class ConfigServiceProvider extends AbstractServiceProvider
 
     public function register(): void
     {
+    }
+
+    public function boot(): void
+    {
         $container = $this->getContainer();
-        $container->add(ConfigInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ConfigInterface::class));
+        $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ConfigInterface::class));
 
-            /** @var PathManager $pathManager */
-            $pathManager = $container->get(PathManager::class);
+        /** @var PathManager $pathManager */
+        $pathManager = $container->get(PathManager::class);
 
-            $nhConfig = new nhConfig($pathManager->get(PathManager::CONFIG_DIR));
-            $envData = $this->loadDotEnv($pathManager->root());
-            $this->loadOverrideConfig($nhConfig, $envData, $pathManager);
+        $nhConfig = new nhConfig($pathManager->get(PathManager::CONFIG_DIR));
+        $envData = $this->loadDotEnv($pathManager->root());
+        $this->loadOverrideConfig($nhConfig, $envData, $pathManager);
 
-            $this->mergeEnvData($nhConfig, $envData);
-            $config = new Config($nhConfig);
-            $this->setTimeZone($config->getString('app.timezone', 'UTC'));
+        $this->mergeEnvData($nhConfig, $envData);
+        $config = new Config($nhConfig);
+        $this->setTimeZone($config->getString('app.timezone', 'UTC'));
 
-            return $config;
-        })->setShared(true);
+        $container->add(ConfigInterface::class, $config)->setShared(true);
     }
 
     /**

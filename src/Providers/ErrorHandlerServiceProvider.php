@@ -4,6 +4,7 @@ namespace Concept\Core\Providers;
 
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Integrations\Whoops\ErrorLogHandler;
+use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use Concept\Core\Integrations\Whoops\ProductionErrorHandler;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
@@ -44,6 +45,13 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
         $whoops = $this->getContainer()->get(Whoops::class);
         $whoops->clearHandlers();
 
+        $whoops->pushHandler(function (Throwable $exception) {
+            $handler = new PhpErrorLogHandler();
+            $handler->setException($exception);
+
+            return $handler->handle();
+        });
+
         if ($container->has(ServerRequestInterface::class) && $container->has(RequestFormat::class)) {
             /** @var ServerRequestInterface $request */
             $request = $this->getContainer()->get(ServerRequestInterface::class);
@@ -51,7 +59,7 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
             $requestFormat = $this->getContainer()->get(RequestFormat::class);
 
             if ($requestFormat->expectsJson($request)) {
-                $whoops->pushHandler(new JsonResponseHandler());
+                $whoops->appendHandler(new JsonResponseHandler());
             } else {
                 $this->registerHandlers($container, $whoops);
             }
@@ -59,7 +67,7 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
             $this->registerHandlers($container, $whoops);
         }
 
-        $whoops->pushHandler(function (Throwable $exception) use ($container) {
+        $whoops->appendHandler(function (Throwable $exception) use ($container) {
             $handler = new ErrorLogHandler($container);
             $handler->setException($exception);
 
@@ -82,13 +90,13 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
         $config = $this->getContainer()->get(ConfigInterface::class);
 
         if ($this->isCli()) {
-            $whoops->pushHandler(new PlainTextHandler());
+            $whoops->appendHandler(new PlainTextHandler());
 
             return;
         }
 
         if ($config->getBool('app.debug', false)) {
-            $whoops->pushHandler(new PrettyPageHandler());
+            $whoops->appendHandler(new PrettyPageHandler());
 
             return;
         }
@@ -97,7 +105,7 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
         $pathManager = $container->get(PathManager::class);
         $fallbackPath = $pathManager->get(PathManager::ERRORS_FALLBACK_VIEWS_DIR);
 
-        $whoops->pushHandler(function (Throwable $exception) use ($container, $fallbackPath) {
+        $whoops->appendHandler(function (Throwable $exception) use ($container, $fallbackPath) {
             $handler = new ProductionErrorHandler($container, $fallbackPath);
             $handler->setException($exception);
 

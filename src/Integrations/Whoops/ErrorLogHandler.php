@@ -9,14 +9,10 @@ use Whoops\Handler\Handler;
 
 class ErrorLogHandler extends Handler
 {
-    use WriteToErrorLog;
-
     public function __construct(private readonly ContainerInterface $container) {}
 
     public function handle(): int
     {
-        $this->writeToErrorLog($this->getException());
-
         if (!$this->container->has(LoggerInterface::class)) {
             return Handler::DONE;
         }

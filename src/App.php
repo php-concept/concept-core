@@ -3,7 +3,7 @@
 namespace Concept\Core;
 
 use Concept\Core\Components\Path\PathManager;
-use Concept\Core\Integrations\Whoops\EarlyBootstrapErrorLogHandler;
+use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use InvalidArgumentException;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -125,7 +125,7 @@ final class App
         }
 
         // Whoops runs handlers in reverse push order — log first, then render.
-        $whoops->pushHandler(new EarlyBootstrapErrorLogHandler());
+        $whoops->pushHandler(new PhpErrorLogHandler());
 
         $whoops->register();
 

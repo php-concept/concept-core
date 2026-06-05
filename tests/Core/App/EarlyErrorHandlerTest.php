@@ -3,7 +3,7 @@
 namespace Tests\Core\App;
 
 use Concept\Core\App;
-use Concept\Core\Integrations\Whoops\EarlyBootstrapErrorLogHandler;
+use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -49,7 +49,7 @@ final class EarlyErrorHandlerTest extends TestCase
 
         self::assertCount(2, $handlers);
         self::assertInstanceOf(PlainTextHandler::class, $handlers[0]);
-        self::assertInstanceOf(EarlyBootstrapErrorLogHandler::class, $handlers[1]);
+        self::assertInstanceOf(PhpErrorLogHandler::class, $handlers[1]);
 
         $whoops->unregister();
     }

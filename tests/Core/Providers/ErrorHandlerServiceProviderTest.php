@@ -64,8 +64,11 @@ final class ErrorHandlerServiceProviderTest extends TestCase
         $GLOBALS['__test_whoops'] = $whoops;
 
         $handlers = $whoops->getHandlers();
-        self::assertNotEmpty($handlers);
-        self::assertTrue($this->containsHandler($handlers, JsonResponseHandler::class));
+
+        self::assertCount(3, $handlers);
+        self::assertInstanceOf(CallbackHandler::class, $handlers[0]);
+        self::assertInstanceOf(JsonResponseHandler::class, $handlers[1]);
+        self::assertInstanceOf(CallbackHandler::class, $handlers[2]);
     }
 
     public function testBootRegistersPlainTextHandlerForCliWhenNotJson(): void
@@ -202,9 +205,10 @@ final class ErrorHandlerServiceProviderTest extends TestCase
 
         $handlers = $whoops->getHandlers();
 
-        self::assertCount(2, $handlers);
+        self::assertCount(3, $handlers);
         self::assertInstanceOf(CallbackHandler::class, $handlers[0]);
         self::assertInstanceOf(CallbackHandler::class, $handlers[1]);
+        self::assertInstanceOf(CallbackHandler::class, $handlers[2]);
         self::assertFalse($this->containsHandler($handlers, PrettyPageHandler::class));
         self::assertFalse($this->containsHandler($handlers, PlainTextHandler::class));
         self::assertFalse($this->containsHandler($handlers, JsonResponseHandler::class));
@@ -236,11 +240,14 @@ final class ErrorHandlerServiceProviderTest extends TestCase
         $GLOBALS['__test_whoops'] = $whoops;
 
         $handlers = $whoops->getHandlers();
-        $closureHandler = end($handlers);
+        self::assertCount(3, $handlers);
+
+        // appendHandler(ErrorLog) is registered last, so it sits at the front of the stack.
+        $errorLogHandler = $handlers[0];
 
         $exception = new RuntimeException('boom');
-        $closureHandler->setException($exception);
-        $closureHandler->handle();
+        $errorLogHandler->setException($exception);
+        $errorLogHandler->handle();
 
         self::assertSame($exception, $loggedException);
     }

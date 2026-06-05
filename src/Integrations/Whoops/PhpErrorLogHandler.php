@@ -2,12 +2,13 @@
 
 namespace Concept\Core\Integrations\Whoops;
 
-use Throwable;
+use Whoops\Handler\Handler;
 
-trait WriteToErrorLog
+class PhpErrorLogHandler extends Handler
 {
-    private function writeToErrorLog(Throwable $exception): void
+    public function handle(): int
     {
+        $exception = $this->getException();
         $uri = '';
         if (isset($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI'])) {
             $uri = $_SERVER['REQUEST_URI'];
@@ -30,5 +31,7 @@ trait WriteToErrorLog
         );
 
         error_log(rtrim($line));
+
+        return Handler::DONE;
     }
 }

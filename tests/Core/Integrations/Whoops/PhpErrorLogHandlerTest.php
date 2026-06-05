@@ -2,11 +2,11 @@
 
 namespace Tests\Core\Integrations\Whoops;
 
-use Concept\Core\Integrations\Whoops\EarlyBootstrapErrorLogHandler;
+use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-final class EarlyBootstrapErrorLogHandlerTest extends TestCase
+final class PhpErrorLogHandlerTest extends TestCase
 {
     private string $tempRoot;
 
@@ -15,7 +15,7 @@ final class EarlyBootstrapErrorLogHandlerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->tempRoot = sys_get_temp_dir() . '/concept-early-log-' . bin2hex(random_bytes(6));
+        $this->tempRoot = sys_get_temp_dir() . '/concept-php-error-log-' . bin2hex(random_bytes(6));
         mkdir($this->tempRoot, 0777, true);
     }
 
@@ -42,7 +42,7 @@ final class EarlyBootstrapErrorLogHandlerTest extends TestCase
         $this->previousErrorLog = ini_get('error_log') ?: '';
         ini_set('error_log', $logFile);
 
-        $handler = new EarlyBootstrapErrorLogHandler();
+        $handler = new PhpErrorLogHandler();
         $handler->setException(new RuntimeException('bootstrap failed'));
         $handler->handle();
 

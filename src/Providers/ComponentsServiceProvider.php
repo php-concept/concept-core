@@ -7,9 +7,7 @@ use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
-use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
-use Concept\Core\Components\View\Registries\ViewPathRegistry;
-use Concept\Core\Components\View\Registries\ViewContextRegistry;
+use Concept\Core\Components\View\Registries\ViewRegistry;
 use Concept\Core\Events\Framework\ComponentRegistering;
 use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
@@ -97,17 +95,11 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
     {
         $container = $this->getContainer();
 
-        /** @var ViewExtensionRegistry $viewExtensionsRegistry */
-        $viewExtensionsRegistry = $container->get(ViewExtensionRegistry::class);
-        $viewExtensionsRegistry->append($registry->viewExtensions());
-
-        /** @var ViewPathRegistry $viewPathRegistry */
-        $viewPathRegistry = $container->get(ViewPathRegistry::class);
-        $viewPathRegistry->append($registry->viewPaths());
-
-        /** @var ViewContextRegistry $viewContextRegistry */
-        $viewContextRegistry = $container->get(ViewContextRegistry::class);
-        $viewContextRegistry->append($registry->viewContexts());
+        /** @var ViewRegistry $viewRegistry */
+        $viewRegistry = $container->get(ViewRegistry::class);
+        $viewRegistry->extensions()->append($registry->viewExtensions());
+        $viewRegistry->paths()->append($registry->viewPaths());
+        $viewRegistry->contexts()->append($registry->viewContexts());
     }
 
 

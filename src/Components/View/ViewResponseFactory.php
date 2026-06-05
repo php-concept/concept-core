@@ -11,9 +11,6 @@ use Concept\Core\Http\RequestAttribute;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 class ViewResponseFactory implements ViewResponseFactoryInterface
 {
@@ -28,9 +25,6 @@ class ViewResponseFactory implements ViewResponseFactoryInterface
      * @param array<string, mixed> $data
      * @param int $code
      * @return ResponseInterface
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
      */
     public function create(
         string $template,

@@ -27,14 +27,14 @@ class UrlGenerator implements UrlGeneratorInterface
         return $baseUrl;
     }
 
-    public function path(string $name, array $parameters = []): string
+    public function uri(string $name, array $parameters = []): string
     {
         return $this->router->getNamedRoute($name)->getPath($parameters);
     }
 
-    public function route(string $name, array $parameters = []): string
+    public function url(string $name, array $parameters = []): string
     {
-        return $this->build($this->base(), $this->path($name, $parameters));
+        return $this->build($this->base(), $this->uri($name, $parameters));
     }
 
     private function build(string $baseUrl, string $uri): string

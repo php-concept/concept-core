@@ -5,13 +5,18 @@ namespace Tests\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\View\Contracts\ViewInterface;
-use Concept\Core\Providers\ViewServiceProvider;
+use Concept\Core\Components\View\Registries\ViewContextRegistry;
+use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
+use Concept\Core\Components\View\Registries\ViewPathRegistry;
+use Concept\Core\Components\View\Registries\ViewRegistry;
+use Concept\Core\Providers\TwigServiceProvider;
+use Concept\Core\Providers\ViewRegistryServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use PHPUnit\Framework\TestCase;
 use Twig\Extension\StringLoaderExtension;
 
-final class ViewServiceProviderTest extends TestCase
+final class TwigServiceProviderTest extends TestCase
 {
     private string $tmpRoot;
 
@@ -34,7 +39,7 @@ final class ViewServiceProviderTest extends TestCase
 
     public function testProvidesViewInterface(): void
     {
-        $provider = new ViewServiceProvider();
+        $provider = new TwigServiceProvider();
         self::assertTrue($provider->provides(ViewInterface::class));
         self::assertFalse($provider->provides('view.unknown'));
     }
@@ -47,30 +52,12 @@ final class ViewServiceProviderTest extends TestCase
             PathManager::CACHE_DIR => 'storage/cache',
         ]))->setShared(true);
 
-        $container->add(ConfigInterface::class, new class implements ConfigInterface {
-            public function get(string $key, mixed $default = null): mixed
-            {
-                if ($key === 'view.paths') {
-                    return ['ui' => 'resources/views/components'];
-                }
-                if ($key === 'view.extensions') {
-                    return [];
-                }
+        $container->add(ViewRegistry::class, $this->makeViewRegistry([
+            'ui' => 'resources/views/components',
+        ]))->setShared(true);
+        $container->add(ConfigInterface::class, $this->makeConfig(debug: false))->setShared(true);
 
-                return $default;
-            }
-            public function set(string $key, mixed $default = null): void {}
-            public function has(string $key): bool { return false; }
-            public function all(): array { return []; }
-            public function getString(string $key, string $default = ''): string { return $default; }
-            public function getInt(string $key, int $default = 0): int { return $default; }
-            public function getBool(string $key, bool $default = false): bool
-            {
-                return $key === 'app.debug' ? false : $default;
-            }
-        })->setShared(true);
-
-        $provider = new ViewServiceProvider();
+        $provider = new TwigServiceProvider();
         $provider->setContainer($container);
         $provider->register();
 
@@ -90,32 +77,13 @@ final class ViewServiceProviderTest extends TestCase
             PathManager::CACHE_DIR => 'storage/cache',
         ]))->setShared(true);
 
-        $container->add(ConfigInterface::class, new class implements ConfigInterface {
-            public function get(string $key, mixed $default = null): mixed
-            {
-                if ($key === 'view.extensions') {
-                    return [StringLoaderExtension::class];
-                }
-                if ($key === 'view.paths') {
-                    return [
-                        'ui' => 'resources/views/components',
-                    ];
-                }
+        $container->add(ViewRegistry::class, $this->makeViewRegistry(
+            ['ui' => 'resources/views/components'],
+            [StringLoaderExtension::class],
+        ))->setShared(true);
+        $container->add(ConfigInterface::class, $this->makeConfig(debug: true))->setShared(true);
 
-                return $default;
-            }
-            public function set(string $key, mixed $default = null): void {}
-            public function has(string $key): bool { return false; }
-            public function all(): array { return []; }
-            public function getString(string $key, string $default = ''): string { return $default; }
-            public function getInt(string $key, int $default = 0): int { return $default; }
-            public function getBool(string $key, bool $default = false): bool
-            {
-                return $key === 'app.debug' ? true : $default;
-            }
-        })->setShared(true);
-
-        $provider = new ViewServiceProvider();
+        $provider = new TwigServiceProvider();
         $provider->setContainer($container);
         $provider->register();
 
@@ -150,13 +118,58 @@ final class ViewServiceProviderTest extends TestCase
             public function getBool(string $key, bool $default = false): bool { return false; }
         })->setShared(true);
 
-        $provider = new ViewServiceProvider();
+        $registryProvider = new ViewRegistryServiceProvider();
+        $registryProvider->setContainer($container);
+        $container->addServiceProvider($registryProvider);
+
+        $provider = new TwigServiceProvider();
         $provider->setContainer($container);
         $provider->register();
 
         $this->expectException(\TypeError::class);
 
         $container->get(ViewInterface::class);
+    }
+
+    /**
+     * @param array<string, string> $paths
+     * @param array<string> $extensions
+     */
+    private function makeViewRegistry(array $paths = [], array $extensions = []): ViewRegistry
+    {
+        $viewPathRegistry = new ViewPathRegistry();
+        $viewPathRegistry->append($paths);
+
+        $viewExtensionRegistry = new ViewExtensionRegistry();
+        $viewExtensionRegistry->append($extensions);
+
+        return new ViewRegistry(
+            $viewPathRegistry,
+            $viewExtensionRegistry,
+            new ViewContextRegistry(),
+        );
+    }
+
+    private function makeConfig(bool $debug): ConfigInterface
+    {
+        return new class ($debug) implements ConfigInterface {
+            public function __construct(private readonly bool $debug) {}
+
+            public function get(string $key, mixed $default = null): mixed
+            {
+                return $default;
+            }
+
+            public function set(string $key, mixed $default = null): void {}
+            public function has(string $key): bool { return false; }
+            public function all(): array { return []; }
+            public function getString(string $key, string $default = ''): string { return $default; }
+            public function getInt(string $key, int $default = 0): int { return $default; }
+            public function getBool(string $key, bool $default = false): bool
+            {
+                return $key === 'app.debug' ? $this->debug : $default;
+            }
+        };
     }
 
     private function removeTree(string $path): void

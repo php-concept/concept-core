@@ -133,7 +133,7 @@ final class ProductionErrorHandlerTest extends TestCase
     {
         $viewsDir = $this->tmpDir . '/views';
         mkdir($viewsDir . '/errors', 0777, true);
-        file_put_contents($viewsDir . '/errors/404' . ViewInterface::DEFAULT_EXTENSION, 'noop');
+        file_put_contents($viewsDir . '/errors/404.twig', 'noop');
 
         $pathManager = new PathManager($this->tmpDir, [PathManager::VIEWS_DIR => 'views']);
 
@@ -167,6 +167,10 @@ final class ProductionErrorHandlerTest extends TestCase
         $renderedTemplate = null;
         $view = $this->createStub(ViewInterface::class);
         $view->method('render')->willReturnCallback(function (string $name) use (&$renderedTemplate): string {
+            if ($name === 'errors/418') {
+                throw new \RuntimeException('template missing');
+            }
+
             $renderedTemplate = $name;
 
             return '<h1>generic</h1>';

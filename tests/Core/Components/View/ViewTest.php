@@ -3,7 +3,7 @@
 namespace Tests\Core\Components\View;
 
 use Concept\Core\Components\View\Contracts\ViewInterface;
-use Concept\Core\Components\View\View;
+use Concept\Core\Components\View\TwigView;
 use Concept\Core\Events\EventName;
 use Concept\Core\Events\Telemetry\ApplicationTelemetryBuffer;
 use League\Event\EventDispatcher;
@@ -20,10 +20,10 @@ final class ViewTest extends TestCase
         $twig = $this->createMock(Twig::class);
         $twig->expects(self::once())
             ->method('render')
-            ->with('home' . ViewInterface::DEFAULT_EXTENSION, ['name' => 'Ada'])
+            ->with('home.twig', ['name' => 'Ada'])
             ->willReturn('<h1>Ada</h1>');
 
-        $view = new View($twig);
+        $view = new TwigView($twig);
 
         self::assertSame('<h1>Ada</h1>', $view->render('home', ['name' => 'Ada']));
     }
@@ -36,7 +36,7 @@ final class ViewTest extends TestCase
             ->with('dashboard.twig', ['x' => 1])
             ->willReturn('ok');
 
-        $view = new View($twig);
+        $view = new TwigView($twig);
 
         self::assertSame('ok', $view->render('dashboard.twig', ['x' => 1]));
     }
@@ -56,7 +56,7 @@ final class ViewTest extends TestCase
         $twig = new Twig(new ArrayLoader(['page.twig' => 'Hello']), ['debug' => true]);
         $twig->addExtension(new ProfilerExtension($profile));
 
-        $view = new View($twig, $dispatcher, $profile);
+        $view = new TwigView($twig, '.twig', $profile, $dispatcher);
         $view->render('page');
 
         $records = $buffer->recordsOf(EventName::VIEW_TEMPLATE_PROFILE_ENTRY);

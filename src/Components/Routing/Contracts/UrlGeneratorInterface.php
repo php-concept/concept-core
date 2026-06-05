@@ -11,12 +11,12 @@ interface UrlGeneratorInterface
      * @param array<string, mixed> $parameters
      * @return string
      */
-    public function path(string $name, array $parameters = []): string;
+    public function uri(string $name, array $parameters = []): string;
 
     /**
      * @param string $name
      * @param array<string, mixed> $parameters
      * @return string
      */
-    public function route(string $name, array $parameters = []): string;
+    public function url(string $name, array $parameters = []): string;
 }

@@ -5,10 +5,8 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
-use Concept\Core\Components\View\Registries\ViewContextRegistry;
-use Concept\Core\Components\View\Registries\ViewPathRegistry;
-use Concept\Core\Components\View\View;
+use Concept\Core\Components\View\Registries\ViewRegistry;
+use Concept\Core\Components\View\TwigView;
 use Concept\Core\Events\Framework\ServiceAwakening;
 use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -22,17 +20,16 @@ use Twig\Extension\ProfilerExtension;
 use Twig\Loader\FilesystemLoader;
 use Twig\Profiler\Profile;
 
-class ViewServiceProvider extends AbstractServiceProvider
+class TwigServiceProvider extends AbstractServiceProvider
 {
+    public const string DEFAULT_EXTENSION = '.twig';
+
     use PeeksEventDispatcher;
 
     public function provides(string $id): bool
     {
         $services = [
             ViewInterface::class,
-            ViewExtensionRegistry::class,
-            ViewPathRegistry::class,
-            ViewContextRegistry::class,
         ];
 
         return in_array($id, $services);
@@ -62,13 +59,10 @@ class ViewServiceProvider extends AbstractServiceProvider
                 'debug' => $debug,
             ]);
 
-            /** @var ViewExtensionRegistry $viewExtensionRegistry */
-            $viewExtensionRegistry = $container->get(ViewExtensionRegistry::class);
-            $this->addExtensions($twig, $viewExtensionRegistry->all(), $debug);
-
-            /** @var ViewPathRegistry $viewPathRegistry */
-            $viewPathRegistry = $container->get(ViewPathRegistry::class);
-            $this->addPaths($loader, $pathManager->root(), $viewPathRegistry->all());
+            /** @var ViewRegistry $viewRegistry */
+            $viewRegistry = $container->get(ViewRegistry::class);
+            $this->addExtensions($twig, $viewRegistry->extensions()->all(), $debug);
+            $this->addPaths($loader, $pathManager->root(), $viewRegistry->paths()->all());
 
             $this->addFallbackPath($loader, $templatesPath);
 
@@ -78,43 +72,9 @@ class ViewServiceProvider extends AbstractServiceProvider
                 $twig->addExtension(new ProfilerExtension($profile));
             }
 
-            return new View($twig, $this->peekEventDispatcher(), $profile);
-        })->setShared(true);
+            $defaultExtension = $config->getString('view.default_extension', self::DEFAULT_EXTENSION);
 
-        $container->add(ViewExtensionRegistry::class, function () use ($container) {
-            /** @var ConfigInterface $config */
-            $config = $container->get(ConfigInterface::class);
-
-            /** @var array<string> $extensions */
-            $extensions = $config->get('view.extensions', []);
-            $viewExtensionRegistry = new ViewExtensionRegistry();
-            $viewExtensionRegistry->append($extensions);
-
-            return $viewExtensionRegistry;
-        })->setShared(true);
-
-        $container->add(ViewPathRegistry::class, function () use ($container) {
-            /** @var ConfigInterface $config */
-            $config = $container->get(ConfigInterface::class);
-
-            /** @var array<string, string> $viewPaths */
-            $viewPaths = $config->get('view.paths', []);
-            $viewPathRegistry = new ViewPathRegistry();
-            $viewPathRegistry->append($viewPaths);
-
-            return $viewPathRegistry;
-        })->setShared(true);
-
-        $container->add(ViewContextRegistry::class, function () use ($container) {
-            /** @var ConfigInterface $config */
-            $config = $container->get(ConfigInterface::class);
-
-            /** @var array<string> $viewContexts */
-            $viewContexts = $config->get('view.contexts', []);
-            $viewContextsRegistry = new ViewContextRegistry();
-            $viewContextsRegistry->append($viewContexts);
-
-            return $viewContextsRegistry;
+            return new TwigView($twig, $defaultExtension, $profile, $this->peekEventDispatcher());
         })->setShared(true);
     }
 

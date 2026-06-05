@@ -13,12 +13,13 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-class View implements ViewInterface
+class TwigView implements ViewInterface
 {
     public function __construct(
         public readonly Twig $twig,
-        private readonly ?EventDispatcherInterface $events = null,
+        private readonly string $defaultExtension = '.twig',
         private readonly ?Profile $twigProfile = null,
+        private readonly ?EventDispatcherInterface $events = null,
     ) {}
 
     /**
@@ -47,11 +48,11 @@ class View implements ViewInterface
 
     private function ensureExtension(string $viewName): string
     {
-        if (str_ends_with($viewName, self::DEFAULT_EXTENSION)) {
+        if (str_ends_with($viewName, $this->defaultExtension)) {
             return $viewName;
         }
 
-        return $viewName . self::DEFAULT_EXTENSION;
+        return $viewName . $this->defaultExtension;
     }
 
     private function resetProfile(): void

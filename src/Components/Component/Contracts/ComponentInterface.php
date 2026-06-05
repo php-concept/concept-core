@@ -6,7 +6,6 @@ use Concept\Core\Components\Database\Contracts\SeederInterface;
 use Illuminate\Database\Migrations\Migration;
 use League\Container\ServiceProvider\ServiceProviderInterface;
 use Symfony\Component\Console\Command\Command;
-use Twig\Extension\ExtensionInterface;
 
 interface ComponentInterface
 {
@@ -29,19 +28,19 @@ interface ComponentInterface
     public function providers(): array;
 
     /**
-     * @return class-string<ExtensionInterface>[]
+     * @return class-string[]
      */
     public function viewExtensions(): array;
 
     /**
-     * Twig namespace => views path relative to the application root.
+     * Namespace => views path relative to the application root.
      *
      * @return array<string, string>
      */
     public function viewPaths(): array;
 
     /**
-     * URI path prefix => Twig namespace.
+     * URI path prefix => Namespace.
      *
      * @return array<string, string>
      */

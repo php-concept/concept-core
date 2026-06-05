@@ -9,7 +9,6 @@ use InvalidArgumentException;
 use League\Container\ServiceProvider\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
-use Twig\Extension\ExtensionInterface;
 
 final class ComponentRegistry
 {
@@ -108,7 +107,7 @@ final class ComponentRegistry
     }
 
     /**
-     * @return class-string<ExtensionInterface>[]
+     * @return class-string[]
      */
     public function viewExtensions(): array
     {

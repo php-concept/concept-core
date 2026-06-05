@@ -102,12 +102,13 @@ class ProductionErrorHandler extends Handler
         }
 
         $template = sprintf(self::TEMPLATE_ERROR_FORMAT, $code);
-        $templatePath = $pathManager->get(PathManager::VIEWS_DIR , $template);
-        if (!file_exists($templatePath . ViewInterface::DEFAULT_EXTENSION)) {
+        try {
+            return $view->render($template, ['exception' => $exception]);
+        } catch (Throwable $e) {
             $template = sprintf(self::TEMPLATE_ERROR_FORMAT, self::DEFAULT_ERROR_CODE);
-        }
 
-        return $view->render($template, ['exception' => $exception]);
+            return $view->render($template, ['exception' => $exception]);
+        }
     }
 
     private function renderFallback(string $fallbackPath, int $code, Throwable $exception): void

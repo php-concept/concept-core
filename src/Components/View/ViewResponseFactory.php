@@ -32,13 +32,11 @@ class ViewResponseFactory implements ViewResponseFactoryInterface
         int $code = HttpStatusCode::OK
     ): ResponseInterface {
         $sharedData = $this->request->getAttribute(RequestAttribute::VIEW_PAYLOAD, []);
-        if (!is_array($sharedData)) {
-            $sharedData = [];
+        if (is_array($sharedData)) {
+            $this->view->share($sharedData);
         }
-        $combinedData = array_merge($sharedData, $data);
 
-        $content = $this->view->render($template, $combinedData);
-
+        $content = $this->view->render($template, $data);
         $response = $this->responseFactory->createResponse($code);
         $response->getBody()->write($content);
 

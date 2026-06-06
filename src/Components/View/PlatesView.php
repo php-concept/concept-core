@@ -33,4 +33,9 @@ class PlatesView implements ViewInterface
             $this->events?->dispatch(new TemplateRendered($viewName, $duration));
         }
     }
+
+    public function share(mixed $data): void
+    {
+        $this->engine->addData($data);
+    }
 }

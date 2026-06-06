@@ -46,6 +46,13 @@ class TwigView implements ViewInterface
         }
     }
 
+    public function share(mixed $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->twig->addGlobal($key, $value);
+        }
+    }
+
     private function ensureExtension(string $viewName): string
     {
         if (str_ends_with($viewName, $this->defaultExtension)) {

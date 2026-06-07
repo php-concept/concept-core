@@ -2,17 +2,16 @@
 
 namespace Concept\Core\Components\View;
 
+use Concept\Core\Components\Telemetry\TelemetryCollector;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\View\Contracts\ViewInterface;
-use Concept\Core\Events\View\TemplateRendered;
-use Concept\Core\Events\View\TemplateRendering;
 use League\Plates\Engine;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 class PlatesView implements ViewInterface
 {
     public function __construct(
         public readonly Engine $engine,
-        private readonly ?EventDispatcherInterface $events = null,
+        public readonly ?TelemetryCollector $telemetryCollector,
     ) {}
 
     /**
@@ -22,15 +21,15 @@ class PlatesView implements ViewInterface
      */
     public function render(string $viewName, array $data = []): string
     {
-        $this->events?->dispatch(new TemplateRendering($viewName));
-
-        $startedAt = microtime(true);
-
+        $telemetryId = '';
         try {
+            $telemetryId = $this->telemetryCollector?->start(TelemetryEvent::TPL_RENDERED, [
+                'view' => $viewName,
+            ]);
+
             return $this->engine->render($viewName, $data);
         } finally {
-            $duration = microtime(true) - $startedAt;
-            $this->events?->dispatch(new TemplateRendered($viewName, $duration));
+            $this->telemetryCollector?->finish(TelemetryEvent::TPL_RENDERED, (string)$telemetryId);
         }
     }
 

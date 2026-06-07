@@ -2,13 +2,13 @@
 
 namespace Concept\Core\Providers;
 
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Components\Logger\Logger;
 use Concept\Core\Components\Masker\Contracts\MaskerInterface;
 use Concept\Core\Components\Path\PathManager;
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Logger\Logger;
-use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
@@ -18,7 +18,7 @@ use Throwable;
 
 class LogServiceProvider extends AbstractServiceProvider
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     public function provides(string $id): bool
     {
@@ -33,7 +33,7 @@ class LogServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(LoggerInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(LoggerInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, LoggerInterface::class);
 
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);

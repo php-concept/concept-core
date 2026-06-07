@@ -2,11 +2,10 @@
 
 namespace Concept\Core\Providers;
 
-use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Config;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
+use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Dotenv\Dotenv;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
@@ -14,7 +13,7 @@ use Noodlehaus\Config as nhConfig;
 
 class ConfigServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     private const string APP_ENV_KEY = 'APP_ENV';
 
@@ -34,7 +33,6 @@ class ConfigServiceProvider extends AbstractServiceProvider implements BootableS
     public function boot(): void
     {
         $container = $this->getContainer();
-        $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ConfigInterface::class));
 
         /** @var PathManager $pathManager */
         $pathManager = $container->get(PathManager::class);

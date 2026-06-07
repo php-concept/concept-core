@@ -3,18 +3,18 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
+use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Components\View\Registries\ViewPathRegistry;
 use Concept\Core\Components\View\Registries\ViewRegistry;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 
 class ViewRegistryServiceProvider extends AbstractServiceProvider
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     public function provides(string $id): bool
     {
@@ -29,7 +29,7 @@ class ViewRegistryServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(ViewRegistry::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ViewRegistry::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ViewRegistry::class);
 
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);

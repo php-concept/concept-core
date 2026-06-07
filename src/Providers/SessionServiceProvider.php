@@ -3,8 +3,8 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 class SessionServiceProvider extends AbstractServiceProvider
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     public function provides(string $id): bool
     {
@@ -30,7 +30,7 @@ class SessionServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(SessionInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(SessionInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, SessionInterface::class);
 
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
@@ -51,7 +51,7 @@ class SessionServiceProvider extends AbstractServiceProvider
         })->setShared(true);
 
         $container->add(FlashBagInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(FlashBagInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, FlashBagInterface::class);
 
             /** @var Session $session */
             $session = $container->get(SessionInterface::class);

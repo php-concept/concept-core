@@ -3,8 +3,8 @@
 namespace Concept\Core;
 
 use Concept\Core\Components\Path\PathManager;
-use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
+use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use InvalidArgumentException;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use League\Container\Container;
@@ -97,6 +97,12 @@ final class App
         $router = $this->container->get(Router::class);
         /** @var ServerRequestInterface $request */
         $request = $this->container->get(ServerRequestInterface::class);
+
+//        //TODO: remove after testing
+//        /** @var TelemetryCollector $telemetryCollector */
+//        $telemetryCollector = $this->container->get(TelemetryCollector::class);
+//        var_dump($telemetryCollector->toArray());
+//        die();
 
         $response = $router->dispatch($request);
         (new SapiEmitter)->emit($response);

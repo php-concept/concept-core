@@ -7,10 +7,9 @@ use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Registries\ViewRegistry;
-use Concept\Core\Events\Framework\ComponentRegistering;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
@@ -19,7 +18,7 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 
 class ComponentsServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     public function provides(string $id): bool
     {
@@ -34,8 +33,6 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
     {
         $container = $this->getContainer();
         $container->add(ComponentRegistry::class, function() use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ComponentRegistry::class));
-
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
             /** @var class-string<ComponentInterface>[] $componentClasses */
@@ -53,11 +50,8 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
 
         /** @var ComponentRegistry $registry */
         $registry = $container->get(ComponentRegistry::class);
-
-        if ($dispatcher = $this->peekEventDispatcher()) {
-            foreach ($registry->all() as $component) {
-                $dispatcher->dispatch(new ComponentRegistering($component));
-            }
+        foreach ($registry->all() as $component) {
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_COMPONENT_REGISTERED, $component::class);
         }
 
         $this->registerConsoleCommands($registry);

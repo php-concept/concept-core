@@ -24,12 +24,22 @@ final class ViewResponseFactoryTest extends TestCase
             ->withAttribute(RequestAttribute::VIEW_PAYLOAD, ['shared' => 1, 'both' => 'from-shared']);
 
         $rendered = [];
-        $view = $this->createStub(ViewInterface::class);
-        $view->method('render')->willReturnCallback(function (string $name, array $data) use (&$rendered): string {
-            $rendered = [$name, $data];
+        $shared = [];
+        $view = $this->createMock(ViewInterface::class);
+        $view->expects(self::once())
+            ->method('share')
+            ->with(['shared' => 1, 'both' => 'from-shared'])
+            ->willReturnCallback(function (array $data) use (&$shared): void {
+                $shared = $data;
+            });
+        $view->expects(self::once())
+            ->method('render')
+            ->with('home.twig', ['both' => 'from-local', 'local' => true])
+            ->willReturnCallback(function (string $name, array $data) use (&$rendered): string {
+                $rendered = [$name, $data];
 
-            return '<html/>';
-        });
+                return '<html/>';
+            });
 
         $container = new \Tests\Fixtures\Core\ArrayContainer([]);
         $responseFactory = new ResponseFactory($container);
@@ -41,11 +51,8 @@ final class ViewResponseFactoryTest extends TestCase
         self::assertSame(HttpValue::HTML, $response->getHeaderLine(HttpHeader::CONTENT_TYPE));
         self::assertSame('<html/>', (string) $response->getBody());
         self::assertSame('home.twig', $rendered[0]);
-        self::assertSame([
-            'shared' => 1,
-            'both' => 'from-local',
-            'local' => true,
-        ], $rendered[1]);
+        self::assertSame(['both' => 'from-local', 'local' => true], $rendered[1]);
+        self::assertSame(['shared' => 1, 'both' => 'from-shared'], $shared);
     }
 
     public function testCreateIgnoresNonArrayViewContextAttribute(): void

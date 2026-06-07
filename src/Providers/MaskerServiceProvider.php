@@ -5,13 +5,13 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Masker\Contracts\MaskerInterface;
 use Concept\Core\Components\Masker\DataMasker;
 use Concept\Core\Components\Masker\RegexMasker;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class MaskerServiceProvider extends AbstractServiceProvider
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     public function provides(string $id): bool
     {
@@ -21,7 +21,7 @@ class MaskerServiceProvider extends AbstractServiceProvider
     public function register(): void
     {
         $this->getContainer()->add(MaskerInterface::class, function () {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(MaskerInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, MaskerInterface::class);
 
             $masker = new DataMasker();
             $masker->addRule(new RegexMasker());

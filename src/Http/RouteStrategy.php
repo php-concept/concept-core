@@ -5,14 +5,10 @@ namespace Concept\Core\Http;
 use Closure;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Caster\Exceptions\CastingException;
-use Concept\Core\Events\Http\FormRequestValidated;
-use Concept\Core\Events\Http\FormRequestValidating;
-use Concept\Core\Events\Http\FormRequestValidationFailed;
-use Concept\Core\Events\Http\RouteCallableInvoked;
-use Concept\Core\Events\Http\RouteCallableInvoking;
-use Concept\Core\Http\Requests\FormRequestInterface;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\Validator\Exceptions\ValidationException;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
+use Concept\Core\Http\Requests\FormRequestInterface;
 use League\Container\DefinitionContainerInterface;
 use League\Route\Route;
 use League\Route\Strategy\ApplicationStrategy;
@@ -29,24 +25,14 @@ use ReflectionParameter;
 
 class RouteStrategy extends ApplicationStrategy
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     public function invokeRouteCallable(Route $route, ServerRequestInterface $request): ResponseInterface
     {
-        $eventDispatcher = $this->peekEventDispatcher();
-
         $request = $this->prepareRequest($route, $request);
 
         $callable = $route->getCallable($this->getContainer());
-        $handlerLabel = $this->describeCallable($callable);
-        $eventDispatcher?->dispatch(new RouteCallableInvoking(
-            $this->normalizeRouteMethods($route),
-            $route->getPath(),
-            $handlerLabel,
-            $route->getVars(),
-        ));
-
-        $startedAt = microtime(true);
+        $telemetryId = $this->startTelemetry(TelemetryEvent::HTTP_ROUTE_CALLABLE_INVOKE, $callable, $route);
 
         try {
             $reflection = $this->getReflection($callable);
@@ -67,13 +53,7 @@ class RouteStrategy extends ApplicationStrategy
             /** @phpstan-ignore-next-line */
             return $reflection->invokeArgs($arguments);
         } finally {
-            $eventDispatcher?->dispatch(new RouteCallableInvoked(
-                $this->normalizeRouteMethods($route),
-                $route->getPath(),
-                $handlerLabel,
-                $route->getVars(),
-                microtime(true) - $startedAt,
-            ));
+            $this->telemetry()?->finish(TelemetryEvent::HTTP_ROUTE_CALLABLE_INVOKE, (string)$telemetryId);
         }
     }
 
@@ -205,21 +185,12 @@ class RouteStrategy extends ApplicationStrategy
     {
         /** @var DefinitionContainerInterface $container */
         $container = $this->getContainer();
-
-        $eventDispatcher = $this->peekEventDispatcher();
-        $eventDispatcher?->dispatch(new FormRequestValidating($className));
-        $startedAt = microtime(true);
-
         /** @var FormRequestInterface $formRequest */
         $formRequest = $container->get($className);
 
         if (!$formRequest->validate()) {
-            $eventDispatcher?->dispatch(new FormRequestValidationFailed($className, $formRequest->errors()));
-
             throw new ValidationException($formRequest->errors(), $formRequest->all());
         }
-
-        $eventDispatcher?->dispatch(new FormRequestValidated($className, microtime(true) - $startedAt));
 
         return $formRequest;
     }
@@ -248,17 +219,17 @@ class RouteStrategy extends ApplicationStrategy
         return $caster->cast($value, $type);
     }
 
-    /**
-     * @return list<string>
-     */
-    private function normalizeRouteMethods(Route $route): array
+    private function startTelemetry(string $telemetryEventName, callable $callable, Route $route): ?string
     {
-        $methods = $route->getMethod();
-        if (is_string($methods)) {
-            return [$methods];
-        }
+        $handlerLabel = $this->describeCallable($callable);
 
-        return array_values($methods);
+        return $this->telemetry()?->start(
+            $telemetryEventName,
+            [
+                'route' => $route,
+                'handler' => $handlerLabel,
+            ]
+        );
     }
 
     private function describeCallable(callable $callable): string

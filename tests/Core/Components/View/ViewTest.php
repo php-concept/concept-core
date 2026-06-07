@@ -2,16 +2,13 @@
 
 namespace Tests\Core\Components\View;
 
-use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Components\Telemetry\TelemetryCollector;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\View\PlatesView;
 use Concept\Core\Components\View\TwigView;
-use Concept\Core\Events\EventName;
-use Concept\Core\Events\Telemetry\ApplicationTelemetryBuffer;
-use League\Event\EventDispatcher;
+use League\Plates\Engine;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment as Twig;
-use Twig\Extension\ProfilerExtension;
-use Twig\Loader\ArrayLoader;
-use Twig\Profiler\Profile;
 
 final class ViewTest extends TestCase
 {
@@ -23,7 +20,7 @@ final class ViewTest extends TestCase
             ->with('home.twig', ['name' => 'Ada'])
             ->willReturn('<h1>Ada</h1>');
 
-        $view = new TwigView($twig);
+        $view = new TwigView($twig, '.twig', null);
 
         self::assertSame('<h1>Ada</h1>', $view->render('home', ['name' => 'Ada']));
     }
@@ -36,35 +33,42 @@ final class ViewTest extends TestCase
             ->with('dashboard.twig', ['x' => 1])
             ->willReturn('ok');
 
-        $view = new TwigView($twig);
+        $view = new TwigView($twig, '.twig', null);
 
         self::assertSame('ok', $view->render('dashboard.twig', ['x' => 1]));
     }
 
-    public function testRenderDispatchesTemplateProfileEntriesAfterTwigProfiler(): void
+    public function testTwigViewRecordsTemplateTelemetry(): void
     {
-        $buffer = new ApplicationTelemetryBuffer();
-        $dispatcher = new EventDispatcher();
-        $dispatcher->subscribeTo(
-            EventName::VIEW_TEMPLATE_PROFILE_ENTRY,
-            static function (object $event) use ($buffer): void {
-                $buffer->record($event);
-            },
-        );
+        $twig = $this->createStub(Twig::class);
+        $twig->method('render')->willReturn('ok');
 
-        $profile = new Profile();
-        $twig = new Twig(new ArrayLoader(['page.twig' => 'Hello']), ['debug' => true]);
-        $twig->addExtension(new ProfilerExtension($profile));
-
-        $view = new TwigView($twig, '.twig', $profile, $dispatcher);
+        $telemetry = new TelemetryCollector();
+        $view = new TwigView($twig, '.twig', $telemetry);
         $view->render('page');
 
-        $records = $buffer->recordsOf(EventName::VIEW_TEMPLATE_PROFILE_ENTRY);
-        self::assertNotEmpty($records);
+        $items = array_values($telemetry->toArray(TelemetryEvent::TPL_RENDERED));
 
-        $spans = $buffer->spans();
-        self::assertSame(EventName::VIEW_TEMPLATE_PROFILE_ENTRY, $spans[0]->name);
-        self::assertGreaterThan(0.0, $spans[0]->duration);
-        self::assertSame('page.twig', $spans[0]->meta['template']);
+        self::assertCount(1, $items);
+        self::assertSame(TelemetryEvent::TPL_RENDERED, $items[0]['name']);
+        self::assertSame(['view' => 'page.twig'], $items[0]['context']);
+        self::assertNotNull($items[0]['duration']);
+    }
+
+    public function testPlatesViewRecordsTemplateTelemetry(): void
+    {
+        $engine = $this->createStub(Engine::class);
+        $engine->method('render')->willReturn('ok');
+
+        $telemetry = new TelemetryCollector();
+        $view = new PlatesView($engine, $telemetry);
+        $view->render('page');
+
+        $items = array_values($telemetry->toArray(TelemetryEvent::TPL_RENDERED));
+
+        self::assertCount(1, $items);
+        self::assertSame(TelemetryEvent::TPL_RENDERED, $items[0]['name']);
+        self::assertSame(['view' => 'page'], $items[0]['context']);
+        self::assertNotNull($items[0]['duration']);
     }
 }

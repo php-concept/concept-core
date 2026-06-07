@@ -6,13 +6,13 @@ use Concept\Core\Components\Caster\Caster;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Path\PathManager;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class CastingServiceProvider extends AbstractServiceProvider
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
     public function provides(string $id): bool
     {
         return $id == CasterInterface::class;
@@ -22,7 +22,7 @@ class CastingServiceProvider extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         $container->add(CasterInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(CasterInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, CasterInterface::class);
 
             /** @var PathManager $pathManager */
             $pathManager = $container->get(PathManager::class);

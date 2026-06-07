@@ -197,7 +197,6 @@ final class ComponentRegistry
 
         foreach ($this->componentClasses as $componentClass) {
             $component = $this->container->get($componentClass);
-
             if (!$component instanceof ComponentInterface) {
                 throw new InvalidArgumentException(
                     sprintf(self::ERR_INVALID_COMPONENT, ComponentInterface::class, $componentClass)

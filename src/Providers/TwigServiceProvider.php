@@ -2,13 +2,13 @@
 
 namespace Concept\Core\Providers;
 
-use Concept\Core\Components\View\Contracts\ViewInterface;
-use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
+use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\Registries\ViewRegistry;
 use Concept\Core\Components\View\TwigView;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -16,15 +16,13 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Extension\DebugExtension;
 use Twig\Extension\ExtensionInterface;
-use Twig\Extension\ProfilerExtension;
 use Twig\Loader\FilesystemLoader;
-use Twig\Profiler\Profile;
 
 class TwigServiceProvider extends AbstractServiceProvider
 {
-    public const string DEFAULT_EXTENSION = '.twig';
+    use TelemetryTrait;
 
-    use PeeksEventDispatcher;
+    public const string DEFAULT_EXTENSION = '.twig';
 
     public function provides(string $id): bool
     {
@@ -40,7 +38,7 @@ class TwigServiceProvider extends AbstractServiceProvider
         $container = $this->getContainer();
 
         $container->add(ViewInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ViewInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ViewInterface::class);
 
             /** @var PathManager $pathManager */
             $pathManager = $container->get(PathManager::class);
@@ -65,16 +63,9 @@ class TwigServiceProvider extends AbstractServiceProvider
             $this->addPaths($loader, $pathManager->root(), $viewRegistry->paths()->all());
 
             $this->addFallbackPath($loader, $templatesPath);
-
-            $profile = null;
-            if ($debug) {
-                $profile = new Profile();
-                $twig->addExtension(new ProfilerExtension($profile));
-            }
-
             $defaultExtension = $config->getString('view.default_extension', self::DEFAULT_EXTENSION);
 
-            return new TwigView($twig, $defaultExtension, $profile, $this->peekEventDispatcher());
+            return new TwigView($twig, $defaultExtension, $this->telemetry());
         })->setShared(true);
     }
 

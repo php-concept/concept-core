@@ -4,11 +4,11 @@ namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\PlatesView;
 use Concept\Core\Components\View\Registries\ViewRegistry;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
@@ -17,9 +17,9 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class PlatesServiceProvider extends AbstractServiceProvider
 {
-    public const string DEFAULT_EXTENSION = '.php';
+    use TelemetryTrait;
 
-    use PeeksEventDispatcher;
+    public const string DEFAULT_EXTENSION = '.php';
 
     public function provides(string $id): bool
     {
@@ -35,7 +35,7 @@ class PlatesServiceProvider extends AbstractServiceProvider
         $container = $this->getContainer();
 
         $container->add(ViewInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ViewInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ViewInterface::class);
 
             /** @var PathManager $pathManager */
             $pathManager = $container->get(PathManager::class);
@@ -51,7 +51,7 @@ class PlatesServiceProvider extends AbstractServiceProvider
             $this->addExtensions($engine, $viewRegistry->extensions()->all());
             $this->addFolders($engine, $pathManager->root(), $viewRegistry->paths()->all());
 
-            return new PlatesView($engine, $this->peekEventDispatcher());
+            return new PlatesView($engine, $this->telemetry());
         })->setShared(true);
     }
 

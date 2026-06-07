@@ -9,9 +9,8 @@ use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Database\SeederManager;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Concept\Core\Events\Database\QueryExecuted as TelemetryQueryExecuted;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Illuminate\Container\Container as IlluminateContainer;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Database\Events\QueryExecuted;
@@ -25,7 +24,7 @@ use Psr\Container\ContainerInterface;
 
 class DatabaseServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     private const string DEFAULT_TABLE_NAME = 'migrations';
 
@@ -54,7 +53,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         $container = $this->getContainer();
 
         $container->add(DatabaseInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(DatabaseInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, DatabaseInterface::class);
 
             /** @var CapsuleManager $capsuleManager */
             $capsuleManager = $container->get(CapsuleManager::class);
@@ -126,7 +125,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 
         $capsuleManager->getConnection()->listen(function (QueryExecuted $query) use ($container, $config) {
             $this->logQueries($container, $config, $query);
-            $this->dispatchEvent($config, $query);
+            $this->storeTelemetryData($config, $query);
         });
 
         $container->add(CapsuleManager::class, $capsuleManager);
@@ -161,22 +160,28 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         if ($config->getBool('app.debug') || $config->getBool('log.query')) {
             /** @var LoggerInterface $logger */
             $logger = $container->get(LoggerInterface::class);
-            $logger->debug('SQL: ' . $query->sql, [
+            $logger->debug('SQL: ' . $query->toRawSql(), [
+                'sql' => $query->sql,
                 'bindings' => $query->bindings,
                 'time' => $query->time
             ]);
         }
     }
 
-    private function dispatchEvent(ConfigInterface $config, QueryExecuted $query): void
+    private function storeTelemetryData(ConfigInterface $config, QueryExecuted $query): void
     {
-        if ($config->getBool('log.query')) {
-            $this->peekEventDispatcher()?->dispatch(new TelemetryQueryExecuted(
-                $query->sql,
-                $query->bindings,
-                $query->time,
-                $query->connectionName
-            ));
+        if (!$config->getBool('log.query')) {
+            return;
         }
+
+        $this->telemetry()?->start(TelemetryEvent::DB_QUERY_EXECUTED,
+            [
+                'sql' => $query->sql,
+                'raw' => $query->toRawSql(),
+                'bindings' => $query->bindings,
+                'time' => $query->time,
+                'connection' => $query->connectionName,
+            ]
+        );
     }
 }

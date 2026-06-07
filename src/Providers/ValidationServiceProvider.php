@@ -2,17 +2,17 @@
 
 namespace Concept\Core\Providers;
 
-use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
+use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
 use Concept\Core\Components\Validator\Validator;
-use Concept\Core\Events\Framework\ServiceAwakening;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Rakit\Validation\Validator as RakitValidator;
 
 class ValidationServiceProvider extends AbstractServiceProvider
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     public function provides(string $id): bool
     {
@@ -33,7 +33,7 @@ class ValidationServiceProvider extends AbstractServiceProvider
         })->setShared(true);
 
         $container->add(ValidatorInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ValidatorInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ValidatorInterface::class);
 
             /** @var RakitValidator $rakitValidator */
             $rakitValidator = $container->get(RakitValidator::class);

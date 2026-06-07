@@ -5,26 +5,26 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Components\Routing\UrlGenerator;
+use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Components\View\ViewResponseFactory;
-use Concept\Core\Events\Framework\ServiceAwakening;
+use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\ResponseFactory;
 use Concept\Core\Http\RouteStrategy;
-use Concept\Core\Providers\Concerns\PeeksEventDispatcher;
 use Illuminate\Pagination\Paginator;
 use InvalidArgumentException;
 use Laminas\Diactoros\ServerRequestFactory;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Route\Router;
-use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class HttpServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
-    use PeeksEventDispatcher;
+    use TelemetryTrait;
 
     private const string ERR_ROUTES_NOT_FOUND = 'Routes file not found at: %s';
 
@@ -47,13 +47,15 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         $container = $this->getContainer();
 
         $container->add(ServerRequestInterface::class, function () {
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ServerRequestInterface::class);
+
             return ServerRequestFactory::fromGlobals(
                 $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
             );
         })->setShared(true);
 
         $container->add(Router::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(Router::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, Router::class);
 
             $router = new Router();
 
@@ -73,7 +75,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         })->setShared(true);
 
         $container->add(UrlGeneratorInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(UrlGeneratorInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, UrlGeneratorInterface::class);
 
             /** @var ServerRequestInterface $request */
             $request = $container->get(ServerRequestInterface::class);
@@ -84,19 +86,19 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         })->setShared(true);
 
         $container->add(RequestFormat::class, function () {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(RequestFormat::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, RequestFormat::class);
 
             return new RequestFormat();
         })->setShared(true);
 
         $container->add(ResponseFactoryInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ResponseFactoryInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ResponseFactoryInterface::class);
 
             return new ResponseFactory($container);
         })->setShared(true);
 
         $container->add(ViewResponseFactoryInterface::class, function () use ($container) {
-            $this->peekEventDispatcher()?->dispatch(new ServiceAwakening(ViewResponseFactoryInterface::class));
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ViewResponseFactoryInterface::class);
 
             /** @var ServerRequestInterface $request */
             $request = $container->get(ServerRequestInterface::class);

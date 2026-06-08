@@ -3,14 +3,14 @@
 namespace Tests\Core\Components\Masker;
 
 use PHPUnit\Framework\TestCase;
-use Concept\Core\Components\Masker\DataMasker;
-use Concept\Core\Components\Masker\Contracts\MaskingRuleInterface;
+use Concept\Core\Components\DataMasker\DataMasker;
+use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
 
 class DataMaskerTest extends TestCase
 {
     public function testMaskArrayWithSensitiveKey(): void
     {
-        $rule = $this->createStub(MaskingRuleInterface::class);
+        $rule = $this->createStub(DataMaskerRuleInterface::class);
         $rule->method('isSensitiveKey')->willReturnCallback(fn($key) => $key === 'password');
         $rule->method('apply')->willReturnArgument(0);
         
@@ -43,7 +43,7 @@ class DataMaskerTest extends TestCase
     public function testMaskObjectImmutability(): void
     {
         $masker = new DataMasker();
-        $rule = $this->createStub(MaskingRuleInterface::class);
+        $rule = $this->createStub(DataMaskerRuleInterface::class);
         $rule->method('isSensitiveKey')->willReturnCallback(fn($key) => $key === 'password');
         $rule->method('apply')->willReturnArgument(0);
         $masker->addRule($rule);
@@ -60,7 +60,7 @@ class DataMaskerTest extends TestCase
 
     public function testMaskStringWithRules(): void
     {
-        $rule = $this->createStub(MaskingRuleInterface::class);
+        $rule = $this->createStub(DataMaskerRuleInterface::class);
         $rule->method('apply')->willReturnCallback(fn($val) => str_replace('secret', '*****', $val));
 
         $masker = new DataMasker();
@@ -71,7 +71,7 @@ class DataMaskerTest extends TestCase
 
     public function testMaskObject(): void
     {
-        $rule = $this->createStub(MaskingRuleInterface::class);
+        $rule = $this->createStub(DataMaskerRuleInterface::class);
         $rule->method('isSensitiveKey')->willReturn(false);
         $rule->method('apply')->willReturnCallback(fn($val) => is_string($val) ? str_replace('secret', '*****', $val) : $val);
 
@@ -87,7 +87,7 @@ class DataMaskerTest extends TestCase
 
     public function testMaskNestedObjectImmutability(): void
     {
-        $rule = $this->createStub(MaskingRuleInterface::class);
+        $rule = $this->createStub(DataMaskerRuleInterface::class);
         $rule->method('isSensitiveKey')->willReturnCallback(fn($key) => $key === 'password');
         $rule->method('apply')->willReturnArgument(0);
 
@@ -110,7 +110,7 @@ class DataMaskerTest extends TestCase
 
     public function testMaskArrayWithObjectImmutability(): void
     {
-        $rule = $this->createStub(MaskingRuleInterface::class);
+        $rule = $this->createStub(DataMaskerRuleInterface::class);
         $rule->method('isSensitiveKey')->willReturnCallback(fn($key) => $key === 'secret');
         $rule->method('apply')->willReturnArgument(0);
 

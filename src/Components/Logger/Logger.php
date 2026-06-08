@@ -3,7 +3,7 @@
 namespace Concept\Core\Components\Logger;
 
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Concept\Core\Components\Masker\Contracts\MaskerInterface;
+use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
 use Monolog\Level;
 use Monolog\Logger as Monolog;
 use Monolog\LogRecord;
@@ -15,7 +15,7 @@ class Logger extends AbstractLogger implements LoggerInterface
 {
     public function __construct(
         private readonly Monolog $monolog,
-        ?MaskerInterface $masker
+        ?DataMaskerInterface $masker
     ) {
         if (!$masker) {
             return;

@@ -5,7 +5,7 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\Logger\Logger;
-use Concept\Core\Components\Masker\Contracts\MaskerInterface;
+use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
 use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
@@ -41,9 +41,9 @@ class LogServiceProvider extends AbstractServiceProvider
             $monolog = new Monolog($config->getString('log.name'));
             $this->setup($monolog);
 
-            /** @var MaskerInterface|null $masker */
-            $masker = $container->has(MaskerInterface::class)
-                ? $container->get(MaskerInterface::class)
+            /** @var DataMaskerInterface|null $masker */
+            $masker = $container->has(DataMaskerInterface::class)
+                ? $container->get(DataMaskerInterface::class)
                 : null;
 
             return new Logger($monolog, $masker);

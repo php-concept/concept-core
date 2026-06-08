@@ -1,23 +1,28 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Masker;
+namespace Concept\Core\Components\DataMasker;
 
-use Concept\Core\Components\Masker\Contracts\MaskerInterface;
-use Concept\Core\Components\Masker\Contracts\MaskingRuleInterface;
+use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
+use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
 
-class DataMasker implements MaskerInterface
+class DataMasker implements DataMaskerInterface
 {
     public const MASK_CHARS = '***';
 
-    /** @var MaskingRuleInterface[] */
+    /** @var DataMaskerRuleInterface[] */
     private array $rules = [];
 
     /**
-     * @param MaskingRuleInterface $rule
+     * @param DataMaskerRuleInterface $rule
      */
-    public function addRule(MaskingRuleInterface $rule): void
+    public function addRule(DataMaskerRuleInterface $rule): void
     {
         $this->rules[] = $rule;
+    }
+
+    public function clearRules(): void
+    {
+        $this->rules = [];
     }
 
     /**

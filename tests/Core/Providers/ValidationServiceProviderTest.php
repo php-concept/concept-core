@@ -8,6 +8,7 @@ use Concept\Core\Foundation\PathManager;
 use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
 use Concept\Core\Components\Validator\ValidationTranslationsLoader;
 use Concept\Core\Components\Validator\Validator;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\ValidationServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
@@ -88,7 +89,7 @@ final class ValidationServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed
             {
-                return $key === 'validator.rules' ? [] : $default;
+                return $key === ConfigKey::VALIDATOR_RULES ? [] : $default;
             }
 
             public function set(string $key, mixed $default = null): void {}

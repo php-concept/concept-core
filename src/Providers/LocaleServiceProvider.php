@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Locale\ConfigLocaleResolver;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
@@ -27,7 +28,7 @@ class LocaleServiceProvider extends AbstractServiceProvider
 
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
-            $resolverClass = $config->get('app.locale_resolver');
+            $resolverClass = $config->get(ConfigKey::APP_LOCALE_RESOLVER);
 
             if (!is_string($resolverClass) || $resolverClass === '') {
                 return $container->get(ConfigLocaleResolver::class);

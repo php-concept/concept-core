@@ -6,6 +6,7 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
 use Concept\Core\Components\DataMasker\DataMasker;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\DataMaskerServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
@@ -118,9 +119,9 @@ final class DataMaskerServiceProviderTest extends TestCase
             public function get(string $key, mixed $default = null): mixed
             {
                 return match ($key) {
-                    'masking.patterns' => $this->patterns,
-                    'masking.key_patterns' => $this->keyPatterns,
-                    'masking.rules' => $this->rules,
+                    ConfigKey::MASKING_PATTERNS => $this->patterns,
+                    ConfigKey::MASKING_KEY_PATTERNS => $this->keyPatterns,
+                    ConfigKey::MASKING_RULES => $this->rules,
                     default => $default,
                 };
             }

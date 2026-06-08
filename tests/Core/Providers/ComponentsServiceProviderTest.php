@@ -7,6 +7,7 @@ use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\ComponentsServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -29,7 +30,7 @@ final class ComponentsServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed
             {
-                return $key === 'components' ? [StubComponent::class] : $default;
+                return $key === ConfigKey::COMPONENTS ? [StubComponent::class] : $default;
             }
             public function set(string $key, mixed $default = null): void {}
             public function has(string $key): bool { return false; }
@@ -57,7 +58,7 @@ final class ComponentsServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed
             {
-                return $key === 'components' ? [StubComponent::class] : $default;
+                return $key === ConfigKey::COMPONENTS ? [StubComponent::class] : $default;
             }
             public function set(string $key, mixed $default = null): void {}
             public function has(string $key): bool { return false; }

@@ -4,6 +4,7 @@ namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Providers\LogServiceProvider;
@@ -52,12 +53,12 @@ final class LogServiceProviderTest extends TestCase
             public function getString(string $key, string $default = ''): string
             {
                 return match ($key) {
-                    'log.name' => 'app-test',
-                    'log.level' => 'debug',
+                    ConfigKey::LOG_NAME => 'app-test',
+                    ConfigKey::LOG_LEVEL => 'debug',
                     default => $default,
                 };
             }
-            public function getInt(string $key, int $default = 0): int { return $key === 'log.max_files' ? 3 : $default; }
+            public function getInt(string $key, int $default = 0): int { return $key === ConfigKey::LOG_MAX_FILES ? 3 : $default; }
             public function getBool(string $key, bool $default = false): bool { return $default; }
         })->setShared(true);
 
@@ -95,8 +96,8 @@ final class LogServiceProviderTest extends TestCase
             public function getString(string $key, string $default = ''): string
             {
                 return match ($key) {
-                    'log.name' => 'app-test',
-                    'log.level' => 'invalid-level',
+                    ConfigKey::LOG_NAME => 'app-test',
+                    ConfigKey::LOG_LEVEL => 'invalid-level',
                     default => $default,
                 };
             }

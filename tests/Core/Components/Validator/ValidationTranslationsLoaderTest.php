@@ -8,6 +8,7 @@ use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Validator\ValidationTranslationsLoader;
+use Concept\Core\Foundation\ConfigKey;
 use PHPUnit\Framework\TestCase;
 
 final class ValidationTranslationsLoaderTest extends TestCase
@@ -102,8 +103,8 @@ PHP);
 
         $config = $this->createStub(ConfigInterface::class);
         $config->method('getString')->willReturnMap([
-            ['app.locale', 'en', 'uk'],
-            ['app.fallback_locale', 'en', 'en'],
+            [ConfigKey::APP_LOCALE, 'en', 'uk'],
+            [ConfigKey::APP_FALLBACK_LOCALE, 'en', 'en'],
         ]);
 
         $loader = $this->makeLoader(
@@ -132,8 +133,8 @@ PHP);
 
         $config = $this->createStub(ConfigInterface::class);
         $config->method('getString')->willReturnMap([
-            ['app.locale', 'en', 'uk'],
-            ['app.fallback_locale', 'en', 'de'],
+            [ConfigKey::APP_LOCALE, 'en', 'uk'],
+            [ConfigKey::APP_FALLBACK_LOCALE, 'en', 'de'],
         ]);
 
         $loader = $this->makeLoader(

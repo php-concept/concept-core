@@ -9,6 +9,7 @@ use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Components\View\ViewResponseFactory;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\ResponseFactory;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\HttpServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Laminas\Diactoros\ServerRequest;
@@ -145,7 +146,7 @@ final class HttpServiceProviderTest extends TestCase
 
             public function get(string $key, mixed $default = null): mixed
             {
-                return $key === 'routes' ? $this->routes : $default;
+                return $key === ConfigKey::ROUTES ? $this->routes : $default;
             }
 
             public function set(string $key, mixed $default = null): void {}

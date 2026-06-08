@@ -5,6 +5,7 @@ namespace Concept\Core\Providers;
 use Concept\Core\Components\Component\ComponentRegistry;
 use Concept\Core\Components\Component\Contracts\ComponentInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
@@ -37,7 +38,7 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
             /** @var class-string<ComponentInterface>[] $componentClasses */
-            $componentClasses = $config->get('components');
+            $componentClasses = $config->get(ConfigKey::COMPONENTS);
 
             return new ComponentRegistry($container, $componentClasses);
         })->setShared(true);

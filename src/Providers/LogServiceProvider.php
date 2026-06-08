@@ -6,6 +6,7 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\Logger\Logger;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
@@ -39,7 +40,7 @@ class LogServiceProvider extends AbstractServiceProvider
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            $monolog = new Monolog($config->getString('log.name'));
+            $monolog = new Monolog($config->getString(ConfigKey::LOG_NAME));
             $this->setup($monolog);
 
             /** @var DataMaskerInterface|null $masker */
@@ -61,7 +62,7 @@ class LogServiceProvider extends AbstractServiceProvider
         $config = $container->get(ConfigInterface::class);
 
         $logsPath = $pathManager->get(PathName::LOGS, 'app.log');
-        $logLevelName = $config->getString('log.level', 'debug');
+        $logLevelName = $config->getString(ConfigKey::LOG_LEVEL, 'debug');
         try {
             /** @phpstan-ignore-next-line */
             $logLevel = Level::fromName($logLevelName);
@@ -69,7 +70,7 @@ class LogServiceProvider extends AbstractServiceProvider
             $logLevel = Level::Debug;
         }
 
-        $maxFiles = $config->getInt('log.max_files', 7);
+        $maxFiles = $config->getInt(ConfigKey::LOG_MAX_FILES, 7);
 
         $monolog->pushHandler(new RotatingFileHandler($logsPath, $maxFiles, $logLevel));
         $monolog->pushProcessor(new PsrLogMessageProcessor());

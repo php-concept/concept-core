@@ -5,6 +5,7 @@ namespace Tests\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Database\Contracts\DatabaseInterface;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\DatabaseServiceProvider;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Database\Migrations\Migrator;
@@ -34,15 +35,15 @@ final class DatabaseServiceProviderTest extends TestCase
             public function getString(string $key, string $default = ''): string
             {
                 return match ($key) {
-                    'db.driver' => 'sqlite',
-                    'db.database' => ':memory:',
+                    ConfigKey::DB_DRIVER => 'sqlite',
+                    ConfigKey::DB_DATABASE => ':memory:',
                     default => $default,
                 };
             }
             public function getInt(string $key, int $default = 0): int { return $default; }
             public function getBool(string $key, bool $default = false): bool
             {
-                return $key === 'log.query' ? false : $default;
+                return $key === ConfigKey::LOG_QUERY ? false : $default;
             }
         })->setShared(true);
 
@@ -72,15 +73,15 @@ final class DatabaseServiceProviderTest extends TestCase
             public function getString(string $key, string $default = ''): string
             {
                 return match ($key) {
-                    'db.driver' => 'sqlite',
-                    'db.database' => ':memory:',
+                    ConfigKey::DB_DRIVER => 'sqlite',
+                    ConfigKey::DB_DATABASE => ':memory:',
                     default => $default,
                 };
             }
             public function getInt(string $key, int $default = 0): int { return $default; }
             public function getBool(string $key, bool $default = false): bool
             {
-                return $key === 'log.query' ? true : $default;
+                return $key === ConfigKey::LOG_QUERY ? true : $default;
             }
         })->setShared(true);
 

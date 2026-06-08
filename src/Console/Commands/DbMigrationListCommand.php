@@ -3,6 +3,7 @@
 namespace Concept\Core\Console\Commands;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,7 +57,7 @@ class DbMigrationListCommand extends Command
 
         $io->title(self::MSG_MIGRATIONS_LIST);
         /** @var array<array<string, mixed>> $migrations */
-        $migrations = $this->capsule->getConnection()->table($this->config->getString('migrations.table', self::DEFAULT_TABLE_NAME))
+        $migrations = $this->capsule->getConnection()->table($this->config->getString(ConfigKey::MIGRATIONS_TABLE, self::DEFAULT_TABLE_NAME))
             ->limit($limit)
             ->get()
             ->map(fn($item) => (array) $item)

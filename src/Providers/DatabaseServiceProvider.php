@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Database\Contracts\DatabaseInterface;
 use Concept\Core\Components\Database\Database;
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
@@ -68,7 +69,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            $migrationTableName = $config->getString('migrations.table', self::DEFAULT_TABLE_NAME);
+            $migrationTableName = $config->getString(ConfigKey::MIGRATIONS_TABLE, self::DEFAULT_TABLE_NAME);
             $repository = new DatabaseMigrationRepository($manager, $migrationTableName);
 
             return new Migrator($repository, $manager, new Filesystem());
@@ -86,7 +87,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             $config = $container->get(ConfigInterface::class);
 
             /** @var array<string> $seeders */
-            $seeders = $config->get('seeders.list', []);
+            $seeders = $config->get(ConfigKey::SEEDERS_LIST, []);
             $seederRegistry = new SeederRegistry();
             $seederRegistry->append($seeders);
 
@@ -98,7 +99,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             $config = $container->get(ConfigInterface::class);
 
             /** @var array<string> $migrations */
-            $migrations = $config->get('migrations.paths', []);
+            $migrations = $config->get(ConfigKey::MIGRATIONS_PATHS, []);
             $migrationRegistry = new MigrationRegistry();
             $migrationRegistry->append($migrations);
 
@@ -140,12 +141,12 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
     private function getConnectionOptions(ConfigInterface $config): array
     {
         return [
-            'driver' => $config->getString('db.driver', 'mysql'),
-            'host' => $config->getString('db.host', '127.0.0.1'),
-            'database' => $config->getString('db.database', 'db'),
-            'username' => $config->getString('db.username', 'root'),
-            'password' => $config->getString('db.password', ''),
-            'charset' => $config->getString('db.charset', 'utf8mb4'),
+            'driver' => $config->getString(ConfigKey::DB_DRIVER, 'mysql'),
+            'host' => $config->getString(ConfigKey::DB_HOST, '127.0.0.1'),
+            'database' => $config->getString(ConfigKey::DB_DATABASE, 'db'),
+            'username' => $config->getString(ConfigKey::DB_USERNAME, 'root'),
+            'password' => $config->getString(ConfigKey::DB_PASSWORD, ''),
+            'charset' => $config->getString(ConfigKey::DB_CHARSET, 'utf8mb4'),
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
         ];
@@ -157,7 +158,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             return;
         }
 
-        if ($config->getBool('app.debug') || $config->getBool('log.query')) {
+        if ($config->getBool(ConfigKey::APP_DEBUG) || $config->getBool(ConfigKey::LOG_QUERY)) {
             /** @var LoggerInterface $logger */
             $logger = $container->get(LoggerInterface::class);
             $logger->debug('SQL: ' . $query->toRawSql(), [
@@ -170,7 +171,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 
     private function storeTelemetryData(ConfigInterface $config, QueryExecuted $query): void
     {
-        if (!$config->getBool('log.query')) {
+        if (!$config->getBool(ConfigKey::LOG_QUERY)) {
             return;
         }
 

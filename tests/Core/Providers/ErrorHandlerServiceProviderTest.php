@@ -8,6 +8,7 @@ use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Http\RequestFormat;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\ErrorHandlerServiceProvider;
 use League\Container\Container;
 use Laminas\Diactoros\ServerRequest;
@@ -298,7 +299,7 @@ final class ErrorHandlerServiceProviderTest extends TestCase
             public function getInt(string $key, int $default = 0): int { return $default; }
             public function getBool(string $key, bool $default = false): bool
             {
-                return $key === 'app.debug' ? $this->debug : $default;
+                return $key === ConfigKey::APP_DEBUG ? $this->debug : $default;
             }
         };
     }

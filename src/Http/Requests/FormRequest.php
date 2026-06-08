@@ -3,6 +3,7 @@
 namespace Concept\Core\Http\Requests;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Dto\Contracts\DtoInterface;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
@@ -120,7 +121,7 @@ abstract class FormRequest implements FormRequestInterface
         $this->validation->validate();
         $isValid = $this->validation->isValid();
 
-        if ($this->config->getBool('log.validation_data', false)) {
+        if ($this->config->getBool(ConfigKey::LOG_VALIDATION_DATA, false)) {
             $this->logger->debug(sprintf(self::LOG_VALIDATED_DATA, static::class), [
                 self::LOG_PAYLOAD_IS_VALID => $isValid,
                 self::LOG_PAYLOAD_VALID_DATA => $this->validation->getValidData(),
@@ -179,7 +180,7 @@ abstract class FormRequest implements FormRequestInterface
         $parsedBody = is_array($body) ? $body : (is_object($body) ? (array)$body : []);
 
         $data = array_merge($this->request->getQueryParams(), $parsedBody);
-        if ($this->config->getBool('log.validation_data', false)) {
+        if ($this->config->getBool(ConfigKey::LOG_VALIDATION_DATA, false)) {
             $this->logger->debug(sprintf(self::LOG_INCOMING_DATA_FOR_VALIDATION, static::class), [
                 self::LOG_PAYLOAD_URI => $this->request->getUri()->getPath(),
                 self::LOG_PAYLOAD_DATA => $data,

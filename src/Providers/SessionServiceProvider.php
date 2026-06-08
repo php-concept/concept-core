@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -67,14 +68,14 @@ class SessionServiceProvider extends AbstractServiceProvider
     private function getSessionOptions(ConfigInterface $config): array
     {
         return [
-            'cookie_lifetime' => $config->getInt('session.cookie_lifetime', 0),
-            'cookie_path' => $config->getString('session.cookie_path', '/'),
-            'cookie_secure' => $config->getBool('session.cookie_secure', false),
-            'cookie_httponly' => $config->getBool('session.cookie_httponly', true),
-            'use_only_cookies' => $config->getBool('session.use_only_cookies', true),
-            'cookie_domain'   => $config->getString('session.domain', ''),
-            'cookie_samesite' => $config->getString('session.samesite', 'Lax'),
-            'use_strict_mode' => $config->getBool('session.use_strict_mode', true),
+            'cookie_lifetime' => $config->getInt(ConfigKey::SESSION_COOKIE_LIFETIME, 0),
+            'cookie_path' => $config->getString(ConfigKey::SESSION_COOKIE_PATH, '/'),
+            'cookie_secure' => $config->getBool(ConfigKey::SESSION_COOKIE_SECURE, false),
+            'cookie_httponly' => $config->getBool(ConfigKey::SESSION_COOKIE_HTTPONLY, true),
+            'use_only_cookies' => $config->getBool(ConfigKey::SESSION_USE_ONLY_COOKIES, true),
+            'cookie_domain'   => $config->getString(ConfigKey::SESSION_DOMAIN, ''),
+            'cookie_samesite' => $config->getString(ConfigKey::SESSION_SAMESITE, 'Lax'),
+            'use_strict_mode' => $config->getBool(ConfigKey::SESSION_USE_STRICT_MODE, true),
         ];
     }
 }

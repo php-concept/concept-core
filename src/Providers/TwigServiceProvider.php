@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
@@ -46,10 +47,10 @@ class TwigServiceProvider extends AbstractServiceProvider
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
 
-            $debug = $config->getBool('app.debug');
+            $debug = $config->getBool(ConfigKey::APP_DEBUG);
             $templatesPath = $pathManager->get(PathName::VIEWS);
 
-            $cacheSubDir = $config->getString('view.cache_dir', 'views');
+            $cacheSubDir = $config->getString(ConfigKey::VIEW_CACHE_DIR, 'views');
             $cachePath = $pathManager->get(PathName::CACHE, $cacheSubDir);
 
             $loader = new FilesystemLoader($templatesPath);
@@ -64,7 +65,7 @@ class TwigServiceProvider extends AbstractServiceProvider
             $this->addPaths($loader, $pathManager->root(), $viewRegistry->paths()->all());
 
             $this->addFallbackPath($loader, $templatesPath);
-            $defaultExtension = $config->getString('view.default_extension', self::DEFAULT_EXTENSION);
+            $defaultExtension = $config->getString(ConfigKey::VIEW_DEFAULT_EXTENSION, self::DEFAULT_EXTENSION);
 
             return new TwigView($twig, $defaultExtension, $this->telemetry());
         })->setShared(true);

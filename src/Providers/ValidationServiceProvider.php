@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
@@ -58,7 +59,7 @@ class ValidationServiceProvider extends AbstractServiceProvider
             $config = $container->get(ConfigInterface::class);
 
             /** @var array<string, class-string> $customRules */
-            $customRules = $config->get('validator.rules', []);
+            $customRules = $config->get(ConfigKey::VALIDATOR_RULES, []);
 
             $validator = new Validator($container, $rakitValidator);
             $validator->addRules($customRules);

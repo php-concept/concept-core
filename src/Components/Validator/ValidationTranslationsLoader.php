@@ -4,6 +4,7 @@ namespace Concept\Core\Components\Validator;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 
@@ -61,7 +62,7 @@ class ValidationTranslationsLoader
             return $this->load($file);
         }
 
-        $fallbackLocale = $this->config->getString('app.fallback_locale', 'en');
+        $fallbackLocale = $this->config->getString(ConfigKey::APP_FALLBACK_LOCALE, 'en');
 
         return $this->load($directory . '/' . $fallbackLocale . '.php');
     }

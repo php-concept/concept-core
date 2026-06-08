@@ -5,6 +5,7 @@ namespace Concept\Core\Components\Caster;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Caster\Exceptions\CastingException;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use CuyZ\Valinor\Cache\FileSystemCache;
@@ -27,7 +28,7 @@ class Caster implements CasterInterface
         private readonly ConfigInterface $config
     ) {
         $cache = new FileSystemCache($this->pathManager->get(PathName::CACHE, self::VALINOR_CACHE_DIR));
-        if ($this->config->getBool('app.debug')) {
+        if ($this->config->getBool(ConfigKey::APP_DEBUG)) {
             $cache = new FileWatchingCache($cache);
         }
 

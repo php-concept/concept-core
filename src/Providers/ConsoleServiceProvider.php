@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Console\DisabledCommand;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -28,8 +29,8 @@ class ConsoleServiceProvider extends AbstractServiceProvider
         $container->add(ConsoleApplication::class, function () use ($container) {
             /** @var ConfigInterface $config */
             $config = $container->get(ConfigInterface::class);
-            $appName = $config->getString('app.name', self::DEFAULT_NAME);
-            $appVersion = $config->getString('app.version', self::DEFAULT_VERSION);
+            $appName = $config->getString(ConfigKey::APP_NAME, self::DEFAULT_NAME);
+            $appVersion = $config->getString(ConfigKey::APP_VERSION, self::DEFAULT_VERSION);
 
             $consoleApplication = new ConsoleApplication($appName, $appVersion);
             $this->addConsoleCommands($consoleApplication);
@@ -45,7 +46,7 @@ class ConsoleServiceProvider extends AbstractServiceProvider
         $config = $container->get(ConfigInterface::class);
 
         /** @var array<class-string> $commandClasses */
-        $commandClasses = $config->get('commands');
+        $commandClasses = $config->get(ConfigKey::COMMANDS);
         foreach ($commandClasses as $className) {
             try {
                 /** @var Command $commandInstance */

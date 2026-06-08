@@ -4,6 +4,7 @@ namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Config;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
@@ -44,7 +45,7 @@ class ConfigServiceProvider extends AbstractServiceProvider implements BootableS
 
         $this->mergeEnvData($nhConfig, $envData);
         $config = new Config($nhConfig);
-        $this->setTimeZone($config->getString('app.timezone', 'UTC'));
+        $this->setTimeZone($config->getString(ConfigKey::APP_TIMEZONE, 'UTC'));
 
         $container->add(ConfigInterface::class, $config)->setShared(true);
     }

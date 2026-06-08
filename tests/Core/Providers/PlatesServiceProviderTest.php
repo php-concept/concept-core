@@ -3,6 +3,7 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\View\Contracts\ViewInterface;
@@ -99,7 +100,7 @@ final class PlatesServiceProviderTest extends TestCase
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed
             {
-                if ($key === 'view.extensions') {
+                if ($key === ConfigKey::VIEW_EXTENSIONS) {
                     return 'not-an-array';
                 }
 
@@ -162,7 +163,7 @@ final class PlatesServiceProviderTest extends TestCase
             public function getInt(string $key, int $default = 0): int { return $default; }
             public function getBool(string $key, bool $default = false): bool
             {
-                return $key === 'app.debug' ? $this->debug : $default;
+                return $key === ConfigKey::APP_DEBUG ? $this->debug : $default;
             }
         };
     }

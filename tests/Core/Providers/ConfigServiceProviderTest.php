@@ -5,6 +5,7 @@ namespace Tests\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\ConfigServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -75,7 +76,7 @@ final class ConfigServiceProviderTest extends TestCase
         $config = $container->get(ConfigInterface::class);
 
         // env merge has priority over file values due to set() after load.
-        self::assertSame('EnvName', $config->getString('app.name'));
+        self::assertSame('EnvName', $config->getString(ConfigKey::APP_NAME));
         self::assertSame('local', $config->getString('app.env'));
         self::assertSame('UTC', date_default_timezone_get());
     }

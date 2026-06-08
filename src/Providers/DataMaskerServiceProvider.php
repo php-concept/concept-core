@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
 use Concept\Core\Components\DataMasker\DataMasker;
@@ -32,13 +33,13 @@ class DataMaskerServiceProvider extends AbstractServiceProvider
             $masker = new DataMasker();
 
             /** @var array<string, string> $patterns */
-            $patterns = $config->get('masking.patterns', []);
+            $patterns = $config->get(ConfigKey::MASKING_PATTERNS, []);
             /** @var array<string, string> $keyPatterns */
-            $keyPatterns = $config->get('masking.key_patterns', []);
+            $keyPatterns = $config->get(ConfigKey::MASKING_KEY_PATTERNS, []);
             $masker->addRule(new RegexMaskerRule($patterns, $keyPatterns));
 
             /** @var array<string, string> $rules */
-            $rules = $config->get('masking.rules', []);
+            $rules = $config->get(ConfigKey::MASKING_RULES, []);
             foreach ($rules as $ruleClass) {
                 /** @var DataMaskerRuleInterface $ruleClassInstance */
                 $ruleClassInstance = $container->get($ruleClass);

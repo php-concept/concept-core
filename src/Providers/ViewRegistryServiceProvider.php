@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
@@ -35,17 +36,17 @@ class ViewRegistryServiceProvider extends AbstractServiceProvider
             $config = $container->get(ConfigInterface::class);
 
             /** @var array<string, string> $viewPaths */
-            $viewPaths = $config->get('view.paths', []);
+            $viewPaths = $config->get(ConfigKey::VIEW_PATHS, []);
             $viewPathRegistry = new ViewPathRegistry();
             $viewPathRegistry->append($viewPaths);
 
             /** @var array<string> $extensions */
-            $extensions = $config->get('view.extensions', []);
+            $extensions = $config->get(ConfigKey::VIEW_EXTENSIONS, []);
             $viewExtensionRegistry = new ViewExtensionRegistry();
             $viewExtensionRegistry->append($extensions);
 
             /** @var array<string> $viewContexts */
-            $viewContexts = $config->get('view.contexts', []);
+            $viewContexts = $config->get(ConfigKey::VIEW_CONTEXTS, []);
             $viewContextsRegistry = new ViewContextRegistry();
             $viewContextsRegistry->append($viewContexts);
 

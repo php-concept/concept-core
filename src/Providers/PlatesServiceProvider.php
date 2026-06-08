@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
@@ -44,7 +45,7 @@ class PlatesServiceProvider extends AbstractServiceProvider
             $config = $container->get(ConfigInterface::class);
 
             $templatesPath = $pathManager->get(PathName::VIEWS);
-            $defaultExtension = $config->getString('view.default_extension', self::DEFAULT_EXTENSION);
+            $defaultExtension = $config->getString(ConfigKey::VIEW_DEFAULT_EXTENSION, self::DEFAULT_EXTENSION);
             $engine = new Engine($templatesPath, ltrim($defaultExtension, '.'));
 
             /** @var ViewRegistry $viewRegistry */

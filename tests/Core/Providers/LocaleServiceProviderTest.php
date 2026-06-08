@@ -5,6 +5,7 @@ namespace Tests\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Locale\ConfigLocaleResolver;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\LocaleServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
@@ -64,7 +65,7 @@ final class LocaleServiceProviderTest extends TestCase
 
             public function get(string $key, mixed $default = null): mixed
             {
-                if ($key === 'app.locale_resolver') {
+                if ($key === ConfigKey::APP_LOCALE_RESOLVER) {
                     return $this->localeResolver;
                 }
 
@@ -77,7 +78,7 @@ final class LocaleServiceProviderTest extends TestCase
 
             public function getString(string $key, string $default = ''): string
             {
-                return $key === 'app.locale' ? $this->locale : $default;
+                return $key === ConfigKey::APP_LOCALE ? $this->locale : $default;
             }
 
             public function getInt(string $key, int $default = 0): int { return $default; }

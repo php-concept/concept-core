@@ -3,6 +3,7 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\DatabaseServiceProvider;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use League\Container\Container;
@@ -19,12 +20,12 @@ final class DatabaseServiceProviderAdvancedTest extends TestCase
         $config = $this->createStub(ConfigInterface::class);
         
         $configData = [
-            'db.driver' => 'pgsql',
-            'db.host' => '10.10.10.10',
-            'db.database' => 'test_db',
-            'db.username' => 'test_user',
-            'db.password' => 'test_pass',
-            'db.charset' => 'utf8',
+            ConfigKey::DB_DRIVER => 'pgsql',
+            ConfigKey::DB_HOST => '10.10.10.10',
+            ConfigKey::DB_DATABASE => 'test_db',
+            ConfigKey::DB_USERNAME => 'test_user',
+            ConfigKey::DB_PASSWORD => 'test_pass',
+            ConfigKey::DB_CHARSET => 'utf8',
         ];
 
         $config->method('getString')->willReturnCallback(function (string $key, string $default = '') use ($configData) {

@@ -3,6 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Http\Routing\UrlGenerator;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
@@ -67,7 +68,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
                 /** @var ConfigInterface $config */
                 $config = $container->get(ConfigInterface::class);
                 /** @var array<string> $routes */
-                $routes = $config->get('routes', []);
+                $routes = $config->get(ConfigKey::ROUTES, []);
                 $this->registerRoutes($router, $routes);
             }
 

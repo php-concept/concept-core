@@ -4,6 +4,7 @@ namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\View\Registries\ViewRegistry;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\ViewRegistryServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -25,9 +26,9 @@ final class ViewRegistryServiceProviderTest extends TestCase
             public function get(string $key, mixed $default = null): mixed
             {
                 return match ($key) {
-                    'view.paths' => ['ui' => 'resources/views/ui'],
-                    'view.extensions' => ['App\\View\\ContextExtension'],
-                    'view.contexts' => ['/admin' => 'admin'],
+                    ConfigKey::VIEW_PATHS => ['ui' => 'resources/views/ui'],
+                    ConfigKey::VIEW_EXTENSIONS => ['App\\View\\ContextExtension'],
+                    ConfigKey::VIEW_CONTEXTS => ['/admin' => 'admin'],
                     default => $default,
                 };
             }

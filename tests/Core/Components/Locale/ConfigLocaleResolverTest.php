@@ -4,6 +4,7 @@ namespace Tests\Core\Components\Locale;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Locale\ConfigLocaleResolver;
+use Concept\Core\Foundation\ConfigKey;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigLocaleResolverTest extends TestCase
@@ -11,7 +12,7 @@ final class ConfigLocaleResolverTest extends TestCase
     public function testResolveReturnsConfiguredLocale(): void
     {
         $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())->method('getString')->with('app.locale', 'en')->willReturn('uk');
+        $config->expects(self::once())->method('getString')->with(ConfigKey::APP_LOCALE, 'en')->willReturn('uk');
 
         $resolver = new ConfigLocaleResolver($config);
 
@@ -21,7 +22,7 @@ final class ConfigLocaleResolverTest extends TestCase
     public function testResolveFallsBackToEnglish(): void
     {
         $config = $this->createMock(ConfigInterface::class);
-        $config->expects(self::once())->method('getString')->with('app.locale', 'en')->willReturn('en');
+        $config->expects(self::once())->method('getString')->with(ConfigKey::APP_LOCALE, 'en')->willReturn('en');
 
         $resolver = new ConfigLocaleResolver($config);
 

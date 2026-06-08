@@ -8,6 +8,7 @@ use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Integrations\Whoops\ErrorLogHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use Concept\Core\Integrations\Whoops\ProductionErrorHandler;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Php\PhpSapi;
@@ -104,7 +105,7 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
             return;
         }
 
-        if ($config->getBool('app.debug', false)) {
+        if ($config->getBool(ConfigKey::APP_DEBUG, false)) {
             $whoops->appendHandler(new PrettyPageHandler());
 
             return;

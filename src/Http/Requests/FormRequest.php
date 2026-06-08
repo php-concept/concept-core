@@ -11,6 +11,7 @@ use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\SessionKey;
 use Concept\Core\Components\Validator\Contracts\ValidationInterface;
 use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
+use Concept\Core\Components\Validator\ValidationTranslationsLoader;
 use Concept\Core\Components\Validator\Exceptions\ValidationCastException;
 use Concept\Core\Components\Validator\Exceptions\ValidationLogicException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -67,6 +68,7 @@ abstract class FormRequest implements FormRequestInterface
         protected readonly ConfigInterface $config,
         protected readonly LoggerInterface $logger,
         protected readonly ValidatorInterface $validator,
+        protected readonly ValidationTranslationsLoader $translations,
         protected readonly ?CasterInterface $caster = null
     ) {}
 
@@ -83,12 +85,36 @@ abstract class FormRequest implements FormRequestInterface
         return [];
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [];
+    }
+
     public function validate(): bool
     {
         $this->validation = $this->validator->make($this->all(), $this->rules());
 
+        $translations = $this->translations->resolve();
+        if ($translations['messages'] !== []) {
+            $this->validation->setMessages($translations['messages']);
+        }
+        if ($translations['translations'] !== []) {
+            $this->validation->setTranslations($translations['translations']);
+        }
+
+        $aliases = $translations['aliases'];
         if (!empty($this->aliases())) {
-            $this->validation->setAliases($this->aliases());
+            $aliases = array_merge($aliases, $this->aliases());
+        }
+        if ($aliases !== []) {
+            $this->validation->setAliases($aliases);
+        }
+
+        if (!empty($this->messages())) {
+            $this->validation->setMessages($this->messages());
         }
 
         $this->validation->validate();

@@ -3,7 +3,7 @@
 namespace Concept\Core;
 
 use Concept\Core\Components\Path\PathManager;
-use Concept\Core\Support\PhpSapi;
+use Concept\Core\Php\PhpSapi;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use InvalidArgumentException;
@@ -125,7 +125,7 @@ final class App
 
         if ($debug) {
             $whoops->pushHandler(new PrettyPageHandler());
-        } elseif (PhpSapi::isCli()) {
+        } elseif (PHP_SAPI === PhpSapi::CLI) {
             $whoops->pushHandler(new PlainTextHandler());
         } else {
             $whoops->pushHandler(new EarlyBootstrapFallbackHandler($this->rootPath));

@@ -40,17 +40,21 @@ final class RakitValidationAdapterTest extends TestCase
 
         $validation = $this->getMockBuilder(RakitValidation::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getValidData', 'errors', 'setAliases'])
+            ->onlyMethods(['getValidData', 'errors', 'setAliases', 'setMessages', 'setTranslations'])
             ->getMock();
 
         $validation->method('getValidData')->willReturn(['email' => 'user@test.dev']);
         $validation->method('errors')->willReturn($errorBag);
         $validation->expects(self::once())->method('setAliases')->with(['email' => 'Email']);
+        $validation->expects(self::once())->method('setMessages')->with(['required' => 'Required']);
+        $validation->expects(self::once())->method('setTranslations')->with(['or' => 'or']);
 
         $adapter = new RakitValidationAdapter($validation);
 
         self::assertSame(['email' => 'user@test.dev'], $adapter->getValidData());
         self::assertSame(['email' => ['required']], $adapter->getErrors());
         $adapter->setAliases(['email' => 'Email']);
+        $adapter->setMessages(['required' => 'Required']);
+        $adapter->setTranslations(['or' => 'or']);
     }
 }

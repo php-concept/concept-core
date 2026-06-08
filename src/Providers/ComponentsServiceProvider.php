@@ -10,7 +10,7 @@ use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Registries\ViewRegistry;
-use Concept\Core\Support\PhpSapi;
+use Concept\Core\Php\PhpSapi;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
@@ -61,7 +61,7 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
 
         $this->registerComponentProviders($registry);
         $this->registerComponentRoutes($registry);
-        if (!PhpSapi::isCli()) {
+        if (PHP_SAPI !== PhpSapi::CLI) {
             $this->registerComponentViewFeatures($registry);
         }
     }

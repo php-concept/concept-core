@@ -17,6 +17,8 @@ class PathManager
     public const string SEEDERS_DIR = 'seeders';
     public const string PUBLIC_DIR = 'public';
     public const string RESOURCES_DIR = 'resources';
+    public const string LANG_DIR = 'lang';
+    public const string VALIDATOR_TRANSLATIONS_DIR = 'validator_translations';
     public const string VIEWS_DIR = 'views';
     public const string STORAGE_DIR = 'storage';
     public const string LOGS_DIR = 'logs';
@@ -40,6 +42,11 @@ class PathManager
     public function root(string $path = ''): string
     {
         return sprintf('%s/%s', $this->rootPath, ltrim($path, '/'));
+    }
+
+    public function has(string $key): bool
+    {
+        return isset($this->pathMap[$key]);
     }
 
     /**

@@ -33,4 +33,14 @@ final class PathManagerTest extends TestCase
 
         $manager->get('unknown');
     }
+
+    public function testHasReturnsWhetherPathKeyIsMapped(): void
+    {
+        $manager = new PathManager('/var/www/project', [
+            PathManager::LANG_DIR => 'resources/lang',
+        ]);
+
+        self::assertTrue($manager->has(PathManager::LANG_DIR));
+        self::assertFalse($manager->has(PathManager::VALIDATOR_TRANSLATIONS_DIR));
+    }
 }

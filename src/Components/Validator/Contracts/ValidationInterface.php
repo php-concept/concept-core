@@ -22,4 +22,14 @@ interface ValidationInterface
      * @param array<string, string> $aliases
      */
     public function setAliases(array $aliases): void;
+
+    /**
+     * @param array<string, string> $messages
+     */
+    public function setMessages(array $messages): void;
+
+    /**
+     * @param array<string, string> $translations
+     */
+    public function setTranslations(array $translations): void;
 }

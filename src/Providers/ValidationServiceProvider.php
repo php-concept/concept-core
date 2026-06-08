@@ -3,9 +3,12 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
+use Concept\Core\Components\Path\PathManager;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
+use Concept\Core\Components\Validator\ValidationTranslationsLoader;
 use Concept\Core\Components\Validator\Validator;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Rakit\Validation\Validator as RakitValidator;
@@ -19,6 +22,7 @@ class ValidationServiceProvider extends AbstractServiceProvider
         $services = [
             RakitValidator::class,
             ValidatorInterface::class,
+            ValidationTranslationsLoader::class,
         ];
 
         return in_array($id, $services);
@@ -30,6 +34,19 @@ class ValidationServiceProvider extends AbstractServiceProvider
 
         $container->add(RakitValidator::class, function () {
             return new RakitValidator();
+        })->setShared(true);
+
+        $container->add(ValidationTranslationsLoader::class, function () use ($container) {
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ValidationTranslationsLoader::class);
+
+            /** @var LocaleResolverInterface $localeResolver */
+            $localeResolver = $container->get(LocaleResolverInterface::class);
+            /** @var PathManager $pathManager */
+            $pathManager = $container->get(PathManager::class);
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+
+            return new ValidationTranslationsLoader($localeResolver, $pathManager, $config);
         })->setShared(true);
 
         $container->add(ValidatorInterface::class, function () use ($container) {

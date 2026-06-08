@@ -8,6 +8,7 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\Validator\Contracts\ValidationInterface;
 use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
+use Concept\Core\Components\Validator\ValidationTranslationsLoader;
 use Concept\Core\Components\Validator\Exceptions\ValidationCastException;
 use Concept\Core\Components\Validator\Exceptions\ValidationLogicException;
 use Concept\Core\Dto\Dto;
@@ -29,6 +30,7 @@ final class FormRequestTest extends TestCase
 
         $validation = $this->createMock(ValidationInterface::class);
         $validation->expects(self::once())->method('setAliases')->with(['title' => 'Title']);
+        $validation->expects(self::once())->method('setMessages')->with(['title:required' => 'Title is required']);
         $validation->expects(self::once())->method('validate');
         $validation->expects(self::once())->method('isValid')->willReturn(true);
         $validation->expects(self::once())->method('getValidData')->willReturn(['title' => 'Hello']);
@@ -61,9 +63,11 @@ final class FormRequestTest extends TestCase
             $config,
             $logger,
             $validator,
+            $this->emptyTranslationsLoader(),
             null,
             ['title' => 'required'],
-            ['title' => 'Title']
+            ['title' => 'Title'],
+            ['title:required' => 'Title is required']
         );
 
         self::assertTrue($form->validate());
@@ -125,7 +129,8 @@ final class FormRequestTest extends TestCase
             new RequestFormat(),
             $config,
             $logger,
-            $validator
+            $validator,
+            $this->emptyTranslationsLoader()
         );
 
         self::assertSame(['q' => 'abc', 'page' => '1'], $form->all());
@@ -217,6 +222,92 @@ final class FormRequestTest extends TestCase
         self::assertSame('fallback', $form->routeParam('missing', 'fallback'));
     }
 
+    public function testValidateAppliesTranslationsFromProviderBeforeRequestMessages(): void
+    {
+        $setMessagesCalls = [];
+        $validation = $this->createMock(ValidationInterface::class);
+        $validation->expects(self::exactly(2))
+            ->method('setMessages')
+            ->willReturnCallback(function (array $messages) use (&$setMessagesCalls): void {
+                $setMessagesCalls[] = $messages;
+            });
+        $validation->expects(self::once())->method('setTranslations')->with(['or' => 'або']);
+        $validation->expects(self::once())->method('validate');
+        $validation->method('isValid')->willReturn(true);
+        $validation->method('getValidData')->willReturn([]);
+        $validation->method('getErrors')->willReturn([]);
+
+        $validator = $this->createStub(ValidatorInterface::class);
+        $validator->method('make')->willReturn($validation);
+
+        $translations = $this->createStub(ValidationTranslationsLoader::class);
+        $translations->method('resolve')->willReturn([
+            'messages' => ['required' => 'Provider required'],
+            'translations' => ['or' => 'або'],
+            'aliases' => [],
+        ]);
+
+        $form = new TestBlogFormRequest(
+            new ServerRequest(),
+            new RequestFormat(),
+            $this->createStub(ConfigInterface::class),
+            $this->createStub(LoggerInterface::class),
+            $validator,
+            $translations,
+            null,
+            ['title' => 'required'],
+            [],
+            ['title:required' => 'Title is required']
+        );
+
+        $form->validate();
+
+        self::assertSame([
+            ['required' => 'Provider required'],
+            ['title:required' => 'Title is required'],
+        ], $setMessagesCalls);
+    }
+
+    public function testValidateMergesProviderAliasesWithRequestAliases(): void
+    {
+        $validation = $this->createMock(ValidationInterface::class);
+        $validation->expects(self::once())->method('setAliases')->with([
+            'email' => 'Email Address',
+            'title' => 'Custom Title',
+        ]);
+        $validation->expects(self::once())->method('validate');
+        $validation->method('isValid')->willReturn(true);
+        $validation->method('getValidData')->willReturn([]);
+        $validation->method('getErrors')->willReturn([]);
+
+        $validator = $this->createStub(ValidatorInterface::class);
+        $validator->method('make')->willReturn($validation);
+
+        $translations = $this->createStub(ValidationTranslationsLoader::class);
+        $translations->method('resolve')->willReturn([
+            'messages' => [],
+            'translations' => [],
+            'aliases' => [
+                'email' => 'Email Address',
+                'title' => 'Title',
+            ],
+        ]);
+
+        $form = new TestBlogFormRequest(
+            new ServerRequest(),
+            new RequestFormat(),
+            $this->createStub(ConfigInterface::class),
+            $this->createStub(LoggerInterface::class),
+            $validator,
+            $translations,
+            null,
+            ['title' => 'required'],
+            ['title' => 'Custom Title']
+        );
+
+        $form->validate();
+    }
+
     public function testDefaultAliasesAreEmpty(): void
     {
         $form = new TestPlainFormRequest(
@@ -224,10 +315,12 @@ final class FormRequestTest extends TestCase
             new RequestFormat(),
             $this->createStub(ConfigInterface::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(ValidatorInterface::class)
+            $this->createStub(ValidatorInterface::class),
+            $this->emptyTranslationsLoader()
         );
 
         self::assertSame([], $form->aliases());
+        self::assertSame([], $form->messages());
     }
 
     /**
@@ -265,10 +358,23 @@ final class FormRequestTest extends TestCase
             $config,
             $logger,
             $validator,
+            $this->emptyTranslationsLoader(),
             $caster,
             $rules,
             ['title' => 'Title']
         );
+    }
+
+    private function emptyTranslationsLoader(): ValidationTranslationsLoader
+    {
+        $loader = $this->createStub(ValidationTranslationsLoader::class);
+        $loader->method('resolve')->willReturn([
+            'messages' => [],
+            'translations' => [],
+            'aliases' => [],
+        ]);
+
+        return $loader;
     }
 }
 
@@ -281,11 +387,13 @@ final class TestBlogFormRequest extends FormRequest
         ConfigInterface $config,
         LoggerInterface $logger,
         ValidatorInterface $validator,
+        ValidationTranslationsLoader $translations,
         ?CasterInterface $caster = null,
         private array $rules = ['title' => 'required'],
-        private array $aliases = []
+        private array $aliases = [],
+        private array $messages = [],
     ) {
-        parent::__construct($request, $requestFormat, $config, $logger, $validator, $caster);
+        parent::__construct($request, $requestFormat, $config, $logger, $validator, $translations, $caster);
     }
 
     public function rules(): array
@@ -296,6 +404,11 @@ final class TestBlogFormRequest extends FormRequest
     public function aliases(): array
     {
         return $this->aliases;
+    }
+
+    public function messages(): array
+    {
+        return $this->messages;
     }
 
     /** @param array<string> $fields */
@@ -328,6 +441,17 @@ final class TestRequestDto extends Dto
 
 final class TestPlainFormRequest extends FormRequest
 {
+    public function __construct(
+        ServerRequest $request,
+        RequestFormat $requestFormat,
+        ConfigInterface $config,
+        LoggerInterface $logger,
+        ValidatorInterface $validator,
+        ValidationTranslationsLoader $translations,
+    ) {
+        parent::__construct($request, $requestFormat, $config, $logger, $validator, $translations);
+    }
+
     public function rules(): array
     {
         return [];

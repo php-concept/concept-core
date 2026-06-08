@@ -33,4 +33,14 @@ class RakitValidationAdapter implements ValidationInterface
     {
         $this->rakitValidation->setAliases($aliases);
     }
+
+    public function setMessages(array $messages): void
+    {
+        $this->rakitValidation->setMessages($messages);
+    }
+
+    public function setTranslations(array $translations): void
+    {
+        $this->rakitValidation->setTranslations($translations);
+    }
 }

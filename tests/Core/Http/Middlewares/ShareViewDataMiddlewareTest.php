@@ -2,7 +2,7 @@
 
 namespace Tests\Core;
 
-use Concept\Core\Components\Csrf\CsrfTokenManager;
+use Concept\Core\Http\Security\CsrfTokenManager;
 use Concept\Core\Http\Middlewares\ShareViewDataMiddleware;
 use Concept\Core\Http\RequestAttribute;
 use Concept\Core\Http\SessionKey;

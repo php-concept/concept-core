@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Integrations\Whoops;
 
-use Concept\Core\Components\Container\ContainerResolver;
+use Concept\Core\Foundation\ContainerResolver;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;

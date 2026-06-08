@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Routing\Contracts;
+namespace Concept\Core\Http\Routing\Contracts;
 
 interface UrlGeneratorInterface
 {

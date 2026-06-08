@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Container;
+namespace Concept\Core\Foundation;
 
 use Psr\Container\ContainerInterface;
 use Throwable;

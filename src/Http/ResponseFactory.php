@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Http;
 
-use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
+use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;

@@ -3,8 +3,8 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
-use Concept\Core\Components\Routing\UrlGenerator;
+use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
+use Concept\Core\Http\Routing\UrlGenerator;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Contracts\ViewInterface;

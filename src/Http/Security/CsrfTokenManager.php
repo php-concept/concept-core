@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Csrf;
+namespace Concept\Core\Http\Security;
 
 use Concept\Core\Http\SessionKey;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;

@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Integrations\Whoops;
 
-use Concept\Core\Components\Container\ContainerResolver;
+use Concept\Core\Foundation\ContainerResolver;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;

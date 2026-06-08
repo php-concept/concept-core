@@ -6,7 +6,7 @@ use Concept\Core\Http\Exceptions\Security\CsrfException;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpMethod;
 use Concept\Core\Http\SessionKey;
-use Concept\Core\Components\Csrf\CsrfTokenManager;
+use Concept\Core\Http\Security\CsrfTokenManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

@@ -5,7 +5,7 @@ namespace Concept\Core\Http\Middlewares;
 use Concept\Core\Http\RequestAttribute;
 use Concept\Core\Http\SessionKey;
 use Concept\Core\Http\ViewKey;
-use Concept\Core\Components\Csrf\CsrfTokenManager;
+use Concept\Core\Http\Security\CsrfTokenManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

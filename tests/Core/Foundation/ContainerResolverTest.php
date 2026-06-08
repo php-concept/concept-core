@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Core\Components\Container;
+namespace Tests\Core\Foundation;
 
-use Concept\Core\Components\Container\ContainerResolver;
+use Concept\Core\Foundation\ContainerResolver;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

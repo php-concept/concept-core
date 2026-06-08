@@ -2,7 +2,7 @@
 
 namespace Tests\Core;
 
-use Concept\Core\Components\Csrf\CsrfTokenManager;
+use Concept\Core\Http\Security\CsrfTokenManager;
 use Concept\Core\Http\Exceptions\Security\CsrfException;
 use Concept\Core\Http\Middlewares\VerifyCsrfTokenMiddleware;
 use Concept\Core\Http\Protocol\HttpHeader;

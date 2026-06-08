@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Core\Components\Masker;
+namespace Tests\Core\Components\DataMasker;
 
-use PHPUnit\Framework\TestCase;
-use Concept\Core\Components\DataMasker\DataMasker;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
+use Concept\Core\Components\DataMasker\DataMasker;
+use PHPUnit\Framework\TestCase;
 
 class DataMaskerTest extends TestCase
 {
@@ -13,7 +13,7 @@ class DataMaskerTest extends TestCase
         $rule = $this->createStub(DataMaskerRuleInterface::class);
         $rule->method('isSensitiveKey')->willReturnCallback(fn($key) => $key === 'password');
         $rule->method('apply')->willReturnArgument(0);
-        
+
         $masker = new DataMasker();
         $masker->addRule($rule);
 

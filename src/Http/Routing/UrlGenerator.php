@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Routing;
+namespace Concept\Core\Http\Routing;
 
-use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
+use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
 use League\Route\Router;
 use Psr\Http\Message\ServerRequestInterface;
 

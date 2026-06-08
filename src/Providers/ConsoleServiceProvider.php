@@ -3,7 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Console\DisabledCommand;
+use Concept\Core\Console\DisabledCommand;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Command\Command;

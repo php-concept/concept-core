@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Console;
+namespace Concept\Core\Console;
 
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command;

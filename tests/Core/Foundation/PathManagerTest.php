@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Core;
+namespace Tests\Core\Foundation;
 
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;

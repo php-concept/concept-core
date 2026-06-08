@@ -3,7 +3,7 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Routing\Contracts\UrlGeneratorInterface;
+use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Components\View\ViewResponseFactory;

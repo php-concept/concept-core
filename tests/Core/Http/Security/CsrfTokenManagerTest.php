@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Core;
+namespace Tests\Core\Http\Security;
 
-use Concept\Core\Components\Csrf\CsrfTokenManager;
+use Concept\Core\Http\Security\CsrfTokenManager;
 use Concept\Core\Http\SessionKey;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Session;

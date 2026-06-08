@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Providers;
 
-use Concept\Core\Components\Container\ContainerResolver;
+use Concept\Core\Foundation\ContainerResolver;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Integrations\Whoops\ErrorLogHandler;

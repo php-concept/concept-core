@@ -7,7 +7,7 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
-use Concept\Core\Components\Telemetry\TelemetryTrait;
+use Concept\Core\Telemetry\TelemetryTrait;
 use Dotenv\Dotenv;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;

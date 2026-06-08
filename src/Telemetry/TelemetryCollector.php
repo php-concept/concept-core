@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Telemetry;
+namespace Concept\Core\Telemetry;
 
-use Concept\Core\Components\Telemetry\Contracts\TelemetryItemInterface;
+use Concept\Core\Telemetry\Contracts\TelemetryItemInterface;
 
 class TelemetryCollector
 {
@@ -12,9 +12,7 @@ class TelemetryCollector
     private array $telemetryItems = [];
 
     /**
-     * @param string $telemetryEventName
      * @param array<mixed> $context
-     * @param float|null $duration
      */
     public function start(string $telemetryEventName, array $context = [], ?float $duration = null): string
     {
@@ -38,8 +36,7 @@ class TelemetryCollector
     }
 
     /**
-     * @param string|null $telemetryEventName
-     * @return array|TelemetryItemInterface[]|Contracts\TelemetryItemInterface[][]|string[]
+     * @return array<string, array<string, TelemetryItemInterface>>|array<string, TelemetryItemInterface>
      */
     public function items(?string $telemetryEventName = null): array
     {
@@ -51,7 +48,7 @@ class TelemetryCollector
     }
 
     /**
-     * @return array<array<string, mixed>>
+     * @return array<array<string, mixed>>|array<string, array<array<string, mixed>>>
      */
     public function toArray(?string $telemetryEventName = null): array
     {

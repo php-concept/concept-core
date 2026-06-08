@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Telemetry\Contracts;
+namespace Concept\Core\Telemetry\Contracts;
 
 interface TelemetryItemInterface
 {

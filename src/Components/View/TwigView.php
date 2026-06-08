@@ -2,8 +2,8 @@
 
 namespace Concept\Core\Components\View;
 
-use Concept\Core\Components\Telemetry\TelemetryCollector;
-use Concept\Core\Components\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryCollector;
+use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Twig\Environment as Twig;
 use Twig\Error\LoaderError;

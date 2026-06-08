@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Telemetry;
+namespace Concept\Core\Telemetry;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;

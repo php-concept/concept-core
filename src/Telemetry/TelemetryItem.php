@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Telemetry;
+namespace Concept\Core\Telemetry;
 
-use Concept\Core\Components\Telemetry\Contracts\TelemetryItemInterface;
+use Concept\Core\Telemetry\Contracts\TelemetryItemInterface;
 
 class TelemetryItem implements TelemetryItemInterface
 {
@@ -16,9 +16,7 @@ class TelemetryItem implements TelemetryItemInterface
     private ?float $finishedAt = null;
 
     /**
-     * @param string $name
      * @param array<mixed> $context
-     * @param float|null $duration
      */
     public function __construct(
         private readonly string $name,

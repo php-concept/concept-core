@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Providers;
 
-use Concept\Core\Components\Telemetry\TelemetryCollector;
+use Concept\Core\Telemetry\TelemetryCollector;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class TelemetryServiceProvider extends AbstractServiceProvider

@@ -6,8 +6,8 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Locale\ConfigLocaleResolver;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
-use Concept\Core\Components\Telemetry\TelemetryEvent;
-use Concept\Core\Components\Telemetry\TelemetryTrait;
+use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class LocaleServiceProvider extends AbstractServiceProvider

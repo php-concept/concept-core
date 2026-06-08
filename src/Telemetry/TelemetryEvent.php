@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Components\Telemetry;
+namespace Concept\Core\Telemetry;
 
 /**
- * String identifiers for {@see \League\Event\HasEventName} and listener registration.
+ * Telemetry event identifiers.
  */
 final class TelemetryEvent
 {

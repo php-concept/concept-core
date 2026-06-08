@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Core\Components\Telemetry;
+namespace Tests\Core\Telemetry;
 
-use Concept\Core\Components\Telemetry\TelemetryCollector;
-use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Telemetry\TelemetryCollector;
+use Concept\Core\Telemetry\TelemetryEvent;
 use PHPUnit\Framework\TestCase;
 
 final class TelemetryCollectorTest extends TestCase

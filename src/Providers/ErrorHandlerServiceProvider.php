@@ -9,6 +9,7 @@ use Concept\Core\Integrations\Whoops\ErrorLogHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use Concept\Core\Integrations\Whoops\ProductionErrorHandler;
 use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Support\PhpSapi;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
@@ -22,8 +23,6 @@ use Whoops\Run as Whoops;
 
 class ErrorHandlerServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
-    private const string PHP_SAPI_CLI = 'cli';
-
     public function provides(string $id): bool
     {
         $services = [
@@ -132,7 +131,7 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
     {
         $whoops->clearHandlers();
 
-        if (!$this->isCli()) {
+        if (!PhpSapi::isCli()) {
             $this->appendEarlyWebFallback($container, $whoops);
         } elseif (($_ENV['APP_DEBUG'] ?? 'false') === 'true') {
             $whoops->appendHandler(new PrettyPageHandler());
@@ -153,10 +152,5 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
         }
 
         $whoops->appendHandler(new EarlyBootstrapFallbackHandler($pathManager->root()));
-    }
-
-    protected function isCli(): bool
-    {
-        return PHP_SAPI === self::PHP_SAPI_CLI;
     }
 }

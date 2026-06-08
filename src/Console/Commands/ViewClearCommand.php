@@ -2,7 +2,8 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
@@ -52,7 +53,7 @@ class ViewClearCommand extends Command
 
         try {
             $cacheSubDir = $this->config->getString('view.cache_dir', 'views');
-            $cachePath = $this->pathManager->get(PathManager::CACHE_DIR, $cacheSubDir);
+            $cachePath = $this->pathManager->get(PathName::CACHE, $cacheSubDir);
 
             if ($this->filesystem->exists($cachePath)) {
                 $this->filesystem->cleanDirectory($cachePath);

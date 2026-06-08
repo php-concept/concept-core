@@ -2,7 +2,8 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use Concept\Core\Providers\ConfigServiceProvider;
 use League\Container\Container;
@@ -47,7 +48,7 @@ final class ConfigServiceProviderBootErrorLogTest extends TestCase
         $container->add(
             PathManager::class,
             new PathManager($this->tmpRoot, [
-                PathManager::CONFIG_DIR => 'config',
+                PathName::CONFIG => 'config',
             ])
         )->setShared(true);
 
@@ -85,7 +86,7 @@ final class ConfigServiceProviderBootErrorLogTest extends TestCase
         $container->add(
             PathManager::class,
             new PathManager($this->tmpRoot, [
-                PathManager::CONFIG_DIR => 'config',
+                PathName::CONFIG => 'config',
             ])
         )->setShared(true);
 

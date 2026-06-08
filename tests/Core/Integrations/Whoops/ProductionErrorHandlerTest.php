@@ -3,7 +3,8 @@
 namespace Tests\Core\Integrations\Whoops;
 
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Integrations\Whoops\ProductionErrorHandler;
@@ -135,7 +136,7 @@ final class ProductionErrorHandlerTest extends TestCase
         mkdir($viewsDir . '/errors', 0777, true);
         file_put_contents($viewsDir . '/errors/404.twig', 'noop');
 
-        $pathManager = new PathManager($this->tmpDir, [PathManager::VIEWS_DIR => 'views']);
+        $pathManager = new PathManager($this->tmpDir, [PathName::VIEWS => 'views']);
 
         $renderedWith = null;
         $view = $this->createStub(ViewInterface::class);
@@ -162,7 +163,7 @@ final class ProductionErrorHandlerTest extends TestCase
 
     public function testRenderErrorPageFallsBackTo500TemplateWhenSpecificMissing(): void
     {
-        $pathManager = new PathManager($this->tmpDir, [PathManager::VIEWS_DIR => 'views']);
+        $pathManager = new PathManager($this->tmpDir, [PathName::VIEWS => 'views']);
 
         $renderedTemplate = null;
         $view = $this->createStub(ViewInterface::class);

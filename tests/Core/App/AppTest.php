@@ -3,7 +3,8 @@
 namespace Tests\Core;
 
 use Concept\Core\App;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use InvalidArgumentException;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
@@ -61,13 +62,13 @@ final class AppTest extends TestCase
     public function testCreateRegistersPathManagerInContainer(): void
     {
         $this->app = App::create($this->tempRoot, [
-            PathManager::LOGS_DIR => 'storage/logs',
+            PathName::LOGS => 'storage/logs',
         ]);
 
         $pathManager = $this->app->getContainer()->get(PathManager::class);
 
         self::assertInstanceOf(PathManager::class, $pathManager);
-        self::assertSame($this->tempRoot . '/storage/logs', $pathManager->get(PathManager::LOGS_DIR));
+        self::assertSame($this->tempRoot . '/storage/logs', $pathManager->get(PathName::LOGS));
     }
 
     public function testRegisterServiceProvidersThrowsForMissingFile(): void

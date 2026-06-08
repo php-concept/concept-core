@@ -5,7 +5,8 @@ namespace Tests\Core\Providers;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Providers\ErrorHandlerServiceProvider;
 use League\Container\Container;
@@ -118,7 +119,7 @@ final class ErrorHandlerServiceProviderTest extends TestCase
         $whoops = new Whoops();
         $container->add(Whoops::class, $whoops, true);
         $container->add(PathManager::class, new PathManager(sys_get_temp_dir(), [
-            PathManager::ERRORS_FALLBACK_VIEWS_DIR => 'errors-fallback',
+            PathName::ERRORS_FALLBACK_VIEWS => 'errors-fallback',
         ]), true);
 
         $provider = $this->makeWebProvider();
@@ -214,7 +215,7 @@ final class ErrorHandlerServiceProviderTest extends TestCase
         $container->add(RequestFormat::class, new RequestFormat(), true);
         $container->add(ConfigInterface::class, $this->makeDebugConfig(false), true);
         $container->add(PathManager::class, new PathManager(sys_get_temp_dir(), [
-            PathManager::ERRORS_FALLBACK_VIEWS_DIR => 'errors-fallback',
+            PathName::ERRORS_FALLBACK_VIEWS => 'errors-fallback',
         ]), true);
 
         $provider = $this->makeWebProvider();

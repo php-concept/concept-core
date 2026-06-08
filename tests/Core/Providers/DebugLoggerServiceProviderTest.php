@@ -3,7 +3,8 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Logger\DebugLogger;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Providers\DebugLoggerServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,7 @@ final class DebugLoggerServiceProviderTest extends TestCase
         try {
             $container = new Container();
             $container->add(PathManager::class, new PathManager($tmpRoot, [
-                PathManager::LOGS_DIR => 'storage/logs',
+                PathName::LOGS => 'storage/logs',
             ]))->setShared(true);
 
             $provider = new DebugLoggerServiceProvider();

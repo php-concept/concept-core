@@ -2,7 +2,8 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Console\Commands\ViewClearCommand;
 use Illuminate\Filesystem\Filesystem;
@@ -52,7 +53,7 @@ final class ViewClearCommandTest extends TestCase
         file_put_contents($cachePath . '/template.php', '<?php // cached');
 
         $pathManager = new PathManager($this->tmpRoot, [
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::CACHE => 'storage/cache',
         ]);
 
         $config = $this->createStub(ConfigInterface::class);
@@ -76,7 +77,7 @@ final class ViewClearCommandTest extends TestCase
     public function testExecuteWorksIfCacheDirectoryDoesNotExist(): void
     {
         $pathManager = new PathManager($this->tmpRoot, [
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::CACHE => 'storage/cache',
         ]);
 
         $config = $this->createStub(ConfigInterface::class);

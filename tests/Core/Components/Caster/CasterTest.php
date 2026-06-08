@@ -5,7 +5,8 @@ namespace Tests\Core\Components\Caster;
 use Concept\Core\Components\Caster\Caster;
 use Concept\Core\Components\Caster\Exceptions\CastingException;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use PHPUnit\Framework\TestCase;
 
 final class CasterTest extends TestCase
@@ -29,7 +30,7 @@ final class CasterTest extends TestCase
     public function testCastMapsArrayToDtoClass(): void
     {
         $pathManager = new PathManager($this->tmpRoot, [
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::CACHE => 'storage/cache',
         ]);
 
         $config = $this->createStub(ConfigInterface::class);
@@ -47,7 +48,7 @@ final class CasterTest extends TestCase
     public function testCastThrowsDomainExceptionOnMappingError(): void
     {
         $pathManager = new PathManager($this->tmpRoot, [
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::CACHE => 'storage/cache',
         ]);
 
         $config = $this->createStub(ConfigInterface::class);
@@ -65,7 +66,7 @@ final class CasterTest extends TestCase
     public function testConstructorUsesFileWatchingCacheWhenDebugEnabled(): void
     {
         $pathManager = new PathManager($this->tmpRoot, [
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::CACHE => 'storage/cache',
         ]);
 
         $config = $this->createStub(ConfigInterface::class);

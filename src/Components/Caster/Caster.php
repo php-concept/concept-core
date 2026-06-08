@@ -5,7 +5,8 @@ namespace Concept\Core\Components\Caster;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Caster\Exceptions\CastingException;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use CuyZ\Valinor\Cache\FileSystemCache;
 use CuyZ\Valinor\Cache\FileWatchingCache;
 use CuyZ\Valinor\Mapper\MappingError;
@@ -25,7 +26,7 @@ class Caster implements CasterInterface
         private readonly PathManager $pathManager,
         private readonly ConfigInterface $config
     ) {
-        $cache = new FileSystemCache($this->pathManager->get(PathManager::CACHE_DIR, self::VALINOR_CACHE_DIR));
+        $cache = new FileSystemCache($this->pathManager->get(PathName::CACHE, self::VALINOR_CACHE_DIR));
         if ($this->config->getBool('app.debug')) {
             $cache = new FileWatchingCache($cache);
         }

@@ -3,7 +3,8 @@
 namespace Tests\Core;
 
 use Concept\Core\Components\Logger\DebugLogger;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -42,7 +43,7 @@ final class DebugLoggerTest extends TestCase
     public function testLogWritesScalarAndArrayPayloads(): void
     {
         $manager = new PathManager($this->tempRoot, [
-            PathManager::LOGS_DIR => 'logs',
+            PathName::LOGS => 'logs',
         ]);
 
         DebugLogger::setInstance(new DebugLogger($manager));

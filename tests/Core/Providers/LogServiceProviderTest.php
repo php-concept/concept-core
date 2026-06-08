@@ -4,7 +4,8 @@ namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Providers\LogServiceProvider;
 use League\Container\Container;
 use Monolog\Handler\RotatingFileHandler;
@@ -40,7 +41,7 @@ final class LogServiceProviderTest extends TestCase
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::LOGS_DIR => 'storage/logs',
+            PathName::LOGS => 'storage/logs',
         ]))->setShared(true);
 
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
@@ -83,7 +84,7 @@ final class LogServiceProviderTest extends TestCase
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::LOGS_DIR => 'storage/logs',
+            PathName::LOGS => 'storage/logs',
         ]))->setShared(true);
 
         $container->add(ConfigInterface::class, new class implements ConfigInterface {

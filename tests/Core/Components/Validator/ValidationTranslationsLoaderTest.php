@@ -5,7 +5,8 @@ namespace Tests\Core\Components\Validator;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Locale\ConfigLocaleResolver;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Validator\ValidationTranslationsLoader;
 use PHPUnit\Framework\TestCase;
 
@@ -108,7 +109,7 @@ PHP);
         $loader = $this->makeLoader(
             new ConfigLocaleResolver($config),
             new PathManager($this->tmpDir, [
-                PathManager::VALIDATOR_TRANSLATIONS_DIR => 'validator',
+                PathName::VALIDATOR_TRANSLATIONS => 'validator',
             ]),
             $config,
         );
@@ -138,7 +139,7 @@ PHP);
         $loader = $this->makeLoader(
             localeResolver: $this->createStub(LocaleResolverInterface::class),
             paths: new PathManager($this->tmpDir, [
-                PathManager::VALIDATOR_TRANSLATIONS_DIR => 'validator',
+                PathName::VALIDATOR_TRANSLATIONS => 'validator',
             ]),
             config: $config,
         );

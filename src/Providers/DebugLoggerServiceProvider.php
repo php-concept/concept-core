@@ -3,7 +3,7 @@
 namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Logger\DebugLogger;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 

@@ -2,7 +2,7 @@
 
 namespace Concept\Core;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
 use Concept\Core\Php\PhpSapi;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;

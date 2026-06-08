@@ -2,7 +2,8 @@
 
 namespace Concept\Core\Components\Logger;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use DateTimeImmutable;
 
 class DebugLogger
@@ -34,7 +35,7 @@ class DebugLogger
 
     private function write(mixed $data): void
     {
-        $logFile = $this->pathManager->get(PathManager::LOGS_DIR, self::DEBUG_FILE_NAME);
+        $logFile = $this->pathManager->get(PathName::LOGS, self::DEBUG_FILE_NAME);
 
         $now = new DateTimeImmutable();
         $timestamp = $now->format(self::DATE_TIME_FORMAT);

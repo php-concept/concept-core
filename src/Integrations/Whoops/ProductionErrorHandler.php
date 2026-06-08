@@ -8,7 +8,7 @@ use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;

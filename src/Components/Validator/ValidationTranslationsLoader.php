@@ -4,7 +4,8 @@ namespace Concept\Core\Components\Validator;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 
 class ValidationTranslationsLoader
 {
@@ -19,7 +20,7 @@ class ValidationTranslationsLoader
      */
     public function resolve(): array
     {
-        if (!$this->paths->has(PathManager::VALIDATOR_TRANSLATIONS_DIR)) {
+        if (!$this->paths->has(PathName::VALIDATOR_TRANSLATIONS)) {
             return $this->emptyResult();
         }
 
@@ -52,7 +53,7 @@ class ValidationTranslationsLoader
      */
     public function loadForLocale(): array
     {
-        $directory = $this->paths->get(PathManager::VALIDATOR_TRANSLATIONS_DIR);
+        $directory = $this->paths->get(PathName::VALIDATOR_TRANSLATIONS);
         $locale = $this->localeResolver->resolve();
         $file = $directory . '/' . $locale . '.php';
 

@@ -5,7 +5,8 @@ namespace Tests\Core\Providers;
 use Concept\Core\Components\Caster\Caster;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Providers\CastingServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +29,7 @@ final class CastingServiceProviderTest extends TestCase
         try {
             $container = new Container();
             $container->add(PathManager::class, new PathManager($tmpRoot, [
-                PathManager::CACHE_DIR => 'storage/cache',
+                PathName::CACHE => 'storage/cache',
             ]))->setShared(true);
 
             $config = new class implements ConfigInterface {

@@ -4,7 +4,8 @@ namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Config;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
 use Dotenv\Dotenv;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -37,7 +38,7 @@ class ConfigServiceProvider extends AbstractServiceProvider implements BootableS
         /** @var PathManager $pathManager */
         $pathManager = $container->get(PathManager::class);
 
-        $nhConfig = new nhConfig($pathManager->get(PathManager::CONFIG_DIR));
+        $nhConfig = new nhConfig($pathManager->get(PathName::CONFIG));
         $envData = $this->loadDotEnv($pathManager->root());
         $this->loadOverrideConfig($nhConfig, $envData, $pathManager);
 
@@ -67,7 +68,7 @@ class ConfigServiceProvider extends AbstractServiceProvider implements BootableS
     private function loadOverrideConfig(nhConfig $nhConfig, array $envData, PathManager $pathManager): void
     {
         $env = $envData[self::APP_ENV_KEY] ?? '';
-        $overrideConfigPath = $pathManager->get(PathManager::CONFIG_DIR, $env);
+        $overrideConfigPath = $pathManager->get(PathName::CONFIG, $env);
         if (is_dir($overrideConfigPath)) {
             $overrideConfig = new nhConfig($overrideConfigPath);
             $nhConfig->merge($overrideConfig);

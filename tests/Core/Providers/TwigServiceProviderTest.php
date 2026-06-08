@@ -3,7 +3,8 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
 use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
@@ -48,8 +49,8 @@ final class TwigServiceProviderTest extends TestCase
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::VIEWS_DIR => 'resources/views',
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::VIEWS => 'resources/views',
+            PathName::CACHE => 'storage/cache',
         ]))->setShared(true);
 
         $container->add(ViewRegistry::class, $this->makeViewRegistry([
@@ -73,8 +74,8 @@ final class TwigServiceProviderTest extends TestCase
         $container = new Container();
         $container->delegate(new ReflectionContainer());
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::VIEWS_DIR => 'resources/views',
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::VIEWS => 'resources/views',
+            PathName::CACHE => 'storage/cache',
         ]))->setShared(true);
 
         $container->add(ViewRegistry::class, $this->makeViewRegistry(
@@ -97,8 +98,8 @@ final class TwigServiceProviderTest extends TestCase
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::VIEWS_DIR => 'resources/views',
-            PathManager::CACHE_DIR => 'storage/cache',
+            PathName::VIEWS => 'resources/views',
+            PathName::CACHE => 'storage/cache',
         ]))->setShared(true);
 
         $container->add(ConfigInterface::class, new class implements ConfigInterface {

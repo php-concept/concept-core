@@ -6,7 +6,8 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Components\Logger\Logger;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Telemetry\TelemetryEvent;
 use Concept\Core\Components\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -59,7 +60,7 @@ class LogServiceProvider extends AbstractServiceProvider
         /** @var ConfigInterface $config */
         $config = $container->get(ConfigInterface::class);
 
-        $logsPath = $pathManager->get(PathManager::LOGS_DIR, 'app.log');
+        $logsPath = $pathManager->get(PathName::LOGS, 'app.log');
         $logLevelName = $config->getString('log.level', 'debug');
         try {
             /** @phpstan-ignore-next-line */

@@ -3,7 +3,8 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Components\View\Registries\ViewContextRegistry;
@@ -49,7 +50,7 @@ final class PlatesServiceProviderTest extends TestCase
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::VIEWS_DIR => 'resources/views',
+            PathName::VIEWS => 'resources/views',
         ]))->setShared(true);
         $container->add(ViewRegistry::class, $this->makeViewRegistry([
             'ui' => 'resources/views/components',
@@ -72,7 +73,7 @@ final class PlatesServiceProviderTest extends TestCase
         $container = new Container();
         $container->delegate(new ReflectionContainer());
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::VIEWS_DIR => 'resources/views',
+            PathName::VIEWS => 'resources/views',
         ]))->setShared(true);
         $container->add(ViewRegistry::class, $this->makeViewRegistry([], [UppercasePlatesExtension::class]))->setShared(true);
         $container->add(ConfigInterface::class, $this->makeConfig(debug: false))->setShared(true);
@@ -93,7 +94,7 @@ final class PlatesServiceProviderTest extends TestCase
     {
         $container = new Container();
         $container->add(PathManager::class, new PathManager($this->tmpRoot, [
-            PathManager::VIEWS_DIR => 'resources/views',
+            PathName::VIEWS => 'resources/views',
         ]))->setShared(true);
         $container->add(ConfigInterface::class, new class implements ConfigInterface {
             public function get(string $key, mixed $default = null): mixed

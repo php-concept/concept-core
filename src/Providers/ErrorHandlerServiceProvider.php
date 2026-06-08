@@ -8,7 +8,8 @@ use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Integrations\Whoops\ErrorLogHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use Concept\Core\Integrations\Whoops\ProductionErrorHandler;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Php\PhpSapi;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -117,7 +118,7 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
             return;
         }
 
-        $fallbackPath = $pathManager->get(PathManager::ERRORS_FALLBACK_VIEWS_DIR);
+        $fallbackPath = $pathManager->get(PathName::ERRORS_FALLBACK_VIEWS);
 
         $whoops->appendHandler(function (Throwable $exception) use ($container, $fallbackPath) {
             $handler = new ProductionErrorHandler($container, $fallbackPath);

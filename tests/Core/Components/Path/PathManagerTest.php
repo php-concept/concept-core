@@ -2,7 +2,8 @@
 
 namespace Tests\Core;
 
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -18,10 +19,10 @@ final class PathManagerTest extends TestCase
     public function testGetReturnsMappedPathWithSubpath(): void
     {
         $manager = new PathManager('/var/www/project', [
-            PathManager::LOGS_DIR => 'storage/logs',
+            PathName::LOGS => 'storage/logs',
         ]);
 
-        self::assertSame('/var/www/project/storage/logs/debug.log', $manager->get(PathManager::LOGS_DIR, 'debug.log'));
+        self::assertSame('/var/www/project/storage/logs/debug.log', $manager->get(PathName::LOGS, 'debug.log'));
     }
 
     public function testGetThrowsOnUnknownKey(): void
@@ -37,10 +38,10 @@ final class PathManagerTest extends TestCase
     public function testHasReturnsWhetherPathKeyIsMapped(): void
     {
         $manager = new PathManager('/var/www/project', [
-            PathManager::LANG_DIR => 'resources/lang',
+            PathName::LANG => 'resources/lang',
         ]);
 
-        self::assertTrue($manager->has(PathManager::LANG_DIR));
-        self::assertFalse($manager->has(PathManager::VALIDATOR_TRANSLATIONS_DIR));
+        self::assertTrue($manager->has(PathName::LANG));
+        self::assertFalse($manager->has(PathName::VALIDATOR_TRANSLATIONS));
     }
 }

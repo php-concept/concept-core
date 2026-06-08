@@ -4,7 +4,7 @@ namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
-use Concept\Core\Components\Path\PathManager;
+use Concept\Core\Foundation\PathManager;
 use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
 use Concept\Core\Components\Validator\ValidationTranslationsLoader;
 use Concept\Core\Components\Validator\Validator;

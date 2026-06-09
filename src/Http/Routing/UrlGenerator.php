@@ -2,15 +2,15 @@
 
 namespace Concept\Core\Http\Routing;
 
+use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
-use League\Route\Router;
 use Psr\Http\Message\ServerRequestInterface;
 
 class UrlGenerator implements UrlGeneratorInterface
 {
     public function __construct(
         private readonly ServerRequestInterface $request,
-        private readonly Router $router
+        private readonly RouterInterface $router
     ) {}
 
     public function base(string $uri = ''): string

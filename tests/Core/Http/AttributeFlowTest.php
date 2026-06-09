@@ -2,11 +2,11 @@
 
 namespace Tests\Core\Http;
 
+use Concept\Core\Http\Routing\Router;
 use Concept\Core\Http\RouteStrategy;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use League\Container\Container;
-use League\Route\Router;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

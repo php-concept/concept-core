@@ -27,6 +27,10 @@ final class ConfigKey
 
     public const string ROUTES = 'routes';
 
+    public const string ROUTES_LIST = 'routes.list';
+
+    public const string ROUTES_INTERCEPTORS = 'routes.interceptors';
+
     public const string DB_DRIVER = 'db.driver';
 
     public const string DB_HOST = 'db.host';

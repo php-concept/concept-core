@@ -4,7 +4,11 @@ namespace Tests\Core\Http;
 
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Validator\Exceptions\ValidationException;
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
+use Concept\Core\Http\Contracts\RouteInterceptorInterface;
 use Concept\Core\Http\RouteStrategy;
+use RuntimeException;
 use Concept\Core\Http\Requests\FormRequestInterface;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
@@ -151,6 +155,166 @@ final class RouteStrategyTest extends TestCase
         $response = $strategy->invokeRouteCallable($route, new ServerRequest());
 
         self::assertSame('null', $response->getHeaderLine('X-Missing-Type'));
+    }
+
+    public function testSkipsInterceptorsWhenConfigIsNotRegistered(): void
+    {
+        $container = new Container();
+        $strategy = new RouteStrategy();
+        $strategy->setContainer($container);
+
+        $route = (new Route('GET', '/open', fn (): ResponseInterface => new Response()))->setName('open');
+
+        $response = $strategy->invokeRouteCallable($route, new ServerRequest());
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testRunsConfiguredInterceptorsBeforeRouteHandler(): void
+    {
+        $container = new Container();
+
+        $interceptor = new RecordingRouteInterceptor();
+        $container->add(RecordingRouteInterceptor::class, $interceptor, true);
+        $container->add(ConfigInterface::class, $this->createInterceptorConfig([RecordingRouteInterceptor::class]), true);
+
+        $strategy = new RouteStrategy();
+        $strategy->setContainer($container);
+
+        $route = (new Route('GET', '/users/{id}', fn (): ResponseInterface => new Response(), null, ['id' => '7']))
+            ->setName('users.index');
+
+        $strategy->invokeRouteCallable($route, new ServerRequest());
+
+        self::assertSame('users.index', $interceptor->route?->getName());
+        self::assertSame(['id' => '7'], $interceptor->route?->getVars());
+    }
+
+    public function testRunsInterceptorsInConfiguredOrder(): void
+    {
+        $container = new Container();
+        $order = new InterceptorOrder();
+
+        $container->add(FirstRouteInterceptor::class, new FirstRouteInterceptor($order), true);
+        $container->add(SecondRouteInterceptor::class, new SecondRouteInterceptor($order), true);
+        $container->add(
+            ConfigInterface::class,
+            $this->createInterceptorConfig([FirstRouteInterceptor::class, SecondRouteInterceptor::class]),
+            true,
+        );
+
+        $strategy = new RouteStrategy();
+        $strategy->setContainer($container);
+
+        $route = new Route('GET', '/ordered', fn (): ResponseInterface => new Response());
+        $strategy->invokeRouteCallable($route, new ServerRequest());
+
+        self::assertSame([FirstRouteInterceptor::class, SecondRouteInterceptor::class], $order->classes);
+    }
+
+    public function testPropagatesExceptionFromInterceptor(): void
+    {
+        $container = new Container();
+
+        $container->add(DenyingRouteInterceptor::class, new DenyingRouteInterceptor(), true);
+        $container->add(ConfigInterface::class, $this->createInterceptorConfig([DenyingRouteInterceptor::class]), true);
+
+        $strategy = new RouteStrategy();
+        $strategy->setContainer($container);
+
+        $route = (new Route('GET', '/admin', fn (): ResponseInterface => new Response()))->setName('admin.dashboard');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Interceptor denied');
+
+        $strategy->invokeRouteCallable($route, new ServerRequest());
+    }
+
+    /**
+     * @param list<class-string<RouteInterceptorInterface>> $interceptors
+     */
+    private function createInterceptorConfig(array $interceptors): ConfigInterface
+    {
+        return new class($interceptors) implements ConfigInterface {
+            /** @param list<class-string<RouteInterceptorInterface>> $interceptors */
+            public function __construct(private readonly array $interceptors) {}
+
+            public function get(string $key, mixed $default = null): mixed
+            {
+                return $key === ConfigKey::ROUTES_INTERCEPTORS ? $this->interceptors : $default;
+            }
+
+            public function set(string $key, mixed $value): void {}
+
+            public function has(string $key): bool
+            {
+                return false;
+            }
+
+            public function all(): array
+            {
+                return [];
+            }
+
+            public function getString(string $key, string $default = ''): string
+            {
+                return $default;
+            }
+
+            public function getInt(string $key, int $default = 0): int
+            {
+                return $default;
+            }
+
+            public function getBool(string $key, bool $default = false): bool
+            {
+                return $default;
+            }
+        };
+    }
+}
+
+final class RecordingRouteInterceptor implements RouteInterceptorInterface
+{
+    public ?Route $route = null;
+
+    public function intercept(Route $route, ServerRequestInterface $request): void
+    {
+        $this->route = $route;
+    }
+}
+
+final class InterceptorOrder
+{
+    /** @var list<class-string<RouteInterceptorInterface>> */
+    public array $classes = [];
+}
+
+final class FirstRouteInterceptor implements RouteInterceptorInterface
+{
+    public function __construct(private readonly InterceptorOrder $order) {}
+
+    public function intercept(Route $route, ServerRequestInterface $request): void
+    {
+        $this->order->classes[] = self::class;
+    }
+}
+
+final class SecondRouteInterceptor implements RouteInterceptorInterface
+{
+    public function __construct(private readonly InterceptorOrder $order) {}
+
+    public function intercept(Route $route, ServerRequestInterface $request): void
+    {
+        $this->order->classes[] = self::class;
+    }
+}
+
+final class DenyingRouteInterceptor implements RouteInterceptorInterface
+{
+    public function intercept(Route $route, ServerRequestInterface $request): void
+    {
+        throw new RuntimeException('Interceptor denied');
     }
 }
 

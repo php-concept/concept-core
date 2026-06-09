@@ -5,7 +5,7 @@ namespace Concept\Core\Console\Commands;
 use Closure;
 use Laravel\SerializableClosure\SerializableClosure;
 use League\Route\Route;
-use League\Route\Router;
+use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionClass;
@@ -27,7 +27,7 @@ final class RouteListCommand extends Command
     private const string MSG_NOT_FOUND = 'No routes found.';
     private const string MSG_TOTAL = 'Total: %d route(s).';
 
-    public function __construct(private readonly Router $router)
+    public function __construct(private readonly RouterInterface $router)
     {
         parent::__construct();
     }
@@ -107,7 +107,7 @@ final class RouteListCommand extends Command
     }
 
     /**
-     * @param ReflectionClass<Router> $reflection
+     * @param ReflectionClass<RouterInterface> $reflection
      */
     private function readRouterProperty(ReflectionClass $reflection, string $propertyName): mixed
     {

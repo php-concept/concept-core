@@ -9,7 +9,7 @@ use InvalidArgumentException;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use League\Container\Container;
-use League\Route\Router;
+use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -186,13 +186,13 @@ final class AppTest extends TestCase
         $request = new ServerRequest();
         $response = (new Response())->withHeader('X-Dispatched', 'yes');
 
-        $router = $this->createMock(Router::class);
+        $router = $this->createMock(RouterInterface::class);
         $router->expects(self::once())
             ->method('dispatch')
             ->with(self::isInstanceOf(ServerRequestInterface::class))
             ->willReturn($response);
 
-        $container->add(Router::class, $router, true);
+        $container->add(RouterInterface::class, $router, true);
         $container->add(ServerRequestInterface::class, $request, true);
 
         ob_start();

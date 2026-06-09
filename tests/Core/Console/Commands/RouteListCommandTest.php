@@ -3,7 +3,7 @@
 namespace Tests\Core\Console\Commands;
 
 use Concept\Core\Console\Commands\RouteListCommand;
-use League\Route\Router;
+use Concept\Core\Http\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

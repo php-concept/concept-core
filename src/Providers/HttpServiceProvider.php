@@ -4,7 +4,9 @@ namespace Concept\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
+use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
+use Concept\Core\Http\Routing\Router;
 use Concept\Core\Http\Routing\UrlGenerator;
 use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Telemetry\TelemetryTrait;
@@ -20,7 +22,6 @@ use InvalidArgumentException;
 use Laminas\Diactoros\ServerRequestFactory;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
-use League\Route\Router;
 use Psr\Http\Message\ServerRequestInterface;
 
 class HttpServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
@@ -33,7 +34,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
     {
         $services = [
             ServerRequestInterface::class,
-            Router::class,
+            RouterInterface::class,
             UrlGeneratorInterface::class,
             RequestFormat::class,
             ResponseFactoryInterface::class,
@@ -55,8 +56,8 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             );
         })->setShared(true);
 
-        $container->add(Router::class, function () use ($container) {
-            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, Router::class);
+        $container->add(RouterInterface::class, function () use ($container) {
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, RouterInterface::class);
 
             $router = new Router();
 
@@ -67,9 +68,9 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             if ($container->has(ConfigInterface::class)) {
                 /** @var ConfigInterface $config */
                 $config = $container->get(ConfigInterface::class);
-                /** @var array<string> $routes */
-                $routes = $config->get(ConfigKey::ROUTES, []);
-                $this->registerRoutes($router, $routes);
+                /** @var list<string> $routePaths */
+                $routePaths = $config->get(ConfigKey::ROUTES_LIST, []);
+                $this->registerRoutes($router, $routePaths);
             }
 
             return $router;
@@ -80,8 +81,8 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
 
             /** @var ServerRequestInterface $request */
             $request = $container->get(ServerRequestInterface::class);
-            /** @var Router $router */
-            $router = $container->get(Router::class);
+            /** @var RouterInterface $router */
+            $router = $container->get(RouterInterface::class);
 
             return new UrlGenerator($request, $router);
         })->setShared(true);
@@ -118,11 +119,11 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
     }
 
     /**
-     * @param Router $router
+     * @param RouterInterface $router
      * @param array<string> $routePaths
      * @return void
      */
-    private function registerRoutes(Router $router, array $routePaths): void
+    private function registerRoutes(RouterInterface $router, array $routePaths): void
     {
         $container = $this->getContainer();
         foreach ($routePaths as $routesFileName) {

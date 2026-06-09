@@ -11,7 +11,7 @@ use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use League\Container\ServiceProvider\ServiceProviderInterface;
-use League\Route\Router;
+use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -90,12 +90,12 @@ final class App
 
     public function run(): void
     {
-        if (!$this->container->has(Router::class) || !$this->container->has(ServerRequestInterface::class)) {
+        if (!$this->container->has(RouterInterface::class) || !$this->container->has(ServerRequestInterface::class)) {
             throw new RuntimeException('Router and ServerRequestInterface must be registered before running the application.');
         }
 
-        /** @var Router $router */
-        $router = $this->container->get(Router::class);
+        /** @var RouterInterface $router */
+        $router = $this->container->get(RouterInterface::class);
         /** @var ServerRequestInterface $request */
         $request = $this->container->get(ServerRequestInterface::class);
 

@@ -4,6 +4,7 @@ namespace Tests\Core\Providers;
 
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
+use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Components\View\ViewResponseFactory;
@@ -16,7 +17,6 @@ use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;
 use InvalidArgumentException;
 use League\Container\Container;
-use League\Route\Router;
 use PHPUnit\Framework\TestCase;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,7 +28,7 @@ final class HttpServiceProviderTest extends TestCase
         $provider = new HttpServiceProvider();
 
         self::assertTrue($provider->provides(ServerRequestInterface::class));
-        self::assertTrue($provider->provides(Router::class));
+        self::assertTrue($provider->provides(RouterInterface::class));
         self::assertTrue($provider->provides(UrlGeneratorInterface::class));
         self::assertTrue($provider->provides(RequestFormat::class));
         self::assertTrue($provider->provides(ResponseFactoryInterface::class));
@@ -53,7 +53,8 @@ final class HttpServiceProviderTest extends TestCase
         $provider->boot();
 
         self::assertInstanceOf(RequestFormat::class, $container->get(RequestFormat::class));
-        self::assertInstanceOf(Router::class, $container->get(Router::class));
+        self::assertInstanceOf(RouterInterface::class, $container->get(RouterInterface::class));
+        self::assertInstanceOf(\Concept\Core\Http\Routing\Router::class, $container->get(RouterInterface::class));
         self::assertInstanceOf(UrlGeneratorInterface::class, $container->get(UrlGeneratorInterface::class));
         self::assertInstanceOf(ResponseFactoryInterface::class, $container->get(ResponseFactoryInterface::class));
         self::assertFalse($container->has(ResponseFactory::class));
@@ -97,7 +98,7 @@ final class HttpServiceProviderTest extends TestCase
             $provider = new HttpServiceProvider();
             $provider->setContainer($container);
             $provider->register();
-            $container->get(Router::class);
+            $container->get(RouterInterface::class);
 
             self::assertFileExists($marker);
             self::assertSame('loaded', file_get_contents($marker));
@@ -130,7 +131,7 @@ final class HttpServiceProviderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Routes file not found at:');
 
-        $container->get(Router::class);
+        $container->get(RouterInterface::class);
     }
 
     /**
@@ -146,7 +147,7 @@ final class HttpServiceProviderTest extends TestCase
 
             public function get(string $key, mixed $default = null): mixed
             {
-                return $key === ConfigKey::ROUTES ? $this->routes : $default;
+                return $key === ConfigKey::ROUTES_LIST ? $this->routes : $default;
             }
 
             public function set(string $key, mixed $default = null): void {}

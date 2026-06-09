@@ -5,9 +5,12 @@ namespace Concept\Core\Http;
 use Closure;
 use Concept\Core\Components\Caster\Contracts\CasterInterface;
 use Concept\Core\Components\Caster\Exceptions\CastingException;
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Telemetry\TelemetryTrait;
 use Concept\Core\Components\Validator\Exceptions\ValidationException;
+use Concept\Core\Http\Contracts\RouteInterceptorInterface;
 use Concept\Core\Http\Requests\FormRequestInterface;
 use League\Container\DefinitionContainerInterface;
 use League\Route\Route;
@@ -29,6 +32,8 @@ class RouteStrategy extends ApplicationStrategy
 
     public function invokeRouteCallable(Route $route, ServerRequestInterface $request): ResponseInterface
     {
+        $this->runInterceptors($route, $request);
+
         $request = $this->prepareRequest($route, $request);
 
         $callable = $route->getCallable($this->getContainer());
@@ -54,6 +59,27 @@ class RouteStrategy extends ApplicationStrategy
             return $reflection->invokeArgs($arguments);
         } finally {
             $this->telemetry()?->finish(TelemetryEvent::HTTP_ROUTE_CALLABLE_INVOKE, (string)$telemetryId);
+        }
+    }
+
+    private function runInterceptors(Route $route, ServerRequestInterface $request): void
+    {
+        /** @var DefinitionContainerInterface $container */
+        $container = $this->getContainer();
+
+        if (!$container->has(ConfigInterface::class)) {
+            return;
+        }
+
+        /** @var ConfigInterface $config */
+        $config = $container->get(ConfigInterface::class);
+        /** @var list<class-string<RouteInterceptorInterface>> $interceptorClasses */
+        $interceptorClasses = $config->get(ConfigKey::ROUTES_INTERCEPTORS, []);
+
+        foreach ($interceptorClasses as $interceptorClass) {
+            /** @var RouteInterceptorInterface $interceptor */
+            $interceptor = $container->get($interceptorClass);
+            $interceptor->intercept($route, $request);
         }
     }
 

@@ -15,7 +15,7 @@ use Concept\Core\Php\PhpSapi;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
-use League\Route\Router;
+use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
 class ComponentsServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
@@ -70,7 +70,7 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
     private function registerComponentRoutes(ComponentRegistry $registry): void
     {
         $container = $this->getContainer();
-        $router = $container->get(Router::class);
+        $router = $container->get(RouterInterface::class);
         foreach ($registry->routes() as $routesFileName) {
             if (file_exists($routesFileName)) {
                 require $routesFileName;

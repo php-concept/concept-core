@@ -99,12 +99,6 @@ final class App
         /** @var ServerRequestInterface $request */
         $request = $this->container->get(ServerRequestInterface::class);
 
-//        //TODO: remove after testing
-//        /** @var TelemetryCollector $telemetryCollector */
-//        $telemetryCollector = $this->container->get(TelemetryCollector::class);
-//        var_dump($telemetryCollector->toArray());
-//        die();
-
         $response = $router->dispatch($request);
         (new SapiEmitter)->emit($response);
     }

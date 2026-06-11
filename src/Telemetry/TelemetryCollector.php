@@ -6,8 +6,6 @@ use Concept\Core\Telemetry\Contracts\TelemetryItemInterface;
 
 class TelemetryCollector
 {
-    private const string NAME_KEY = 'name';
-
     /** @var array<string, array<string, TelemetryItemInterface>> */
     private array $telemetryItems = [];
 
@@ -42,7 +40,7 @@ class TelemetryCollector
 
     public function mark(string $telemetryEventName, string $name): void
     {
-        $id = $this->start($telemetryEventName, [self::NAME_KEY => $name]);
+        $id = $this->start($telemetryEventName, [TelemetryKey::NAME => $name]);
         $this->finish($telemetryEventName, $id);
     }
 

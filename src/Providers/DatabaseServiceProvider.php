@@ -11,6 +11,7 @@ use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Database\SeederManager;
 use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Telemetry\TelemetryTrait;
 use Illuminate\Container\Container as IlluminateContainer;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
@@ -175,14 +176,16 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
             return;
         }
 
-        $this->telemetry()?->start(TelemetryEvent::DB_QUERY_EXECUTED,
+        $this->telemetry()?->record(
+            TelemetryEvent::DB_QUERY_EXECUTED,
             [
-                'sql' => $query->sql,
-                'raw' => $query->toRawSql(),
-                'bindings' => $query->bindings,
-                'time' => $query->time,
-                'connection' => $query->connectionName,
-            ]
+                TelemetryKey::SQL => $query->sql,
+                TelemetryKey::RAW => $query->toRawSql(),
+                TelemetryKey::BINDINGS => $query->bindings,
+                TelemetryKey::TIME => $query->time,
+                TelemetryKey::CONNECTION => $query->connectionName,
+            ],
+            $query->time / 1000
         );
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Core\Components\View;
 
 use Concept\Core\Telemetry\TelemetryCollector;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Components\View\PlatesView;
 use Concept\Core\Components\View\TwigView;
 use League\Plates\Engine;
@@ -51,7 +52,7 @@ final class ViewTest extends TestCase
 
         self::assertCount(1, $items);
         self::assertSame(TelemetryEvent::TPL_RENDERED, $items[0]['name']);
-        self::assertSame(['view' => 'page.twig'], $items[0]['context']);
+        self::assertSame([TelemetryKey::VIEW => 'page.twig'], $items[0]['context']);
         self::assertNotNull($items[0]['duration']);
     }
 
@@ -68,7 +69,7 @@ final class ViewTest extends TestCase
 
         self::assertCount(1, $items);
         self::assertSame(TelemetryEvent::TPL_RENDERED, $items[0]['name']);
-        self::assertSame(['view' => 'page'], $items[0]['context']);
+        self::assertSame([TelemetryKey::VIEW => 'page'], $items[0]['context']);
         self::assertNotNull($items[0]['duration']);
     }
 }

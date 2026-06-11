@@ -8,6 +8,7 @@ use Concept\Core\Components\Caster\Exceptions\CastingException;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Telemetry\TelemetryTrait;
 use Concept\Core\Components\Validator\Exceptions\ValidationException;
 use Concept\Core\Http\Contracts\RouteInterceptorInterface;
@@ -77,7 +78,7 @@ class RouteStrategy extends ApplicationStrategy
         $interceptorClasses = $config->get(ConfigKey::ROUTES_INTERCEPTORS, []);
 
         foreach ($interceptorClasses as $interceptorClass) {
-            $telemetryId = $this->telemetry()?->start(TelemetryEvent::HTTP_ROUTE_INTERCEPTOR_EXECUTED, ['name' => $interceptorClass]);
+            $telemetryId = $this->telemetry()?->start(TelemetryEvent::HTTP_ROUTE_INTERCEPTOR_EXECUTED, [TelemetryKey::NAME => $interceptorClass]);
             /** @var RouteInterceptorInterface $interceptor */
             $interceptor = $container->get($interceptorClass);
             $interceptor->intercept($route, $request);
@@ -216,11 +217,16 @@ class RouteStrategy extends ApplicationStrategy
         /** @var FormRequestInterface $formRequest */
         $formRequest = $container->get($className);
 
-        if (!$formRequest->validate()) {
-            throw new ValidationException($formRequest->errors(), $formRequest->all());
-        }
+        $telemetryId = $this->telemetry()?->start(TelemetryEvent::HTTP_FORM_REQUEST_VALIDATED, [TelemetryKey::NAME => $className]);
+        try {
+            if (!$formRequest->validate()) {
+                throw new ValidationException($formRequest->errors(), $formRequest->all());
+            }
 
-        return $formRequest;
+            return $formRequest;
+        } finally {
+            $this->telemetry()?->finish(TelemetryEvent::HTTP_FORM_REQUEST_VALIDATED, (string) $telemetryId);
+        }
     }
 
     /**
@@ -254,8 +260,8 @@ class RouteStrategy extends ApplicationStrategy
         return $this->telemetry()?->start(
             $telemetryEventName,
             [
-                'route' => $route,
-                'handler' => $handlerLabel,
+                TelemetryKey::ROUTE => $route,
+                TelemetryKey::HANDLER => $handlerLabel,
             ]
         );
     }

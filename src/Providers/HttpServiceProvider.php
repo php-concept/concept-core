@@ -6,9 +6,11 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
+use Concept\Core\Http\Routing\RouteDescriptor;
 use Concept\Core\Http\Routing\Router;
 use Concept\Core\Http\Routing\UrlGenerator;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Telemetry\TelemetryTrait;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
@@ -35,6 +37,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
         $services = [
             ServerRequestInterface::class,
             RouterInterface::class,
+            RouteDescriptor::class,
             UrlGeneratorInterface::class,
             RequestFormat::class,
             ResponseFactoryInterface::class,
@@ -74,6 +77,13 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             }
 
             return $router;
+        })->setShared(true);
+
+        $container->add(RouteDescriptor::class, function () use ($container) {
+            /** @var RouterInterface $router */
+            $router = $container->get(RouterInterface::class);
+
+            return new RouteDescriptor($router);
         })->setShared(true);
 
         $container->add(UrlGeneratorInterface::class, function () use ($container) {
@@ -139,8 +149,8 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             $this->telemetry()?->record(
                 TelemetryEvent::FRAMEWORK_ROUTES_REGISTERED,
                 [
-                    'files' => $loadedFiles,
-                    'count' => count($loadedFiles),
+                    TelemetryKey::FILES => $loadedFiles,
+                    TelemetryKey::COUNT => count($loadedFiles),
                 ]
             );
         }

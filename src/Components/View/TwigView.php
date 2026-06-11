@@ -4,6 +4,7 @@ namespace Concept\Core\Components\View;
 
 use Concept\Core\Telemetry\TelemetryCollector;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Twig\Environment as Twig;
 use Twig\Error\LoaderError;
@@ -32,7 +33,7 @@ class TwigView implements ViewInterface
         try {
             $viewName = $this->ensureExtension($viewName);
             $telemetryId = $this->telemetryCollector?->start(TelemetryEvent::TPL_RENDERED, [
-                'view' => $viewName,
+                TelemetryKey::VIEW => $viewName,
             ]);
 
             return $this->twig->render($viewName, $data);

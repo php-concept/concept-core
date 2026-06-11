@@ -2,8 +2,13 @@
 
 namespace Concept\Core;
 
+use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Php\PhpSapi;
+use Concept\Core\Telemetry\TelemetryCollector;
+use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use InvalidArgumentException;
@@ -99,8 +104,16 @@ final class App
         /** @var ServerRequestInterface $request */
         $request = $this->container->get(ServerRequestInterface::class);
 
-        $response = $router->dispatch($request);
-        (new SapiEmitter)->emit($response);
+        $telemetry = $this->telemetry();
+        $startedAt = microtime(true);
+        $memoryStart = memory_get_usage(true);
+
+        try {
+            $response = $router->dispatch($request);
+            (new SapiEmitter)->emit($response);
+        } finally {
+            $this->telemetryRecord($telemetry, $request, $memoryStart, $startedAt);
+        }
     }
 
     /**
@@ -131,5 +144,42 @@ final class App
         $whoops->register();
 
         $this->container->add(Whoops::class, $whoops)->setShared(true);
+    }
+
+    private function telemetry(): ?TelemetryCollector
+    {
+        if (!$this->container->has(TelemetryCollector::class) || !$this->container->has(ConfigInterface::class)) {
+            return null;
+        }
+
+        /** @var ConfigInterface $config */
+        $config = $this->container->get(ConfigInterface::class);
+        if (!$config->getBool(ConfigKey::TELEMETRY_ENABLED, false)) {
+            return null;
+        }
+
+        /** @var TelemetryCollector $collector */
+        $collector = $this->container->get(TelemetryCollector::class);
+
+        return $collector;
+    }
+
+    private function telemetryRecord(
+        ?TelemetryCollector $telemetry,
+        ServerRequestInterface $request,
+        int $memoryStart,
+        float $startedAt
+    ): void {
+        $telemetry?->record(
+            TelemetryEvent::HTTP_REQUEST_HANDLED,
+            [
+                TelemetryKey::METHOD => $request->getMethod(),
+                TelemetryKey::PATH => $request->getUri()->getPath(),
+                TelemetryKey::MEMORY_START => $memoryStart,
+                TelemetryKey::MEMORY_END => memory_get_usage(true),
+                TelemetryKey::MEMORY_PEAK => memory_get_peak_usage(true),
+            ],
+            microtime(true) - $startedAt
+        );
     }
 }

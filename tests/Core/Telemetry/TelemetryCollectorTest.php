@@ -5,6 +5,7 @@ namespace Tests\Core\Telemetry;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use Concept\Core\Telemetry\TelemetryCollector;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use PHPUnit\Framework\TestCase;
 
 final class TelemetryCollectorTest extends TestCase
@@ -12,14 +13,14 @@ final class TelemetryCollectorTest extends TestCase
     public function testStartAndFinishRecordsDuration(): void
     {
         $collector = new TelemetryCollector();
-        $id = $collector->start(TelemetryEvent::TPL_RENDERED, ['view' => 'home.twig']);
+        $id = $collector->start(TelemetryEvent::TPL_RENDERED, [TelemetryKey::VIEW => 'home.twig']);
         $collector->finish(TelemetryEvent::TPL_RENDERED, $id);
 
         $items = array_values($collector->toArray(TelemetryEvent::TPL_RENDERED));
 
         self::assertCount(1, $items);
         self::assertSame(TelemetryEvent::TPL_RENDERED, $items[0]['name']);
-        self::assertSame(['view' => 'home.twig'], $items[0]['context']);
+        self::assertSame([TelemetryKey::VIEW => 'home.twig'], $items[0]['context']);
         self::assertNotNull($items[0]['started_at']);
         self::assertNotNull($items[0]['finished_at']);
         self::assertNotNull($items[0]['duration']);
@@ -34,7 +35,7 @@ final class TelemetryCollectorTest extends TestCase
 
         self::assertCount(1, $items);
         self::assertSame(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, $items[0]['name']);
-        self::assertSame(['name' => ViewInterface::class], $items[0]['context']);
+        self::assertSame([TelemetryKey::NAME => ViewInterface::class], $items[0]['context']);
         self::assertNotNull($items[0]['duration']);
     }
 

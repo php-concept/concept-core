@@ -4,6 +4,7 @@ namespace Concept\Core\Components\View;
 
 use Concept\Core\Telemetry\TelemetryCollector;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Components\View\Contracts\ViewInterface;
 use League\Plates\Engine;
 
@@ -24,7 +25,7 @@ class PlatesView implements ViewInterface
         $telemetryId = '';
         try {
             $telemetryId = $this->telemetryCollector?->start(TelemetryEvent::TPL_RENDERED, [
-                'view' => $viewName,
+                TelemetryKey::VIEW => $viewName,
             ]);
 
             return $this->engine->render($viewName, $data);

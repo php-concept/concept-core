@@ -3,6 +3,7 @@
 namespace Tests\Core\Console\Commands;
 
 use Concept\Core\Console\Commands\RouteListCommand;
+use Concept\Core\Http\Routing\RouteDescriptor;
 use Concept\Core\Http\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -16,7 +17,7 @@ final class RouteListCommandTest extends TestCase
 {
     public function testShowsWarningWhenNoRoutesFound(): void
     {
-        $tester = new CommandTester(new RouteListCommand(new Router()));
+        $tester = new CommandTester(new RouteListCommand(new RouteDescriptor(new Router())));
 
         $exitCode = $tester->execute([]);
 
@@ -34,7 +35,7 @@ final class RouteListCommandTest extends TestCase
             $router->get('/health', 'HealthController::show')->setName('api.health');
         });
 
-        $tester = new CommandTester(new RouteListCommand($router));
+        $tester = new CommandTester(new RouteListCommand(new RouteDescriptor($router)));
         $exitCode = $tester->execute([]);
         $display = $tester->getDisplay();
 
@@ -52,7 +53,7 @@ final class RouteListCommandTest extends TestCase
         $router->lazyMiddleware(SampleRouteListMiddleware::class);
         $router->get('/users', 'UserController::index');
 
-        $tester = new CommandTester(new RouteListCommand($router));
+        $tester = new CommandTester(new RouteListCommand(new RouteDescriptor($router)));
         $exitCode = $tester->execute(['--full-middleware' => true]);
         $display = $tester->getDisplay();
 

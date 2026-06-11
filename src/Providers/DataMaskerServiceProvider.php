@@ -7,7 +7,7 @@ use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
 use Concept\Core\Components\DataMasker\DataMasker;
-use Concept\Core\Components\DataMasker\RegexMaskerRule;
+use Concept\Core\Components\DataMasker\RegexDataMaskerRule;
 use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -36,7 +36,9 @@ class DataMaskerServiceProvider extends AbstractServiceProvider
             $patterns = $config->get(ConfigKey::MASKING_PATTERNS, []);
             /** @var array<string, string> $keyPatterns */
             $keyPatterns = $config->get(ConfigKey::MASKING_KEY_PATTERNS, []);
-            $masker->addRule(new RegexMaskerRule($patterns, $keyPatterns));
+            if (!empty($patterns) || !empty($keyPatterns)) {
+                $masker->addRule(new RegexDataMaskerRule($patterns, $keyPatterns));
+            }
 
             /** @var array<string, string> $rules */
             $rules = $config->get(ConfigKey::MASKING_RULES, []);

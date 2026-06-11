@@ -64,6 +64,23 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
         $middleware->process($request, $handler);
     }
 
+    public function testAllowsValidTokenForPatchMethod(): void
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $manager = new CsrfTokenManager($session);
+        $token = $manager->getToken();
+        $middleware = new VerifyCsrfTokenMiddleware($manager);
+
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler->expects(self::once())->method('handle')->willReturn(new Response());
+
+        $request = (new ServerRequest())
+            ->withMethod(HttpMethod::PATCH)
+            ->withHeader(HttpHeader::X_CSRF_TOKEN, $token);
+
+        $middleware->process($request, $handler);
+    }
+
     public function testAllowsUrlEncodedXsrfTokenHeader(): void
     {
         $session = new Session(new MockArraySessionStorage());

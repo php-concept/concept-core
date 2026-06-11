@@ -4,7 +4,7 @@ namespace Concept\Core\Components\DataMasker;
 
 use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
 
-class RegexMaskerRule implements DataMaskerRuleInterface
+class RegexDataMaskerRule implements DataMaskerRuleInterface
 {
     /** @var array<string, string> */
     private array $patterns = [];

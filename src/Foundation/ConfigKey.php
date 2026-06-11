@@ -75,9 +75,9 @@ final class ConfigKey
 
     public const string SESSION_USE_ONLY_COOKIES = 'session.use_only_cookies';
 
-    public const string SESSION_DOMAIN = 'session.domain';
+    public const string SESSION_COOKIE_DOMAIN = 'session.cookie_domain';
 
-    public const string SESSION_SAMESITE = 'session.samesite';
+    public const string SESSION_COOKIE_SAMESITE = 'session.cookie_samesite';
 
     public const string SESSION_USE_STRICT_MODE = 'session.use_strict_mode';
 

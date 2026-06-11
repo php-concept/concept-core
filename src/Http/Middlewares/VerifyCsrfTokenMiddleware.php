@@ -14,7 +14,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class VerifyCsrfTokenMiddleware implements MiddlewareInterface
 {
-    private const array PROTECTED_METHODS = [HttpMethod::POST, HttpMethod::PUT, HttpMethod::DELETE];
+    private const array PROTECTED_METHODS = [HttpMethod::POST, HttpMethod::PUT, HttpMethod::PATCH, HttpMethod::DELETE];
 
     public function __construct(
         private readonly CsrfTokenManager $csrfTokenManager

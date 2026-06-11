@@ -73,8 +73,8 @@ class SessionServiceProvider extends AbstractServiceProvider
             'cookie_secure' => $config->getBool(ConfigKey::SESSION_COOKIE_SECURE, false),
             'cookie_httponly' => $config->getBool(ConfigKey::SESSION_COOKIE_HTTPONLY, true),
             'use_only_cookies' => $config->getBool(ConfigKey::SESSION_USE_ONLY_COOKIES, true),
-            'cookie_domain'   => $config->getString(ConfigKey::SESSION_DOMAIN, ''),
-            'cookie_samesite' => $config->getString(ConfigKey::SESSION_SAMESITE, 'Lax'),
+            'cookie_domain'   => $config->getString(ConfigKey::SESSION_COOKIE_DOMAIN, ''),
+            'cookie_samesite' => $config->getString(ConfigKey::SESSION_COOKIE_SAMESITE, 'Lax'),
             'use_strict_mode' => $config->getBool(ConfigKey::SESSION_USE_STRICT_MODE, true),
         ];
     }

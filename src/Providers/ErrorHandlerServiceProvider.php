@@ -13,6 +13,8 @@ use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Php\PhpSapi;
 use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use Psr\Container\ContainerInterface;
@@ -25,6 +27,8 @@ use Whoops\Run as Whoops;
 
 class ErrorHandlerServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
+    use TelemetryTrait;
+
     public function provides(string $id): bool
     {
         $services = [
@@ -47,6 +51,8 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
         if ($whoops === null) {
             return;
         }
+
+        $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, Whoops::class);
 
         try {
             $whoops->clearHandlers();

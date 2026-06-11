@@ -171,7 +171,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 
     private function storeTelemetryData(ConfigInterface $config, QueryExecuted $query): void
     {
-        if (!$config->getBool(ConfigKey::LOG_QUERY)) {
+        if (!$config->getBool(ConfigKey::TELEMETRY_DB_QUERIES)) {
             return;
         }
 

@@ -6,11 +6,11 @@ use Concept\Core\Telemetry\Contracts\TelemetryItemInterface;
 
 class TelemetryItem implements TelemetryItemInterface
 {
-    private const NAME = 'name';
-    private const CONTEXT = 'context';
-    private const STARTED_AT = 'started_at';
-    private const FINISHED_AT = 'finished_at';
-    private const DURATION = 'duration';
+    private const string NAME = 'name';
+    private const string CONTEXT = 'context';
+    private const string STARTED_AT = 'started_at';
+    private const string FINISHED_AT = 'finished_at';
+    private const string DURATION = 'duration';
 
     private ?float $startedAt = null;
     private ?float $finishedAt = null;

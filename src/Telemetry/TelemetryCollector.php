@@ -6,7 +6,7 @@ use Concept\Core\Telemetry\Contracts\TelemetryItemInterface;
 
 class TelemetryCollector
 {
-    private const NAME_KEY = 'name';
+    private const string NAME_KEY = 'name';
 
     /** @var array<string, array<string, TelemetryItemInterface>> */
     private array $telemetryItems = [];
@@ -29,10 +29,26 @@ class TelemetryCollector
         }
     }
 
+    /**
+     * @param array<mixed> $context
+     */
+    public function record(string $telemetryEventName, array $context = [], ?float $duration = null): string
+    {
+        $id = $this->start($telemetryEventName, $context, $duration);
+        $this->finish($telemetryEventName, $id);
+
+        return $id;
+    }
+
     public function mark(string $telemetryEventName, string $name): void
     {
         $id = $this->start($telemetryEventName, [self::NAME_KEY => $name]);
         $this->finish($telemetryEventName, $id);
+    }
+
+    public function reset(): void
+    {
+        $this->telemetryItems = [];
     }
 
     /**

@@ -83,6 +83,8 @@ final class ConfigKey
 
     public const string TELEMETRY_ENABLED = 'telemetry.enabled';
 
+    public const string TELEMETRY_DB_QUERIES = 'telemetry.db_queries';
+
     public const string VALIDATOR_RULES = 'validator.rules';
 
     public const string VIEW_CACHE_DIR = 'view.cache_dir';

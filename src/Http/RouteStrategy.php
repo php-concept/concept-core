@@ -37,7 +37,7 @@ class RouteStrategy extends ApplicationStrategy
         $request = $this->prepareRequest($route, $request);
 
         $callable = $route->getCallable($this->getContainer());
-        $telemetryId = $this->startTelemetry(TelemetryEvent::HTTP_ROUTE_CALLABLE_INVOKE, $callable, $route);
+        $telemetryId = $this->startTelemetry(TelemetryEvent::HTTP_ROUTE_CALLABLE_INVOKED, $callable, $route);
 
         try {
             $reflection = $this->getReflection($callable);
@@ -58,7 +58,7 @@ class RouteStrategy extends ApplicationStrategy
             /** @phpstan-ignore-next-line */
             return $reflection->invokeArgs($arguments);
         } finally {
-            $this->telemetry()?->finish(TelemetryEvent::HTTP_ROUTE_CALLABLE_INVOKE, (string)$telemetryId);
+            $this->telemetry()?->finish(TelemetryEvent::HTTP_ROUTE_CALLABLE_INVOKED, (string)$telemetryId);
         }
     }
 
@@ -77,9 +77,11 @@ class RouteStrategy extends ApplicationStrategy
         $interceptorClasses = $config->get(ConfigKey::ROUTES_INTERCEPTORS, []);
 
         foreach ($interceptorClasses as $interceptorClass) {
+            $telemetryId = $this->telemetry()?->start(TelemetryEvent::HTTP_ROUTE_INTERCEPTOR_EXECUTED, ['name' => $interceptorClass]);
             /** @var RouteInterceptorInterface $interceptor */
             $interceptor = $container->get($interceptorClass);
             $interceptor->intercept($route, $request);
+            $this->telemetry()?->finish(TelemetryEvent::HTTP_ROUTE_INTERCEPTOR_EXECUTED, (string)$telemetryId);
         }
     }
 

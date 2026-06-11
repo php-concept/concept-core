@@ -9,23 +9,11 @@ final class TelemetryEvent
 {
     public const string FRAMEWORK_SERVICE_AWAKENING = 'framework.service_awakening';
     public const string FRAMEWORK_COMPONENT_REGISTERED = 'framework.component_registered';
-    public const string HTTP_ROUTE_CALLABLE_INVOKE = 'http.route_callable_invoke';
-    public const string HTTP_FORM_REQUEST_VALIDATED = 'http.form_request_validated';
-    public const string DB_QUERY_EXECUTED = 'db.query_executed';
-    public const string TPL_RENDERED = 'tpl.rendered';
+    public const string FRAMEWORK_ROUTES_REGISTERED = 'framework.routes_registered';
 
-    /**
-     * @return list<string>
-     */
-    public static function telemetryEvents(): array
-    {
-        return [
-            self::FRAMEWORK_SERVICE_AWAKENING,
-            self::FRAMEWORK_COMPONENT_REGISTERED,
-            self::HTTP_ROUTE_CALLABLE_INVOKE,
-            self::HTTP_FORM_REQUEST_VALIDATED,
-            self::DB_QUERY_EXECUTED,
-            self::TPL_RENDERED,
-        ];
-    }
+    public const string HTTP_ROUTE_INTERCEPTOR_EXECUTED = 'http.route_interceptor_executed';
+    public const string HTTP_ROUTE_CALLABLE_INVOKED = 'http.route_callable_invoked';
+    public const string DB_QUERY_EXECUTED = 'db.query_executed';
+
+    public const string TPL_RENDERED = 'tpl.rendered';
 }

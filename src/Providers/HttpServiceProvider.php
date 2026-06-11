@@ -125,13 +125,24 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
      */
     private function registerRoutes(RouterInterface $router, array $routePaths): void
     {
-        $container = $this->getContainer();
+        $loadedFiles = [];
         foreach ($routePaths as $routesFileName) {
             if (!file_exists($routesFileName)) {
                 throw new InvalidArgumentException(sprintf(self::ERR_ROUTES_NOT_FOUND, $routesFileName));
             }
 
             require $routesFileName;
+            $loadedFiles[] = $routesFileName;
+        }
+
+        if ($loadedFiles !== []) {
+            $this->telemetry()?->record(
+                TelemetryEvent::FRAMEWORK_ROUTES_REGISTERED,
+                [
+                    'files' => $loadedFiles,
+                    'count' => count($loadedFiles),
+                ]
+            );
         }
     }
 

@@ -7,6 +7,7 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
+use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Telemetry\TelemetryTrait;
 use Dotenv\Dotenv;
 use League\Container\ServiceProvider\AbstractServiceProvider;
@@ -48,6 +49,8 @@ class ConfigServiceProvider extends AbstractServiceProvider implements BootableS
         $this->setTimeZone($config->getString(ConfigKey::APP_TIMEZONE, 'UTC'));
 
         $container->add(ConfigInterface::class, $config)->setShared(true);
+
+        $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ConfigInterface::class);
     }
 
     /**

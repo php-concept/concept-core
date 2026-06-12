@@ -2,12 +2,12 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
-use Concept\Core\Components\DataMasker\Contracts\DataMaskerRuleInterface;
-use Concept\Core\Components\DataMasker\DataMasker;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\DataMasker\Contracts\DataMaskerInterface;
+use Concept\Core\Services\DataMasker\Contracts\DataMaskerRuleInterface;
+use Concept\Core\Services\DataMasker\DataMasker;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\DataMaskerServiceProvider;
+use Concept\Core\Providers\Support\DataMaskerServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use PHPUnit\Framework\TestCase;

@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Http\Middlewares;
 
-use Concept\Core\Components\Validator\Exceptions\ValidationException;
+use Concept\Core\Services\Validator\Exceptions\ValidationException;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\SessionKey;

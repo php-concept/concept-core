@@ -2,8 +2,8 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Providers\SessionServiceProvider;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Providers\Http\SessionServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;

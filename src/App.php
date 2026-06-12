@@ -2,7 +2,7 @@
 
 namespace Concept\Core;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Php\PhpSapi;

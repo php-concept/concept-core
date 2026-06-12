@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Database\Registries\SeederRegistry;
+use Concept\Core\Services\Database\Registries\SeederRegistry;
 use Concept\Core\Console\Commands\DbSeedersListCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;

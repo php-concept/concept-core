@@ -2,14 +2,14 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Locale\Contracts\LocaleResolverInterface;
 use Concept\Core\Foundation\PathManager;
-use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
-use Concept\Core\Components\Validator\ValidationTranslationsLoader;
-use Concept\Core\Components\Validator\Validator;
+use Concept\Core\Services\Validator\Contracts\ValidatorInterface;
+use Concept\Core\Services\Validator\ValidationTranslationsLoader;
+use Concept\Core\Services\Validator\Validator;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\ValidationServiceProvider;
+use Concept\Core\Providers\Support\ValidationServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use PHPUnit\Framework\TestCase;

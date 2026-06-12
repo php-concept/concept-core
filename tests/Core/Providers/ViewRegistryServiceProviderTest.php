@@ -2,10 +2,10 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\View\Registries\ViewRegistry;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\View\Registries\ViewRegistry;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\ViewRegistryServiceProvider;
+use Concept\Core\Providers\View\ViewRegistryServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 

@@ -2,7 +2,7 @@
 
 namespace Tests\Core;
 
-use Concept\Core\Components\Validator\Exceptions\ValidationException;
+use Concept\Core\Services\Validator\Exceptions\ValidationException;
 use Concept\Core\Http\Middlewares\HandleValidationExceptionMiddleware;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;

@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Database\Registries\MigrationRegistry;
+use Concept\Core\Services\Database\Registries\MigrationRegistry;
 use Concept\Core\Console\Commands\DbMigrateCommand;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Migrations\Migrator;

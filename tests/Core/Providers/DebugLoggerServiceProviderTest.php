@@ -2,10 +2,10 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Logger\DebugLogger;
+use Concept\Core\Services\Logger\DebugLogger;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
-use Concept\Core\Providers\DebugLoggerServiceProvider;
+use Concept\Core\Providers\Logging\DebugLoggerServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 

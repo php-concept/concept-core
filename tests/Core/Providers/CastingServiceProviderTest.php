@@ -2,12 +2,12 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Caster\Caster;
-use Concept\Core\Components\Caster\Contracts\CasterInterface;
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Caster\Caster;
+use Concept\Core\Services\Caster\Contracts\CasterInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
-use Concept\Core\Providers\CastingServiceProvider;
+use Concept\Core\Providers\Support\CastingServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 

@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Telemetry;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use League\Container\DefinitionContainerInterface;
 use Throwable;

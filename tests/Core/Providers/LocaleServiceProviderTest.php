@@ -2,11 +2,11 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Locale\ConfigLocaleResolver;
-use Concept\Core\Components\Locale\Contracts\LocaleResolverInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Locale\ConfigLocaleResolver;
+use Concept\Core\Services\Locale\Contracts\LocaleResolverInterface;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\LocaleServiceProvider;
+use Concept\Core\Providers\Support\LocaleServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use PHPUnit\Framework\TestCase;

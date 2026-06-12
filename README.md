@@ -168,8 +168,8 @@ A **component** is a vertical slice of your application: routes, providers, migr
 
 namespace Concept\Components\AuthAdmin;
 
-use Concept\Core\Components\Component\Contracts\ComponentInterface;
-use Concept\Core\Components\Database\Contracts\SeederInterface;
+use Concept\Core\Services\Component\Contracts\ComponentInterface;
+use Concept\Core\Services\Database\Contracts\SeederInterface;
 use League\Container\ServiceProvider\ServiceProviderInterface;
 use Symfony\Component\Console\Command\Command;
 
@@ -546,24 +546,39 @@ Monolog with rotating file handler (`storage/logs`). Configurable level, retenti
 
 ## Service providers (built-in)
 
+Providers live under `Concept\Core\Providers\{Group}\*`. Root-level class names (e.g. `ConfigServiceProvider`) remain as deprecated aliases.
+
+```
+Providers/
+├── Bootstrap/   ConfigServiceProvider, ErrorHandlerServiceProvider
+├── Database/    DatabaseServiceProvider
+├── Http/        HttpServiceProvider, SessionServiceProvider
+├── Logging/     LogServiceProvider, DebugLoggerServiceProvider
+├── View/        TwigServiceProvider, PlatesServiceProvider, ViewRegistryServiceProvider
+├── Console/     ConsoleServiceProvider
+├── Support/     CastingServiceProvider, ValidationServiceProvider, LocaleServiceProvider, DataMaskerServiceProvider
+├── Telemetry/   TelemetryServiceProvider
+└── Component/   ComponentsServiceProvider
+```
+
 | Provider | Registers |
 |----------|-----------|
-| `ConfigServiceProvider` | Config, PathManager, `.env` |
-| `HttpServiceProvider` | Router, PSR-7 request, URL generator, responses |
-| `SessionServiceProvider` | Symfony session & flash bag |
-| `ValidationServiceProvider` | Rakit validator, translations |
-| `CastingServiceProvider` | Valinor `CasterInterface` |
-| `DatabaseServiceProvider` | Capsule, migrator, seeder manager |
-| `TwigServiceProvider` / `PlatesServiceProvider` | View engine |
-| `ViewRegistryServiceProvider` | Paths, extensions, contexts |
-| `ComponentsServiceProvider` | Component boot (routes, migrations, …) |
-| `ConsoleServiceProvider` | Symfony Console application |
-| `LogServiceProvider` | Monolog |
-| `ErrorHandlerServiceProvider` | Whoops handlers per environment |
-| `TelemetryServiceProvider` | Telemetry collector |
-| `DataMaskerServiceProvider` | Log redaction rules |
-| `LocaleServiceProvider` | Locale resolution |
-| `DebugLoggerServiceProvider` | In-memory debug log (dev tools) |
+| `Bootstrap\ConfigServiceProvider` | Config, PathManager, `.env` |
+| `Http\HttpServiceProvider` | Router, PSR-7 request, URL generator, responses |
+| `Http\SessionServiceProvider` | Symfony session & flash bag |
+| `Support\ValidationServiceProvider` | Rakit validator, translations |
+| `Support\CastingServiceProvider` | Valinor `CasterInterface` |
+| `Database\DatabaseServiceProvider` | Capsule, migrator, seeder manager |
+| `View\TwigServiceProvider` / `View\PlatesServiceProvider` | View engine |
+| `View\ViewRegistryServiceProvider` | Paths, extensions, contexts |
+| `Component\ComponentsServiceProvider` | Component boot (routes, migrations, …) |
+| `Console\ConsoleServiceProvider` | Symfony Console application |
+| `Logging\LogServiceProvider` | Monolog |
+| `Bootstrap\ErrorHandlerServiceProvider` | Whoops handlers per environment |
+| `Telemetry\TelemetryServiceProvider` | Telemetry collector |
+| `Support\DataMaskerServiceProvider` | Log redaction rules |
+| `Support\LocaleServiceProvider` | Locale resolution |
+| `Logging\DebugLoggerServiceProvider` | In-memory debug log (dev tools) |
 
 Register only what you need in `bootstrap/providers/app.php`.
 

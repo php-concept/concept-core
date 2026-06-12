@@ -2,19 +2,19 @@
 
 namespace Concept\Core\Http\Requests;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Services\Logger\Contracts\LoggerInterface;
 use Concept\Core\Dto\Contracts\DtoInterface;
-use Concept\Core\Components\Caster\Contracts\CasterInterface;
-use Concept\Core\Components\Caster\Exceptions\CastingException;
+use Concept\Core\Services\Caster\Contracts\CasterInterface;
+use Concept\Core\Services\Caster\Exceptions\CastingException;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\SessionKey;
-use Concept\Core\Components\Validator\Contracts\ValidationInterface;
-use Concept\Core\Components\Validator\Contracts\ValidatorInterface;
-use Concept\Core\Components\Validator\ValidationTranslationsLoader;
-use Concept\Core\Components\Validator\Exceptions\ValidationCastException;
-use Concept\Core\Components\Validator\Exceptions\ValidationLogicException;
+use Concept\Core\Services\Validator\Contracts\ValidationInterface;
+use Concept\Core\Services\Validator\Contracts\ValidatorInterface;
+use Concept\Core\Services\Validator\ValidationTranslationsLoader;
+use Concept\Core\Services\Validator\Exceptions\ValidationCastException;
+use Concept\Core\Services\Validator\Exceptions\ValidationLogicException;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

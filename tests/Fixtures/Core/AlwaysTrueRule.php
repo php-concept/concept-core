@@ -2,7 +2,7 @@
 
 namespace Tests\Fixtures\Core;
 
-use Concept\Core\Components\Validator\Rule;
+use Concept\Core\Services\Validator\Rule;
 
 final class AlwaysTrueRule extends Rule
 {

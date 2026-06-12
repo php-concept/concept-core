@@ -3,7 +3,7 @@
 namespace Tests\Core\Providers;
 
 use Concept\Core\Telemetry\TelemetryCollector;
-use Concept\Core\Providers\TelemetryServiceProvider;
+use Concept\Core\Providers\Telemetry\TelemetryServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 

@@ -2,13 +2,13 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Component\ComponentRegistry;
-use Concept\Core\Components\Component\Contracts\ComponentInterface;
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Database\Registries\MigrationRegistry;
-use Concept\Core\Components\Database\Registries\SeederRegistry;
+use Concept\Core\Services\Component\ComponentRegistry;
+use Concept\Core\Services\Component\Contracts\ComponentInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Database\Registries\MigrationRegistry;
+use Concept\Core\Services\Database\Registries\SeederRegistry;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\ComponentsServiceProvider;
+use Concept\Core\Providers\Component\ComponentsServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;

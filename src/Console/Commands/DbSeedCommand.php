@@ -2,8 +2,8 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Database\Registries\SeederRegistry;
-use Concept\Core\Components\Database\SeederManager;
+use Concept\Core\Services\Database\Registries\SeederRegistry;
+use Concept\Core\Services\Database\SeederManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

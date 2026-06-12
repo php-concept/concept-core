@@ -2,10 +2,10 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Console\Commands\DbMigrationListCommand;
-use Concept\Core\Providers\ConsoleServiceProvider;
+use Concept\Core\Providers\Console\ConsoleServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;

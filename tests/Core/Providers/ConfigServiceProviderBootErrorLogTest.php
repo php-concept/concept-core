@@ -5,7 +5,7 @@ namespace Tests\Core\Providers;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
-use Concept\Core\Providers\ConfigServiceProvider;
+use Concept\Core\Providers\Bootstrap\ConfigServiceProvider;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Throwable;

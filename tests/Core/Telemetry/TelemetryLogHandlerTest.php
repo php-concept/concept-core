@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Telemetry;
 
-use Concept\Core\Components\Logger\Logger;
+use Concept\Core\Services\Logger\Logger;
 use Concept\Core\Telemetry\TelemetryCollector;
 use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Telemetry\TelemetryKey;

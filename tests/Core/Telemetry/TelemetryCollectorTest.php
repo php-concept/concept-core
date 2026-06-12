@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Telemetry;
 
-use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Services\View\Contracts\ViewInterface;
 use Concept\Core\Telemetry\TelemetryCollector;
 use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Telemetry\TelemetryKey;

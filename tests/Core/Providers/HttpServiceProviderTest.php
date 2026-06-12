@@ -2,17 +2,17 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Http\Routing\Contracts\UrlGeneratorInterface;
 use Concept\Core\Http\Routing\Contracts\RouterInterface;
 use Concept\Core\Http\Routing\RouteDescriptor;
-use Concept\Core\Components\View\Contracts\ViewInterface;
-use Concept\Core\Components\View\Contracts\ViewResponseFactoryInterface;
-use Concept\Core\Components\View\ViewResponseFactory;
+use Concept\Core\Services\View\Contracts\ViewInterface;
+use Concept\Core\Services\View\Contracts\ViewResponseFactoryInterface;
+use Concept\Core\Services\View\ViewResponseFactory;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\ResponseFactory;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\HttpServiceProvider;
+use Concept\Core\Providers\Http\HttpServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;

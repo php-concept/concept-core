@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Console\Commands;
 
-use Concept\Core\Components\Database\SeederManager;
+use Concept\Core\Services\Database\SeederManager;
 use Concept\Core\Console\Commands\DbSeedCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;

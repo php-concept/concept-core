@@ -2,9 +2,9 @@
 
 namespace Tests\Core\Http;
 
-use Concept\Core\Components\Caster\Contracts\CasterInterface;
-use Concept\Core\Components\Validator\Exceptions\ValidationException;
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Caster\Contracts\CasterInterface;
+use Concept\Core\Services\Validator\Exceptions\ValidationException;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Http\Contracts\RouteInterceptorInterface;
 use Concept\Core\Http\RouteStrategy;

@@ -2,9 +2,9 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\DatabaseServiceProvider;
+use Concept\Core\Providers\Database\DatabaseServiceProvider;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;

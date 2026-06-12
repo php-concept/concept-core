@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Symfony\Component\Console\Command\Command;

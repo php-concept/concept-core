@@ -2,10 +2,10 @@
 
 namespace Tests\Core\Integrations\Whoops;
 
-use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Services\Logger\Contracts\LoggerInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
-use Concept\Core\Components\View\Contracts\ViewInterface;
+use Concept\Core\Services\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Integrations\Whoops\ProductionErrorHandler;
 use PHPUnit\Framework\TestCase;

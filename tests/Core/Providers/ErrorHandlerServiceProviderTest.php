@@ -2,14 +2,14 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
-use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Services\Logger\Contracts\LoggerInterface;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Providers\ErrorHandlerServiceProvider;
+use Concept\Core\Providers\Bootstrap\ErrorHandlerServiceProvider;
 use League\Container\Container;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;

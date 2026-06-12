@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Console\Commands;
 
-use Concept\Core\Components\Database\Registries\MigrationRegistry;
+use Concept\Core\Services\Database\Registries\MigrationRegistry;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

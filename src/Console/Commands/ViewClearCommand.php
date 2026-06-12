@@ -4,7 +4,7 @@ namespace Concept\Core\Console\Commands;
 
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;

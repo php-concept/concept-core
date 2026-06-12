@@ -3,14 +3,14 @@
 namespace Concept\Core\Http;
 
 use Closure;
-use Concept\Core\Components\Caster\Contracts\CasterInterface;
-use Concept\Core\Components\Caster\Exceptions\CastingException;
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Caster\Contracts\CasterInterface;
+use Concept\Core\Services\Caster\Exceptions\CastingException;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Telemetry\TelemetryEvent;
 use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Telemetry\TelemetryTrait;
-use Concept\Core\Components\Validator\Exceptions\ValidationException;
+use Concept\Core\Services\Validator\Exceptions\ValidationException;
 use Concept\Core\Http\Contracts\RouteInterceptorInterface;
 use Concept\Core\Http\Requests\FormRequestInterface;
 use League\Container\DefinitionContainerInterface;

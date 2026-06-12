@@ -2,13 +2,13 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
-use Concept\Core\Components\Database\Contracts\DatabaseInterface;
-use Concept\Core\Components\Database\QueryLogger;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Database\Contracts\DatabaseInterface;
+use Concept\Core\Services\Database\QueryLogger;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
-use Concept\Core\Providers\DatabaseServiceProvider;
+use Concept\Core\Providers\Database\DatabaseServiceProvider;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Database\Migrations\Migrator;
 use League\Container\Container;

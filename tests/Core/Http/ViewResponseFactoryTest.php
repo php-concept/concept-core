@@ -2,8 +2,8 @@
 
 namespace Tests\Core\Http;
 
-use Concept\Core\Components\View\Contracts\ViewInterface;
-use Concept\Core\Components\View\ViewResponseFactory;
+use Concept\Core\Services\View\Contracts\ViewInterface;
+use Concept\Core\Services\View\ViewResponseFactory;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;

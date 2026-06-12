@@ -2,7 +2,7 @@
 
 namespace Tests\Core\Integrations\Whoops;
 
-use Concept\Core\Components\Logger\Contracts\LoggerInterface;
+use Concept\Core\Services\Logger\Contracts\LoggerInterface;
 use Concept\Core\Integrations\Whoops\ErrorLogHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;
 use League\Container\Container;

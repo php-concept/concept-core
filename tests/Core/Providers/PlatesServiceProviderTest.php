@@ -2,17 +2,17 @@
 
 namespace Tests\Core\Providers;
 
-use Concept\Core\Components\Config\Contracts\ConfigInterface;
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
-use Concept\Core\Components\View\Contracts\ViewInterface;
-use Concept\Core\Components\View\Registries\ViewExtensionRegistry;
-use Concept\Core\Components\View\Registries\ViewContextRegistry;
-use Concept\Core\Components\View\Registries\ViewPathRegistry;
-use Concept\Core\Components\View\Registries\ViewRegistry;
-use Concept\Core\Providers\PlatesServiceProvider;
-use Concept\Core\Providers\ViewRegistryServiceProvider;
+use Concept\Core\Services\View\Contracts\ViewInterface;
+use Concept\Core\Services\View\Registries\ViewExtensionRegistry;
+use Concept\Core\Services\View\Registries\ViewContextRegistry;
+use Concept\Core\Services\View\Registries\ViewPathRegistry;
+use Concept\Core\Services\View\Registries\ViewRegistry;
+use Concept\Core\Providers\View\PlatesServiceProvider;
+use Concept\Core\Providers\View\ViewRegistryServiceProvider;
 use League\Container\Container;
 use League\Container\ReflectionContainer;
 use League\Plates\Engine;

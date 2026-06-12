@@ -4,8 +4,8 @@ namespace Concept\Core\Providers\Http;
 
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Telemetry\TelemetryEvent;
-use Concept\Core\Telemetry\TelemetryTrait;
+use Concept\Core\Services\Telemetry\TelemetryEvent;
+use Concept\Core\Services\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;

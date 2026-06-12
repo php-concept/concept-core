@@ -5,7 +5,7 @@ namespace Concept\Core\Http\Middlewares;
 use Concept\Core\Http\Exceptions\Security\CsrfException;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpMethod;
-use Concept\Core\Http\SessionKey;
+use Concept\Core\Services\Session\SessionKey;
 use Concept\Core\Http\Security\CsrfTokenManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

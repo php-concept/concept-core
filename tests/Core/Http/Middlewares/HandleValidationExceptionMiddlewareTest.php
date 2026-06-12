@@ -9,7 +9,7 @@ use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
 use Concept\Core\Http\RequestFormat;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
-use Concept\Core\Http\SessionKey;
+use Concept\Core\Services\Session\SessionKey;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;

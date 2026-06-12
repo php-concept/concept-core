@@ -4,7 +4,7 @@ namespace Tests\Core\Providers;
 
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Services\Database\Contracts\DatabaseInterface;
-use Concept\Core\Services\Database\QueryLogger;
+use Concept\Core\Services\Logger\QueryLogger;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;

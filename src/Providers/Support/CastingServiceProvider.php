@@ -6,8 +6,8 @@ use Concept\Core\Services\Caster\Caster;
 use Concept\Core\Services\Caster\Contracts\CasterInterface;
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\PathManager;
-use Concept\Core\Telemetry\TelemetryEvent;
-use Concept\Core\Telemetry\TelemetryTrait;
+use Concept\Core\Services\Telemetry\TelemetryEvent;
+use Concept\Core\Services\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class CastingServiceProvider extends AbstractServiceProvider

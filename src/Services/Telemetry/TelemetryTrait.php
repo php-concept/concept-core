@@ -1,0 +1,36 @@
+<?php declare(strict_types=1);
+
+namespace Concept\Core\Services\Telemetry;
+
+use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
+use League\Container\DefinitionContainerInterface;
+use Throwable;
+
+trait TelemetryTrait
+{
+    private function telemetry(): ?TelemetryCollector
+    {
+        /** @var DefinitionContainerInterface $container */
+        $container = $this->getContainer();
+        if (!$container->has(TelemetryCollector::class)) {
+            return null;
+        }
+
+        /** @var ConfigInterface $config */
+        $config = $container->get(ConfigInterface::class);
+
+        if (!$config->getBool(ConfigKey::TELEMETRY_ENABLED, false)) {
+            return null;
+        }
+
+        try {
+            /** @var TelemetryCollector $telemetryCollector */
+            $telemetryCollector = $container->get(TelemetryCollector::class);
+        } catch (Throwable) {
+            $telemetryCollector = null;
+        }
+
+        return $telemetryCollector;
+    }
+}

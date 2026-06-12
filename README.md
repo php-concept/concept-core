@@ -546,7 +546,7 @@ Monolog with rotating file handler (`storage/logs`). Configurable level, retenti
 
 ## Service providers (built-in)
 
-Providers live under `Concept\Core\Providers\{Group}\*`. Root-level class names (e.g. `ConfigServiceProvider`) remain as deprecated aliases.
+Providers live under `Concept\Core\Providers\{Group}\*`.
 
 ```
 Providers/

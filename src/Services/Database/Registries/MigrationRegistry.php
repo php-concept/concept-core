@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Services\Database\Registries;
 
-use Concept\Core\Support\Registry\Contracts\RegistryInterface;
-use Concept\Core\Support\Registry\Registry;
+use Concept\Core\Services\Registry\Contracts\RegistryInterface;
+use Concept\Core\Services\Registry\Registry;
 
 class MigrationRegistry extends Registry implements RegistryInterface {}

@@ -7,7 +7,7 @@ use Concept\Core\Http\Exceptions\Security\CsrfException;
 use Concept\Core\Http\Middlewares\VerifyCsrfTokenMiddleware;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpMethod;
-use Concept\Core\Http\SessionKey;
+use Concept\Core\Services\Session\SessionKey;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;

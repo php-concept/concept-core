@@ -8,8 +8,8 @@ use Concept\Core\Services\DataMasker\Contracts\DataMaskerInterface;
 use Concept\Core\Services\DataMasker\Contracts\DataMaskerRuleInterface;
 use Concept\Core\Services\DataMasker\DataMasker;
 use Concept\Core\Services\DataMasker\RegexDataMaskerRule;
-use Concept\Core\Telemetry\TelemetryEvent;
-use Concept\Core\Telemetry\TelemetryTrait;
+use Concept\Core\Services\Telemetry\TelemetryEvent;
+use Concept\Core\Services\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class DataMaskerServiceProvider extends AbstractServiceProvider

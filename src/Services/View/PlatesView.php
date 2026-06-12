@@ -2,9 +2,9 @@
 
 namespace Concept\Core\Services\View;
 
-use Concept\Core\Telemetry\TelemetryCollector;
-use Concept\Core\Telemetry\TelemetryEvent;
-use Concept\Core\Telemetry\TelemetryKey;
+use Concept\Core\Services\Telemetry\TelemetryCollector;
+use Concept\Core\Services\Telemetry\TelemetryEvent;
+use Concept\Core\Services\Telemetry\TelemetryKey;
 use Concept\Core\Services\View\Contracts\ViewInterface;
 use League\Plates\Engine;
 

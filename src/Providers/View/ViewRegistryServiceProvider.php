@@ -4,8 +4,8 @@ namespace Concept\Core\Providers\View;
 
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
-use Concept\Core\Telemetry\TelemetryEvent;
-use Concept\Core\Telemetry\TelemetryTrait;
+use Concept\Core\Services\Telemetry\TelemetryEvent;
+use Concept\Core\Services\Telemetry\TelemetryTrait;
 use Concept\Core\Services\View\Registries\ViewContextRegistry;
 use Concept\Core\Services\View\Registries\ViewExtensionRegistry;
 use Concept\Core\Services\View\Registries\ViewPathRegistry;

@@ -2,9 +2,9 @@
 
 namespace Tests\Core\Services\View;
 
-use Concept\Core\Telemetry\TelemetryCollector;
-use Concept\Core\Telemetry\TelemetryEvent;
-use Concept\Core\Telemetry\TelemetryKey;
+use Concept\Core\Services\Telemetry\TelemetryCollector;
+use Concept\Core\Services\Telemetry\TelemetryEvent;
+use Concept\Core\Services\Telemetry\TelemetryKey;
 use Concept\Core\Services\View\PlatesView;
 use Concept\Core\Services\View\TwigView;
 use League\Plates\Engine;

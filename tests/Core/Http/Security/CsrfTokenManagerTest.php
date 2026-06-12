@@ -3,7 +3,7 @@
 namespace Tests\Core\Http\Security;
 
 use Concept\Core\Http\Security\CsrfTokenManager;
-use Concept\Core\Http\SessionKey;
+use Concept\Core\Services\Session\SessionKey;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;

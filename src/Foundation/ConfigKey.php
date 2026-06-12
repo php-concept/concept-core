@@ -49,7 +49,7 @@ final class ConfigKey
 
     public const string LOG_MAX_FILES = 'log.max_files';
 
-    public const string LOG_QUERY = 'log.query';
+    public const string LOG_DB_QUERIES = 'log.db_queries';
 
     public const string LOG_VALIDATION_DATA = 'log.validation_data';
 
@@ -84,6 +84,8 @@ final class ConfigKey
     public const string TELEMETRY_ENABLED = 'telemetry.enabled';
 
     public const string TELEMETRY_DB_QUERIES = 'telemetry.db_queries';
+
+    public const string TELEMETRY_LOGS = 'telemetry.logs';
 
     public const string VALIDATOR_RULES = 'validator.rules';
 

@@ -484,7 +484,7 @@ php bin/console.php view:clear
 PHP config files merged via Noodlehaus Config. Canonical keys live in `Concept\Core\Foundation\ConfigKey`:
 
 - `app.name`, `app.debug`, `app.version`, `app.locale`, `app.fallback_locale`, `app.timezone`
-- `db.*`, `session.*`, `log.*` (`log.query`, `log.validation_data`)
+- `db.*`, `session.*`, `log.*` (`log.db_queries`, `log.validation_data`)
 - `routes.list`, `routes.interceptors`
 - `components`, `commands`, `migrations.paths`, `migrations.table`, `seeders.list`
 - `view.paths`, `view.contexts`, `view.extensions`, `view.cache_dir`, `view.default_extension`

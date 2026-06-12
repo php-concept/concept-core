@@ -16,4 +16,5 @@ final class TelemetryEvent
     public const string HTTP_REQUEST_HANDLED = 'http.request_handled';
     public const string DB_QUERY_EXECUTED = 'db.query_executed';
     public const string TPL_RENDERED = 'tpl.rendered';
+    public const string LOG_RECORDED = 'log.recorded';
 }

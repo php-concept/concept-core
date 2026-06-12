@@ -10,6 +10,7 @@ use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Concept\Core\Telemetry\TelemetryLogHandler;
 use Concept\Core\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use Monolog\Handler\RotatingFileHandler;
@@ -73,6 +74,25 @@ class LogServiceProvider extends AbstractServiceProvider
         $maxFiles = $config->getInt(ConfigKey::LOG_MAX_FILES, 7);
 
         $monolog->pushHandler(new RotatingFileHandler($logsPath, $maxFiles, $logLevel));
+        $this->pushTelemetryHandler($monolog, $config, $logLevel);
         $monolog->pushProcessor(new PsrLogMessageProcessor());
+    }
+
+    private function pushTelemetryHandler(Monolog $monolog, ConfigInterface $config, Level $logLevel): void
+    {
+        if (!$config->getBool(ConfigKey::TELEMETRY_ENABLED, false)) {
+            return;
+        }
+
+        if (!$config->getBool(ConfigKey::TELEMETRY_LOGS, false)) {
+            return;
+        }
+
+        $collector = $this->telemetry();
+        if ($collector === null) {
+            return;
+        }
+
+        $monolog->pushHandler(new TelemetryLogHandler($collector, $logLevel));
     }
 }

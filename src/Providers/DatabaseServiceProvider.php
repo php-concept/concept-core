@@ -6,11 +6,17 @@ use Concept\Core\Components\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Components\Database\Contracts\DatabaseInterface;
 use Concept\Core\Components\Database\Database;
+use Concept\Core\Components\Database\QueryLogger;
+use Concept\Core\Components\DataMasker\Contracts\DataMaskerInterface;
+use Concept\Core\Foundation\PathManager;
+use Concept\Core\Foundation\PathName;
 use Concept\Core\Components\Database\Registries\MigrationRegistry;
 use Concept\Core\Components\Database\Registries\SeederRegistry;
 use Concept\Core\Components\Database\SeederManager;
-use Concept\Core\Components\Logger\Contracts\LoggerInterface;
 use Concept\Core\Telemetry\TelemetryEvent;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Level;
+use Monolog\Logger as Monolog;
 use Concept\Core\Telemetry\TelemetryKey;
 use Concept\Core\Telemetry\TelemetryTrait;
 use Illuminate\Container\Container as IlluminateContainer;
@@ -38,6 +44,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
         $services = [
             CapsuleManager::class,
             DatabaseInterface::class,
+            QueryLogger::class,
             Migrator::class,
             SeederManager::class,
             SeederRegistry::class,
@@ -106,6 +113,27 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 
             return $migrationRegistry;
         })->setShared(true);
+
+        $container->add(QueryLogger::class, function () use ($container) {
+            /** @var PathManager $pathManager */
+            $pathManager = $container->get(PathManager::class);
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+
+            $monolog = new Monolog('query');
+            $monolog->pushHandler(new RotatingFileHandler(
+                $pathManager->get(PathName::LOGS, 'query.log'),
+                $config->getInt(ConfigKey::LOG_MAX_FILES, 7),
+                Level::Debug,
+            ));
+
+            /** @var DataMaskerInterface|null $masker */
+            $masker = $container->has(DataMaskerInterface::class)
+                ? $container->get(DataMaskerInterface::class)
+                : null;
+
+            return new QueryLogger($monolog, $masker);
+        })->setShared(true);
     }
 
     /**
@@ -155,19 +183,17 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 
     private function logQueries(ContainerInterface $container, ConfigInterface $config, QueryExecuted $query): void
     {
-        if (!$container->has(LoggerInterface::class)) {
+        if (!$config->getBool(ConfigKey::LOG_DB_QUERIES)) {
             return;
         }
 
-        if ($config->getBool(ConfigKey::APP_DEBUG) || $config->getBool(ConfigKey::LOG_QUERY)) {
-            /** @var LoggerInterface $logger */
-            $logger = $container->get(LoggerInterface::class);
-            $logger->debug('SQL: ' . $query->toRawSql(), [
-                'sql' => $query->sql,
-                'bindings' => $query->bindings,
-                'time' => $query->time
-            ]);
+        if (!$container->has(QueryLogger::class)) {
+            return;
         }
+
+        /** @var QueryLogger $queryLogger */
+        $queryLogger = $container->get(QueryLogger::class);
+        $queryLogger->log($query);
     }
 
     private function storeTelemetryData(ConfigInterface $config, QueryExecuted $query): void

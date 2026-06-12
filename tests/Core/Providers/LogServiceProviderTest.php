@@ -8,6 +8,8 @@ use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Foundation\PathName;
 use Concept\Core\Providers\LogServiceProvider;
+use Concept\Core\Telemetry\TelemetryCollector;
+use Concept\Core\Telemetry\TelemetryLogHandler;
 use League\Container\Container;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger as Monolog;
@@ -80,6 +82,51 @@ final class LogServiceProviderTest extends TestCase
         self::assertInstanceOf(RotatingFileHandler::class, $handlers[0]);
     }
 
+    public function testRegisterAddsTelemetryHandlerWhenEnabled(): void
+    {
+        $container = new Container();
+        $container->add(PathManager::class, new PathManager($this->tmpRoot, [
+            PathName::LOGS => 'storage/logs',
+        ]))->setShared(true);
+        $container->add(TelemetryCollector::class, new TelemetryCollector())->setShared(true);
+
+        $container->add(ConfigInterface::class, new class implements ConfigInterface {
+            public function get(string $key, mixed $default = null): mixed { return $default; }
+            public function set(string $key, mixed $default = null): void {}
+            public function has(string $key): bool { return false; }
+            public function all(): array { return []; }
+            public function getString(string $key, string $default = ''): string
+            {
+                return match ($key) {
+                    ConfigKey::LOG_NAME => 'app-test',
+                    ConfigKey::LOG_LEVEL => 'debug',
+                    default => $default,
+                };
+            }
+            public function getInt(string $key, int $default = 0): int { return $key === ConfigKey::LOG_MAX_FILES ? 3 : $default; }
+            public function getBool(string $key, bool $default = false): bool
+            {
+                return match ($key) {
+                    ConfigKey::TELEMETRY_ENABLED, ConfigKey::TELEMETRY_LOGS => true,
+                    default => $default,
+                };
+            }
+        })->setShared(true);
+
+        $provider = new LogServiceProvider();
+        $provider->setContainer($container);
+        $provider->register();
+
+        $logger = $container->get(LoggerInterface::class);
+        $reflection = new \ReflectionClass($logger);
+        $monolog = $reflection->getProperty('monolog')->getValue($logger);
+        self::assertInstanceOf(Monolog::class, $monolog);
+
+        $handlers = $monolog->getHandlers();
+        self::assertCount(2, $handlers);
+        self::assertTrue(array_any($handlers, static fn ($handler): bool => $handler instanceof RotatingFileHandler));
+        self::assertTrue(array_any($handlers, static fn ($handler): bool => $handler instanceof TelemetryLogHandler));
+    }
 
     public function testInvalidLogLevelFallsBackToDebug(): void
     {

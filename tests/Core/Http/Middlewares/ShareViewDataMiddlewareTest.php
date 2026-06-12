@@ -4,7 +4,7 @@ namespace Tests\Core;
 
 use Concept\Core\Http\Security\CsrfTokenManager;
 use Concept\Core\Http\Middlewares\ShareViewDataMiddleware;
-use Concept\Core\Http\RequestAttribute;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Concept\Core\Services\Session\SessionKey;
 use Concept\Core\Services\View\ViewKey;
 use Laminas\Diactoros\Response;

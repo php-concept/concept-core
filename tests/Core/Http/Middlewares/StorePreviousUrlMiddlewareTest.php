@@ -6,7 +6,7 @@ use Concept\Core\Http\Middlewares\StorePreviousUrlMiddleware;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpMethod;
 use Concept\Core\Http\Protocol\HttpValue;
-use Concept\Core\Http\RequestAttribute;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Concept\Core\Services\Session\SessionKey;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;

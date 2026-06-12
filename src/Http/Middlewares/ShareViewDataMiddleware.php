@@ -2,7 +2,7 @@
 
 namespace Concept\Core\Http\Middlewares;
 
-use Concept\Core\Http\RequestAttribute;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Concept\Core\Services\Session\SessionKey;
 use Concept\Core\Services\View\ViewKey;
 use Concept\Core\Http\Security\CsrfTokenManager;

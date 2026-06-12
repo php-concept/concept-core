@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Core;
+namespace Tests\Core\Http\Requests;
 
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpValue;
-use Concept\Core\Http\RequestFormat;
+use Concept\Core\Http\Requests\RequestFormat;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 

@@ -7,7 +7,7 @@ use Concept\Core\Services\View\ViewResponseFactory;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
-use Concept\Core\Http\RequestAttribute;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Concept\Core\Http\ResponseFactory;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;

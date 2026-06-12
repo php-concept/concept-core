@@ -6,7 +6,7 @@ use League\Route\Route;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Pre-handler hook invoked by {@see \Concept\Core\Http\RouteStrategy} for each matched route.
+ * Pre-handler hook invoked by {@see \Concept\Core\Http\Routing\RouteStrategy} for each matched route.
  * Applications throw their own exceptions; core does not define authorization types.
  */
 interface RouteInterceptorInterface

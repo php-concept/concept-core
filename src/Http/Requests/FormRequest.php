@@ -8,7 +8,6 @@ use Concept\Core\Services\Logger\Contracts\LoggerInterface;
 use Concept\Core\Services\Dto\Contracts\DtoInterface;
 use Concept\Core\Services\Caster\Contracts\CasterInterface;
 use Concept\Core\Services\Caster\Exceptions\CastingException;
-use Concept\Core\Http\RequestFormat;
 use Concept\Core\Services\Session\SessionKey;
 use Concept\Core\Services\Validator\Contracts\ValidationInterface;
 use Concept\Core\Services\Validator\Contracts\ValidatorInterface;

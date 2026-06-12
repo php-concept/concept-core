@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Core\Http;
+namespace Tests\Core\Http\Routing;
 
 use Concept\Core\Services\Caster\Contracts\CasterInterface;
 use Concept\Core\Services\Validator\Exceptions\ValidationException;
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Http\Contracts\RouteInterceptorInterface;
-use Concept\Core\Http\RouteStrategy;
+use Concept\Core\Http\Routing\RouteStrategy;
 use RuntimeException;
 use Concept\Core\Http\Requests\FormRequestInterface;
 use Laminas\Diactoros\Response;

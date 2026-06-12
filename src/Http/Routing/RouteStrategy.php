@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Http;
+namespace Concept\Core\Http\Routing;
 
 use Closure;
 use Concept\Core\Services\Caster\Contracts\CasterInterface;

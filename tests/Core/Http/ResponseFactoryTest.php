@@ -6,7 +6,7 @@ use Concept\Core\Http\ResponseFactory;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
-use Concept\Core\Http\RequestAttribute;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\TestCase;

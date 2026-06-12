@@ -6,7 +6,7 @@ use Concept\Core\Foundation\ContainerResolver;
 use Concept\Core\Services\Logger\Contracts\LoggerInterface;
 use Concept\Core\Services\View\Contracts\ViewInterface;
 use Concept\Core\Http\Protocol\HttpStatusCode;
-use Concept\Core\Http\RequestFormat;
+use Concept\Core\Http\Requests\RequestFormat;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Concept\Core\Foundation\PathManager;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;

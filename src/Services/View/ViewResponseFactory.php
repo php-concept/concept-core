@@ -7,7 +7,7 @@ use Concept\Core\Services\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
-use Concept\Core\Http\RequestAttribute;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

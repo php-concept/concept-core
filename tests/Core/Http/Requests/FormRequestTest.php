@@ -12,7 +12,7 @@ use Concept\Core\Services\Validator\ValidationTranslationsLoader;
 use Concept\Core\Services\Validator\Exceptions\ValidationCastException;
 use Concept\Core\Services\Validator\Exceptions\ValidationLogicException;
 use Concept\Core\Services\Dto\Dto;
-use Concept\Core\Http\RequestFormat;
+use Concept\Core\Http\Requests\RequestFormat;
 use Concept\Core\Http\Requests\FormRequest;
 use Concept\Core\Services\Session\SessionKey;
 use Laminas\Diactoros\ServerRequest;

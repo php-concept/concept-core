@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Concept\Core\Http;
+namespace Concept\Core\Http\Requests;
 
 /**
  * Keys used to store attributes in the PSR-7 ServerRequestInterface

@@ -3,7 +3,7 @@
 namespace Concept\Core\Providers\Bootstrap;
 
 use Concept\Core\Foundation\ContainerResolver;
-use Concept\Core\Http\RequestFormat;
+use Concept\Core\Http\Requests\RequestFormat;
 use Concept\Core\Integrations\Whoops\EarlyBootstrapFallbackHandler;
 use Concept\Core\Integrations\Whoops\ErrorLogHandler;
 use Concept\Core\Integrations\Whoops\PhpErrorLogHandler;

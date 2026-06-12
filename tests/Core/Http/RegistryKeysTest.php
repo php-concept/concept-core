@@ -6,7 +6,7 @@ use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpMethod;
 use Concept\Core\Http\Protocol\HttpValue;
 use Concept\Core\Http\Protocol\UrlComponent;
-use Concept\Core\Http\RequestAttribute;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Concept\Core\Services\Session\SessionKey;
 use Concept\Core\Services\View\ViewKey;
 use PHPUnit\Framework\TestCase;

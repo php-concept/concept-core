@@ -9,7 +9,7 @@ use Concept\Core\Http\Routing\RouteDescriptor;
 use Concept\Core\Services\View\Contracts\ViewInterface;
 use Concept\Core\Services\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Services\View\ViewResponseFactory;
-use Concept\Core\Http\RequestFormat;
+use Concept\Core\Http\Requests\RequestFormat;
 use Concept\Core\Http\ResponseFactory;
 use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Providers\Http\HttpServiceProvider;

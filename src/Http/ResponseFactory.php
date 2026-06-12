@@ -11,6 +11,7 @@ use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Psr\Container\ContainerInterface;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
+use Concept\Core\Http\Requests\RequestAttribute;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

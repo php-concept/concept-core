@@ -7,7 +7,7 @@ use Concept\Core\Http\Middlewares\HandleValidationExceptionMiddleware;
 use Concept\Core\Http\Protocol\HttpHeader;
 use Concept\Core\Http\Protocol\HttpStatusCode;
 use Concept\Core\Http\Protocol\HttpValue;
-use Concept\Core\Http\RequestFormat;
+use Concept\Core\Http\Requests\RequestFormat;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
 use Concept\Core\Services\Session\SessionKey;
 use Laminas\Diactoros\Response;

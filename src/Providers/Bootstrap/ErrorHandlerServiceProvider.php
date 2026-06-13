@@ -57,14 +57,12 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
         try {
             $whoops->clearHandlers();
 
-            $whoops->pushHandler(function (Throwable $exception) {
+            $whoops->appendHandler(function (Throwable $exception) {
                 $handler = new PhpErrorLogHandler();
                 $handler->setException($exception);
 
                 return $handler->handle();
             });
-
-            $this->registerRenderHandlers($container, $whoops);
 
             $whoops->appendHandler(function (Throwable $exception) use ($container) {
                 $handler = new ErrorLogHandler($container);
@@ -72,6 +70,8 @@ class ErrorHandlerServiceProvider extends AbstractServiceProvider implements Boo
 
                 return $handler->handle();
             });
+
+            $this->registerRenderHandlers($container, $whoops);
 
             $whoops->register();
         } catch (Throwable) {

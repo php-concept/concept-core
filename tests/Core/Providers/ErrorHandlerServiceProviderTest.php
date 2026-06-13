@@ -69,8 +69,8 @@ final class ErrorHandlerServiceProviderTest extends TestCase
         $handlers = $whoops->getHandlers();
 
         self::assertCount(3, $handlers);
-        self::assertInstanceOf(CallbackHandler::class, $handlers[0]);
-        self::assertInstanceOf(JsonResponseHandler::class, $handlers[1]);
+        self::assertInstanceOf(JsonResponseHandler::class, $handlers[0]);
+        self::assertInstanceOf(CallbackHandler::class, $handlers[1]);
         self::assertInstanceOf(CallbackHandler::class, $handlers[2]);
     }
 
@@ -264,8 +264,8 @@ final class ErrorHandlerServiceProviderTest extends TestCase
         $handlers = $whoops->getHandlers();
         self::assertCount(3, $handlers);
 
-        // appendHandler(ErrorLog) is registered last, so it sits at the front of the stack.
-        $errorLogHandler = $handlers[0];
+        // appendHandler() unshifts onto the stack: last registered handler is first.
+        $errorLogHandler = $handlers[1];
 
         $exception = new RuntimeException('boom');
         $errorLogHandler->setException($exception);

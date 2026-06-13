@@ -20,6 +20,7 @@ use InvalidArgumentException;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
+use Concept\Core\Http\RequestProxy;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class HttpServiceProviderTest extends TestCase
@@ -29,6 +30,7 @@ final class HttpServiceProviderTest extends TestCase
         $provider = new HttpServiceProvider();
 
         self::assertTrue($provider->provides(ServerRequestInterface::class));
+        self::assertTrue($provider->provides(RequestProxy::class));
         self::assertTrue($provider->provides(RouterInterface::class));
         self::assertTrue($provider->provides(RouteDescriptor::class));
         self::assertTrue($provider->provides(UrlGeneratorInterface::class));
@@ -54,6 +56,7 @@ final class HttpServiceProviderTest extends TestCase
         $provider->register();
         $provider->boot();
 
+        self::assertInstanceOf(RequestProxy::class, $container->get(RequestProxy::class));
         self::assertInstanceOf(RequestFormat::class, $container->get(RequestFormat::class));
         self::assertInstanceOf(RouterInterface::class, $container->get(RouterInterface::class));
         self::assertInstanceOf(\Concept\Core\Http\Routing\Router::class, $container->get(RouterInterface::class));

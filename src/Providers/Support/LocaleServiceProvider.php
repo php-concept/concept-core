@@ -16,12 +16,26 @@ class LocaleServiceProvider extends AbstractServiceProvider
 
     public function provides(string $id): bool
     {
-        return $id === LocaleResolverInterface::class;
+        $services = [
+            ConfigLocaleResolver::class,
+            LocaleResolverInterface::class,
+        ];
+
+        return in_array($id, $services);
     }
 
     public function register(): void
     {
         $container = $this->getContainer();
+
+        $container->add(ConfigLocaleResolver::class, function () use ($container) {
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, ConfigLocaleResolver::class);
+
+            /** @var ConfigInterface $config */
+            $config = $container->get(ConfigInterface::class);
+
+            return new ConfigLocaleResolver($config);
+        })->setShared(true);
 
         $container->add(LocaleResolverInterface::class, function () use ($container) {
             $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, LocaleResolverInterface::class);

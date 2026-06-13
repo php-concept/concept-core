@@ -16,6 +16,7 @@ use Concept\Core\Services\View\Contracts\ViewInterface;
 use Concept\Core\Services\View\Contracts\ViewResponseFactoryInterface;
 use Concept\Core\Services\View\ViewResponseFactory;
 use Concept\Core\Http\Contracts\ResponseFactoryInterface;
+use Concept\Core\Http\RequestProxy;
 use Concept\Core\Http\Requests\RequestFormat;
 use Concept\Core\Http\ResponseFactory;
 use Concept\Core\Http\Routing\RouteStrategy;
@@ -36,6 +37,7 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
     {
         $services = [
             ServerRequestInterface::class,
+            RequestProxy::class,
             RouterInterface::class,
             RouteDescriptor::class,
             UrlGeneratorInterface::class,
@@ -57,6 +59,12 @@ class HttpServiceProvider extends AbstractServiceProvider implements BootableSer
             return ServerRequestFactory::fromGlobals(
                 $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
             );
+        })->setShared(true);
+
+        $container->add(RequestProxy::class, function () use ($container) {
+            $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, RequestProxy::class);
+
+            return new RequestProxy($container);
         })->setShared(true);
 
         $container->add(RouterInterface::class, function () use ($container) {

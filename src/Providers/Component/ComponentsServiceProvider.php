@@ -125,6 +125,6 @@ class ComponentsServiceProvider extends AbstractServiceProvider implements Boota
     {
         /** @var MigrationRegistry $migrationRegistry */
         $migrationRegistry = $this->getContainer()->get(MigrationRegistry::class);
-        $migrationRegistry->append($registry->migrations());
+        $migrationRegistry->append($registry->migrationPaths());
     }
 }

@@ -48,7 +48,7 @@ final class ComponentsServiceProviderTest extends TestCase
         $registry = $container->get(ComponentRegistry::class);
 
         self::assertSame(['StubSeeder'], $registry->seeders());
-        self::assertSame(['/stub/migrations'], $registry->migrations());
+        self::assertSame(['/stub/migrations'], $registry->migrationPaths());
     }
 
     public function testRegisterComponentSeedersAndMigrationsAppendsToRegistries(): void
@@ -165,7 +165,7 @@ final class StubComponent implements ComponentInterface
         return ['StubSeeder'];
     }
 
-    public function migrations(): array
+    public function migrationPaths(): array
     {
         return ['/stub/migrations'];
     }

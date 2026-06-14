@@ -79,14 +79,14 @@ final class ComponentRegistry
     }
 
     /**
-     * @return class-string<Migration>[]
+     * @return array<string>
      */
-    public function migrations(): array
+    public function migrationPaths(): array
     {
         $migrations = [];
 
         foreach ($this->components() as $component) {
-            $migrations = array_merge($migrations, $component->migrations());
+            $migrations = array_merge($migrations, $component->migrationPaths());
         }
 
         return $migrations;

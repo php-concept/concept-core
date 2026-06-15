@@ -5,6 +5,7 @@ namespace Concept\Core\Providers\Support;
 use Concept\Core\Services\Caster\Caster;
 use Concept\Core\Services\Caster\Contracts\CasterInterface;
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
+use Concept\Core\Foundation\ConfigKey;
 use Concept\Core\Foundation\PathManager;
 use Concept\Core\Services\Telemetry\TelemetryEvent;
 use Concept\Core\Services\Telemetry\TelemetryTrait;
@@ -29,7 +30,15 @@ class CastingServiceProvider extends AbstractServiceProvider
             /** @var ConfigInterface $config */
             $config = $this->getContainer()->get(ConfigInterface::class);
 
-            return new Caster($pathManager, $config);
+            /** @var list<class-string> $transformerClasses */
+            $transformerClasses = $config->get(ConfigKey::CASTER_TRANSFORMERS, []);
+            $transformers = [];
+
+            foreach ($transformerClasses as $transformerClass) {
+                $transformers[] = $container->get($transformerClass);
+            }
+
+            return new Caster($pathManager, $config, $transformers);
         })->setShared(true);
     }
 }

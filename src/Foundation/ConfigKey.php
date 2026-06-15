@@ -89,6 +89,8 @@ final class ConfigKey
 
     public const string VALIDATOR_RULES = 'validator.rules';
 
+    public const string CASTER_TRANSFORMERS = 'caster.transformers';
+
     public const string VIEW_CACHE_DIR = 'view.cache_dir';
 
     public const string VIEW_DEFAULT_EXTENSION = 'view.default_extension';

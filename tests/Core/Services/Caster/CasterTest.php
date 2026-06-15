@@ -81,6 +81,32 @@ final class CasterTest extends TestCase
         self::assertSame('Debug', $dto->title);
     }
 
+    public function testCastUsesRegisteredTransformers(): void
+    {
+        $pathManager = new PathManager($this->tmpRoot, [
+            PathName::CACHE => 'storage/cache',
+        ]);
+
+        $config = $this->createStub(ConfigInterface::class);
+        $config->method('getBool')->willReturn(false);
+
+        $caster = new Caster($pathManager, $config, [
+            new CasterTestWhitespaceToNullTransformer(),
+            new CasterTestOnOffToBooleanTransformer(),
+        ]);
+
+        $dto = $caster->cast([
+            'name' => '   ',
+            'active' => 'on',
+            'archived' => 'off',
+        ], CasterTransformerTestDto::class);
+
+        self::assertInstanceOf(CasterTransformerTestDto::class, $dto);
+        self::assertNull($dto->name);
+        self::assertTrue($dto->active);
+        self::assertFalse($dto->archived);
+    }
+
     private function removeTree(string $path): void
     {
         if (!is_dir($path)) {
@@ -114,5 +140,36 @@ final class CasterRequiredDto
 {
     public function __construct(public int $id)
     {
+    }
+}
+
+final class CasterTransformerTestDto
+{
+    public ?string $name;
+    public bool $active;
+    public bool $archived;
+}
+
+final class CasterTestWhitespaceToNullTransformer
+{
+    public function __invoke(?string $value): ?string
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        return $value;
+    }
+}
+
+final class CasterTestOnOffToBooleanTransformer
+{
+    public function __invoke(string|bool|null $value): bool
+    {
+        if ($value === null || $value === '' || $value === 'off') {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 }

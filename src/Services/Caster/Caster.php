@@ -23,20 +23,32 @@ class Caster implements CasterInterface
 
     private TreeMapper $mapper;
 
+    /**
+     * @param PathManager $pathManager
+     * @param ConfigInterface $config
+     * @param array<mixed> $transformers
+     */
     public function __construct(
         private readonly PathManager $pathManager,
-        private readonly ConfigInterface $config
+        private readonly ConfigInterface $config,
+        array $transformers = [],
     ) {
         $cache = new FileSystemCache($this->pathManager->get(PathName::CACHE, self::VALINOR_CACHE_DIR));
         if ($this->config->getBool(ConfigKey::APP_DEBUG)) {
             $cache = new FileWatchingCache($cache);
         }
 
-        $this->mapper = (new MapperBuilder())
+        $builder = (new MapperBuilder())
             ->withCache($cache)
             ->allowScalarValueCasting()
-            ->allowSuperfluousKeys()
-            ->mapper();
+            ->allowSuperfluousKeys();
+
+        foreach ($transformers as $transformer) {
+            /** @var class-string $transformer */
+            $builder = $builder->registerConverter($transformer);
+        }
+
+        $this->mapper = $builder->mapper();
     }
 
     public function cast(mixed $value, string $type): mixed

@@ -2,6 +2,7 @@
 
 namespace Concept\Core\Http\Contracts;
 
+use Concept\Core\Http\Protocol\HttpStatusCode;
 use Psr\Http\Message\ResponseFactoryInterface as PsrResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -33,7 +34,7 @@ interface ResponseFactoryInterface extends PsrResponseFactoryInterface
         int $jsonFlags = JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
     ): ResponseInterface;
 
-    public function redirect(string $url, int $status = 302): ResponseInterface;
+    public function redirect(string $url, int $status = HttpStatusCode::FOUND): ResponseInterface;
 
     /**
      * @param string $urlName
@@ -41,7 +42,7 @@ interface ResponseFactoryInterface extends PsrResponseFactoryInterface
      * @param int $status
      * @return ResponseInterface
      */
-    public function redirectByName(string $urlName, array $parameters = [], int $status = 302): ResponseInterface;
+    public function redirectByName(string $urlName, array $parameters = [], int $status = HttpStatusCode::FOUND): ResponseInterface;
 
-    public function back(int $status = 302, string $fallback = '/'): ResponseInterface;
+    public function back(int $status = HttpStatusCode::FOUND, string $fallback = '/'): ResponseInterface;
 }

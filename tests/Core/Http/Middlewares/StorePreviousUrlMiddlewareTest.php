@@ -12,15 +12,14 @@ use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Tests\Fixtures\Core\SessionFixture;
 use Tests\Fixtures\Core\RecordingHandler;
 
 final class StorePreviousUrlMiddlewareTest extends TestCase
 {
     public function testTracksCurrentAndPreviousUrlOnSequentialGetRequests(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $middleware = new StorePreviousUrlMiddleware($session);
         $response = new Response();
 
@@ -45,7 +44,7 @@ final class StorePreviousUrlMiddlewareTest extends TestCase
 
     public function testPostUsesCurrentUrlAsSafeBack(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $session->set(SessionKey::CURRENT_URL, 'https://app.test/form');
         $middleware = new StorePreviousUrlMiddleware($session);
 
@@ -61,7 +60,7 @@ final class StorePreviousUrlMiddlewareTest extends TestCase
 
     public function testAjaxGetDoesNotShiftSessionUrls(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $session->set(SessionKey::CURRENT_URL, 'https://app.test/page');
         $middleware = new StorePreviousUrlMiddleware($session);
 

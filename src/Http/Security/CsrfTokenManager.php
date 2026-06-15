@@ -3,7 +3,7 @@
 namespace Concept\Core\Http\Security;
 
 use Concept\Core\Services\Session\SessionKey;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Concept\Core\Services\Session\Contracts\SessionInterface;
 
 class CsrfTokenManager
 {

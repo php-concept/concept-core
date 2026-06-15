@@ -4,12 +4,13 @@ namespace Concept\Core\Providers\Http;
 
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Foundation\ConfigKey;
+use Concept\Core\Services\Session\Contracts\FlashBagInterface;
+use Concept\Core\Services\Session\Contracts\SessionInterface;
+use Concept\Core\Services\Session\FlashBag;
+use Concept\Core\Services\Session\Session;
 use Concept\Core\Services\Telemetry\TelemetryEvent;
 use Concept\Core\Services\Telemetry\TelemetryTrait;
 use League\Container\ServiceProvider\AbstractServiceProvider;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
@@ -42,7 +43,7 @@ class SessionServiceProvider extends AbstractServiceProvider
                 new NativeFileSessionHandler()
             );
 
-            $session = new Session($storage);
+            $session = new Session($storage, flashes: new FlashBag());
 
             if (!$session->isStarted()) {
                 $session->start();
@@ -54,7 +55,7 @@ class SessionServiceProvider extends AbstractServiceProvider
         $container->add(FlashBagInterface::class, function () use ($container) {
             $this->telemetry()?->mark(TelemetryEvent::FRAMEWORK_SERVICE_AWAKENING, FlashBagInterface::class);
 
-            /** @var Session $session */
+            /** @var SessionInterface $session */
             $session = $container->get(SessionInterface::class);
 
             return $session->getFlashBag();

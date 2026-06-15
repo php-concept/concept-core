@@ -16,7 +16,7 @@ use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Concept\Core\Services\Session\Contracts\FlashBagInterface;
 
 final class HandleValidationExceptionMiddlewareTest extends TestCase
 {
@@ -38,7 +38,7 @@ final class HandleValidationExceptionMiddlewareTest extends TestCase
 
         $requestFormat = new RequestFormat();
         $flash = $this->createMock(FlashBagInterface::class);
-        $flash->expects(self::never())->method('set');
+        $flash->expects(self::never())->method('addError');
 
         $middleware = new HandleValidationExceptionMiddleware($responseFactory, $requestFormat, $flash);
 
@@ -65,8 +65,12 @@ final class HandleValidationExceptionMiddlewareTest extends TestCase
 
         $requestFormat = new RequestFormat();
 
+        $errorMessage = null;
         $sets = [];
         $flash = $this->createStub(FlashBagInterface::class);
+        $flash->method('addError')->willReturnCallback(function (string $message) use (&$errorMessage): void {
+            $errorMessage = $message;
+        });
         $flash->method('set')->willReturnCallback(function (string $k, mixed $v) use (&$sets): void {
             $sets[$k] = $v;
         });
@@ -83,7 +87,7 @@ final class HandleValidationExceptionMiddlewareTest extends TestCase
         $response = $middleware->process($request, $handler);
 
         self::assertSame($back, $response);
-        self::assertSame('Validation failed', $sets['error']);
+        self::assertSame('Validation failed', $errorMessage);
         self::assertSame(['x' => ['bad']], $sets[SessionKey::VALIDATION_ERRORS]);
         self::assertSame(['x' => 'old'], $sets[SessionKey::VALIDATION_DATA]);
     }

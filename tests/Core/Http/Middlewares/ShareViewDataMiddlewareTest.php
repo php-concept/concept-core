@@ -10,16 +10,15 @@ use Concept\Core\Services\View\ViewKey;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Concept\Core\Services\Session\Contracts\FlashBagInterface;
+use Tests\Fixtures\Core\SessionFixture;
 use Tests\Fixtures\Core\RecordingHandler;
 
 final class ShareViewDataMiddlewareTest extends TestCase
 {
     public function testAddsViewContextAttributeForDownstream(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $csrf = new CsrfTokenManager($session);
         $token = $csrf->getToken();
 

@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Concept\Core\Services\Session\Contracts\FlashBagInterface;
 
 class HandleValidationExceptionMiddleware implements MiddlewareInterface
 {
@@ -34,7 +34,7 @@ class HandleValidationExceptionMiddleware implements MiddlewareInterface
                 );
             }
 
-            $this->flashBag->set('error', $e->getMessage());
+            $this->flashBag->addError($e->getMessage());
             $this->flashBag->set(SessionKey::VALIDATION_ERRORS, $e->getErrors());
             $this->flashBag->set(SessionKey::VALIDATION_DATA, $e->getOldData());
 

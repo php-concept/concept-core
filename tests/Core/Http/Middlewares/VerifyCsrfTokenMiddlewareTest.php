@@ -12,14 +12,13 @@ use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Tests\Fixtures\Core\SessionFixture;
 
 final class VerifyCsrfTokenMiddlewareTest extends TestCase
 {
     public function testIgnoresSafeMethods(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $middleware = new VerifyCsrfTokenMiddleware(new CsrfTokenManager($session));
 
         $handler = $this->createMock(RequestHandlerInterface::class);
@@ -32,7 +31,7 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
 
     public function testAllowsValidTokenInParsedBody(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $token = $manager->getToken();
         $middleware = new VerifyCsrfTokenMiddleware($manager);
@@ -49,7 +48,7 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
 
     public function testAllowsValidTokenInHeader(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $token = $manager->getToken();
         $middleware = new VerifyCsrfTokenMiddleware($manager);
@@ -66,7 +65,7 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
 
     public function testAllowsValidTokenForPatchMethod(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $token = $manager->getToken();
         $middleware = new VerifyCsrfTokenMiddleware($manager);
@@ -83,7 +82,7 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
 
     public function testAllowsUrlEncodedXsrfTokenHeader(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $token = $manager->getToken();
         $middleware = new VerifyCsrfTokenMiddleware($manager);
@@ -100,7 +99,7 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
 
     public function testFallsBackToHeaderWhenBodyTokenIsNotString(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $token = $manager->getToken();
         $middleware = new VerifyCsrfTokenMiddleware($manager);
@@ -118,7 +117,7 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
 
     public function testRejectsRequestWithoutAnyTokenSource(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $manager->getToken();
         $middleware = new VerifyCsrfTokenMiddleware($manager);
@@ -135,7 +134,7 @@ final class VerifyCsrfTokenMiddlewareTest extends TestCase
 
     public function testRejectsInvalidToken(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $manager->getToken();
         $middleware = new VerifyCsrfTokenMiddleware($manager);

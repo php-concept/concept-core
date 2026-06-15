@@ -4,10 +4,11 @@ namespace Tests\Core\Providers;
 
 use Concept\Core\Services\Config\Contracts\ConfigInterface;
 use Concept\Core\Providers\Http\SessionServiceProvider;
+use Concept\Core\Services\Session\Contracts\FlashBagInterface;
+use Concept\Core\Services\Session\Contracts\SessionInterface;
+use Concept\Core\Services\Session\FlashType;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class SessionServiceProviderTest extends TestCase
 {
@@ -43,7 +44,7 @@ final class SessionServiceProviderTest extends TestCase
 
         /** @var FlashBagInterface $flash */
         $flash = $container->get(FlashBagInterface::class);
-        $flash->set('info', 'ok');
-        self::assertSame(['ok'], $session->getFlashBag()->get('info'));
+        $flash->addInfo('ok');
+        self::assertSame(['ok'], $session->getFlashBag()->get(FlashType::INFO));
     }
 }

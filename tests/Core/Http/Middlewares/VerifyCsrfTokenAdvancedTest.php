@@ -12,8 +12,7 @@ use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Tests\Fixtures\Core\SessionFixture;
 
 final class VerifyCsrfTokenAdvancedTest extends TestCase
 {
@@ -23,7 +22,7 @@ final class VerifyCsrfTokenAdvancedTest extends TestCase
      */
     public function testFailsWhenSessionTokenWasRegenerated(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         
         $oldToken = $manager->getToken();
@@ -50,7 +49,7 @@ final class VerifyCsrfTokenAdvancedTest extends TestCase
      */
     public function testFailsWithIncorrectlyDecodedXsrfToken(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
         $manager->getToken();
         

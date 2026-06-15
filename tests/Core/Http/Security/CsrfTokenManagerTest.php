@@ -5,14 +5,13 @@ namespace Tests\Core\Http\Security;
 use Concept\Core\Http\Security\CsrfTokenManager;
 use Concept\Core\Services\Session\SessionKey;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Tests\Fixtures\Core\SessionFixture;
 
 final class CsrfTokenManagerTest extends TestCase
 {
     public function testGetTokenGeneratesAndReusesToken(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
 
         $first = $manager->getToken();
@@ -25,7 +24,7 @@ final class CsrfTokenManagerTest extends TestCase
 
     public function testGetTokenReturnsEmptyStringWhenSessionValueIsNotString(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $session->set(SessionKey::CSRF_TOKEN, ['unexpected']);
 
         $manager = new CsrfTokenManager($session);
@@ -35,7 +34,7 @@ final class CsrfTokenManagerTest extends TestCase
 
     public function testValidateReturnsFalseWhenTokenMissingOrInvalid(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
 
         self::assertFalse($manager->validate(null));
@@ -47,7 +46,7 @@ final class CsrfTokenManagerTest extends TestCase
 
     public function testValidateReturnsTrueWhenTokenMatches(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $manager = new CsrfTokenManager($session);
 
         $token = $manager->getToken();
@@ -57,7 +56,7 @@ final class CsrfTokenManagerTest extends TestCase
 
     public function testValidateReturnsFalseWhenSessionTokenIsNotString(): void
     {
-        $session = new Session(new MockArraySessionStorage());
+        $session = SessionFixture::make();
         $session->set(SessionKey::CSRF_TOKEN, ['unexpected']);
 
         $manager = new CsrfTokenManager($session);
